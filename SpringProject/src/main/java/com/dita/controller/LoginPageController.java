@@ -13,9 +13,17 @@ import lombok.extern.java.Log;
 public class LoginPageController {
 
 	@GetMapping("/Login")
-	public String showAttendancePage(Model model) {
+	public String showLoginPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능
-		return "Login/Login"; //templates/admin/adminMemberManage.html 호출
+		return "Login/Login";
+	}
+	@GetMapping("/Join")
+	public String showJoinPage(Model model) {
+		return "Login/Join";
+	}
+	@GetMapping("/Findid")
+	public String showFindidpage(Model model) {
+		return "Login/Findid";
 	}
 	
 }
