@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출퇴근 내역</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="sidebar">
+    <h3>내 프로필</h3>
+    <ul>
+      <li>알림 <span style="color: red;">●</span></li>
+      <li>홈</li>
+      <li>회원 관리</li>
+      <li>일정 관리</li>
+      <li>병실 관리</li>
+      <li>통계</li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <div class="status-boxes">
+      <div class="status-box">정상출근<br><strong>3건</strong></div>
+      <div class="status-box red">근태이상<br><strong>2건</strong></div>
+      <div class="status-box purple">수정<br><strong>3건</strong></div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>일자</th>
+            <th>이름</th>
+            <th>부서</th>
+            <th>직급</th>
+            <th>근로제 유형</th>
+            <th>출근시각</th>
+            <th>출근위치</th>
+            <th>퇴근시각</th>
+            <th>퇴근위치</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10/15(일)</td>
+            <td>최직원</td>
+            <td>T_행복주식회사</td>
+            <td>사원</td>
+            <td>일반</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="label normal">정상처리</span></td>
+          </tr>
+          <tr>
+            <td>10/13(금)</td>
+            <td>최직원</td>
+            <td>T_행복주식회사</td>
+            <td>사원</td>
+            <td>일반</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="label abnormal">근태이상</span></td>
+          </tr>
+          <!-- 추가 행을 여기에 삽입 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
