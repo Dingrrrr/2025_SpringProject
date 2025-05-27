@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의료 기록 차트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 200px;
+            background-color: white;
+            border-right: 1px solid #ddd;
+            padding: 20px 0;
+        }
+
+        .sidebar .profile {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .profile-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #333;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .sidebar .menu-item.active {
+            background-color: #e3f2fd;
+            border-right: 3px solid #2196f3;
+        }
+
+        .sidebar .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            opacity: 0.7;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .search-btn {
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .patient-info {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .patient-details {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .content-area {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .chart-section {
+            flex: 2;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .chart-btn {
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .chart-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .chart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .chart-table th,
+        .chart-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .chart-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .chart-table .row-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .chart-table td {
+            height: 50px;
+        }
+
+        .notes-section {
+            flex: 1;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .notes-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .notes-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span>내 프로필</span>
+        </div>
+        
+        <div class="menu-item">
+            <div class="menu-icon">🔔</div>
+            <span>알림</span>
+        </div>
+        
+        <div class="menu-item active">
+            <div class="menu-icon">🏠</div>
+            <span>홈</span>
+        </div>
+        
+        <div class="menu-item">
+            <div class="menu-icon">💜</div>
+            <span>바이탈 기록</span>
+        </div>
+        
+        <div class="menu-item">
+            <div class="menu-icon">✏️</div>
+            <span>예약</span>
+        </div>
+        
+        <div class="menu-item">
+            <div class="menu-icon">📋</div>
+            <span>차트</span>
+        </div>
+        
+        <div class="menu-item">
+            <div class="menu-icon">👥</div>
+            <span>투약 및 처치 기록</span>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="환자 검색">
+                <button class="search-btn">🔍</button>
+            </div>
+            <div class="patient-info">이화진 환자</div>
+            <div class="patient-details">성별:남 나이:26 신장:174 체중:73</div>
+        </div>
+
+        <!-- 컨텐츠 영역 -->
+        <div class="content-area">
+            <!-- 차트 섹션 -->
+            <div class="chart-section">
+                <div class="chart-controls">
+                    <button class="chart-btn active">작성하기</button>
+                    <button class="chart-btn">저장하기</button>
+                </div>
+
+                <table class="chart-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;"></th>
+                            <th style="width: 120px;">아침</th>
+                            <th style="width: 120px;">점심</th>
+                            <th style="width: 120px;">저녁</th>
+                            <th style="width: 120px;">야간</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="row-header">혈압</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">심박수</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">체온</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">호흡수</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 특이사항 섹션 -->
+            <div class="notes-section">
+                <div class="notes-title">환자 특이사항</div>
+                <form class="notes-form">
+                    <div class="form-group">
+                        <label class="form-label">약물</label>
+                        <input type="text" class="form-input" placeholder="약물 정보를 입력하세요">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">질병</label>
+                        <textarea class="form-input form-textarea" placeholder="질병 정보를 입력하세요"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">기타</label>
+                        <textarea class="form-input form-textarea" placeholder="기타 특이사항을 입력하세요"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 메뉴 클릭 이벤트
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 차트 버튼 클릭 이벤트
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (this.textContent === '저장하기') {
+                    alert('차트가 저장되었습니다.');
+                }
+            });
+        });
+
+        // 차트 셀 클릭 이벤트 (값 입력)
+        document.querySelectorAll('.chart-table td:not(.row-header)').forEach(cell => {
+            cell.addEventListener('click', function() {
+                if (!this.querySelector('input')) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.style.width = '100%';
+                    input.style.border = 'none';
+                    input.style.textAlign = 'center';
+                    input.value = this.textContent;
+                    
+                    input.addEventListener('blur', function() {
+                        cell.textContent = this.value;
+                    });
+                    
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            this.blur();
+                        }
+                    });
+                    
+                    this.textContent = '';
+                    this.appendChild(input);
+                    input.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
