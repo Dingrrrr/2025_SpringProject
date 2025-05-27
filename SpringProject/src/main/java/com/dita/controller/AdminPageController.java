@@ -13,8 +13,9 @@ import lombok.extern.java.Log;
 public class AdminPageController {
 	
 	@GetMapping("/adminMemberManage")
-    public void showAttendancePage(Model model) {
-        
+    public String showAttendancePage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "admin/adminMemberManage"; // templates/admin/adminMemberManage.html 호출
     }
 	
 }
