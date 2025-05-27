@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang = "ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수납 홈</title>
+<link rel="stylesheet" href="/css/acceptanceHomestyle.css">
+
+<style>
+
+</style>
+</head>
+<body>
+<!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span>내 프로필</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">👥</div>
+		<span>예약</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">👥</div>
+		<span>입원</span>
+	</div>
+</div>
+
+<!-- 메인 -->
+<div class="top-menu-bar">
+    <!-- 왼쪽 영역: 예약 -->
+    <div class="menu-section">
+        <span class="menu-title">|예약</span>
+        <button class="icon-btn btn-reset">🔄 초기화</button>
+        <select class="dropdown">
+            <option>11</option>
+            <option>12</option>
+        </select>
+        <label class="label-text">내원접수</label>
+    </div>
+
+    <!-- 가운데 영역: 접수 -->
+    <div class="menu-section reception-menu">
+        <span class="menu-title">|접수</span>
+        <button class="action-btn">+ 상담등록</button>
+        <button class="action-btn">+ 하이패스 수납</button>
+        <button class="alert-btn">🔴 내원취소</button>
+    </div>
+
+    <!-- 오른쪽 영역: 진료 -->
+    <div class="menu-section treatment-menu">
+        <span class="menu-title">|진료</span>
+        <button class="icon-btn">👤 수납</button>
+        <button class="icon-btn">📝 진료등록</button>
+        <button class="icon-btn">✔️ 귀가처리</button>
+        <button class="icon-btn">🔍 인쇄</button>
+    </div>
+</div>
+<!-- 하단 영역 -->
+<div class="content-wrapper">
+    <!-- 예약 영역 -->
+    <div class="column reservation-column">
+        <div class ="header">
+        	<div class = "search-bar">
+        		<input type = "text" class="search-input" placeholder="환자 검색">
+        		<button class="search-btn">검색</button>
+        	</div>
+        </div>
+        
+   <!-- 예약현황  -->
+    <div class="reservation-topbar">
+        <span class="reservation-title">예약현황(14명)</span>
+        <div class="reservation-actions">
+            <button class="action-btn">+ 예약등록</button>
+            <button class="action-btn">+ 고객등록</button>
+        </div>
+    </div>
+	<!-- 예약 리스트 -->
+		 <ul class="reservation-list">
+        	<li class="reservation-item">
+            	<span class="time">13:00 전</span>
+            	<div class="info">
+               	 <div class="name">기묘진 (남) 010-7191-8111</div>
+                	<div class="details">예약: 성애네트웍스 / 재진 / 예약관리3</div>
+            	</div>
+        	</li>
+        </ul>
+    </div>
+
+    <!-- 접수 영역 -->
+    <div class="column reception-column">
+          <!-- 날짜 영역 -->
+  <div class="date-header">
+    <button class="nav-btn">📅 날짜이동</button>
+    <button class="nav-arrow">◀</button>
+    <span class="date-text">2023-08-28 월요일</span>
+    <button class="nav-arrow">▶</button>
+    <button class="nav-btn">🔄 새로고침</button>
+  </div>
+
+  <!-- 접수현황 상단 바 -->
+  <div class="reception-topbar">
+    <span class="reception-title">접수현황(3명)</span>
+    <div class="filter-options">
+      <label><input type="radio" name="filter" checked> 전체</label>
+      <label><input type="radio" name="filter"> 예약</label>
+      <label><input type="radio" name="filter"> 비예약</label>
+    </div>
+  </div>
+
+  <!-- 접수 리스트 -->
+  <ul class="reception-list">
+    <li class="reception-item">
+      <div class="times">
+        <span class="time1">15:00 전</span>
+        <span class="time2">18:36 내원</span>
+      </div>
+      <div class="info">
+        <div class="name">전향애(여) 010-7937-6626 [0002]</div>
+        <div class="details">
+          접수: 성민네트웍스 | 예약: 김치호 | 재진 | 예약관리3
+        </div>
+      </div>
+    </li>
+   </ul>
+
+    </div>
+
+    <!-- 진료 영역 -->
+    <div class="column treatment-column">
+         <!-- 상단 탭 -->
+  <div class="treatment-tabs">
+    <button class="tab-btn active">오늘통계</button>
+    <button class="tab-btn">귀가</button>
+  </div>
+  
+   <div class="treatment-tabs-option ">
+      <select class="select-all">
+      <option>전체선택</option>
+      <option>선택해제</option>
+    </select>
+  </div>
+
+  <!-- 수납/진료 현황 파란 바 -->
+  <div class="treatment-status-bar">
+    수납 [대기/완료] (0명/1명)<br>
+    진료 [대기/중/완료] (0명/0명/0명)
+  </div>
+
+  <!-- 진료 리스트 -->
+  <ul class="treatment-list">
+    <li class="treatment-item">
+      <div class="treatment-top">
+        <div class="left-time">
+          <span class="time-main">13:00 전</span>
+          <span class="time-sub">09:16 수납완료</span>
+        </div>
+        <div class="patient-name">
+          테테투스스(여) 010-1234-5678
+        </div>
+      </div>
+
+      <div class="treatment-info">
+        <div><strong>접수:</strong> 상담 성애네트웍스 / <strong>조진:</strong> 외국인상담</div>
+        <div>[카드] 234,422원 [현금] 0원 [통장] 0원</div>
+        <div>▶ 치료지시 ▶ 치료1 ///</div>
+        <div>▶ 치료지시 ▶ 치료2 ///</div>
+        <div>▶ 치료지시 ▶ 치료3, 부귀세 ///</div>
+      </div>
+    </li>
+   </ul>
+
+    </div>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

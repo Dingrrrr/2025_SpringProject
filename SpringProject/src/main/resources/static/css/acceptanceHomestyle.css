@@ -1,0 +1,488 @@
+@charset "UTF-8";
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 180px;
+            background-color: white;
+            border-right: 1px solid #ddd;
+            padding: 20px 0;
+        }
+
+        .sidebar .profile {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .profile-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #333;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .sidebar .menu-item.active {
+            background-color: #e3f2fd;
+            border-right: 3px solid #2196f3;
+        }
+
+        .sidebar .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            opacity: 0.7;
+        }
+        
+        /*메인*/
+        .main-content{
+        flex:1;
+        padding:20px;
+        display:flex;
+        flex-direction: column;
+        }
+        
+        .header{
+        	background:white;
+        	padding:15px 20px;
+        	board-radius:8px;
+        	margin-bottom: 20px;
+        	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+		
+		.top-menu-bar {
+		    display: flex;
+		    justify-content: space-between; /* 또는 space-around, space-evenly */
+		    align-items: center;
+		    background-color: white;
+		    padding: 15px 20px;
+		    margin-left: 180px; /* 사이드바 너비만큼 오른쪽으로 */
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		    position: fixed;
+		    width: calc(100% - 180px); /* 사이드바를 제외한 너비 */
+		    z-index: 100;
+		}
+		
+		.menu-section {
+		    display: inline-flex;  /* flex는 그대로 사용 */
+		    align-items: center;
+		    gap: 10px;
+		    margin-right: 30px;
+		    flex-shrink: 0;
+		}
+		.treatment-menu {
+		    margin-left: auto;         /* 원래 자동 오른쪽 정렬을 막고 */
+		    margin-right: 135px;        /* 원하는 만큼 왼쪽으로 당김 (조절 가능) */
+		}
+		.reception-menu {
+		    margin-left: auto;
+		    margin-right: -70px; /* ← 숫자 조절로 우측 밀기 */
+		}
+		.menu-title {
+		    font-weight: bold;
+		    margin-right: 8px;
+		}
+		
+		.icon-btn, .action-btn, .alert-btn, .dropdown, .label-text {
+		    margin-right: 5px;
+		}
+		button {
+		    background: none;
+		    border: none;
+		    padding: 0;
+		    margin: 0;
+		    font: inherit;
+		    cursor: pointer;
+		}
+		.btn-reset {
+    		margin-right: 100px;  /* 기본 5px + 추가 여백 */
+		}
+		.content-wrapper {
+		    display: flex;
+		    padding: 100px 20px 20px 200px; /* 위 여백은 top-menu-bar와 겹치지 않도록 */
+		    gap: 20px;
+				}
+				
+		/* content-wrapper 영역을 기준으로 위치 잡기 위해 relative 설정 */
+		.content-wrapper {
+		    position: relative;
+    		height: auto;  /* ← 여기! */
+    		min-height: 100vh;
+		    background-color: #f5f5f5;
+		}
+		
+		/* 공통 칼럼 스타일 */
+		.column {
+		    position: absolute;
+		    background-color: white;
+		    border: 1px solid #ddd;
+		    border-radius: 10px;
+		    padding: 20px;
+		    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+		    max-height: 90vh;
+		    overflow-y: auto;
+		}
+		
+		/* 예약 칼럼 위치 및 크기 조정 */
+		.reservation-column {
+		    width: 600px;
+		    height:900px;
+		    top: 70px;
+		    left: 10px;
+		}
+		
+		/* 접수 칼럼 위치 및 크기 조정 */
+		.reception-column {
+		    width: 520px;
+		    height:900px;
+		    top: 70px;
+		    left: 630px; /* 예약 칼럼 오른쪽으로 이동 */
+		}
+		
+		/* 진료 칼럼 위치 및 크기 조정 */
+		.treatment-column {
+		    width: 520px;
+		    height: 900px;
+		    top: 70px;
+		    left: 1170px; /* 접수 칼럼 오른쪽으로 이동 */
+		}
+	
+	/* 검색바 컨테이너 크기 조정 */
+	.search-bar {
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    width: 100%;         /* 너비 100% 사용 */
+	    height: 40px;        /* ✅ 검색바 높이 조정 */
+	}
+	
+	/* 검색 input 크기 조정 */
+	.search-input {
+	    flex: 1;             /* 나머지 공간 차지 */
+	    padding: 8px 12px;
+	    font-size: 14px;
+	    border: 1px solid #ccc;
+	    border-radius: 4px;
+	    height: 100%;        /* ✅ 부모 높이에 맞춤 */
+	}
+	
+	/* 버튼 크기 조정 */
+	.search-btn {
+	    padding: 8px 14px;
+	    font-size: 16px;
+	    height: 100%;        /* ✅ 부모 높이에 맞춤 */
+	    border: none;
+	    background-color: #3f78c5;
+	    color: white;
+	    border-radius: 4px;
+	    cursor: pointer;
+	}
+	
+	.reservation-topbar {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    background-color: #3f78c5;
+	    color: white;
+	    padding: 10px 15px;
+	    border-radius: 5px;
+	    font-size: 14px;
+	    font-weight: bold;
+	    margin: 10px 0; /* 검색창/리스트 사이 간격 */
+	}
+
+	/* 우측 버튼 영역 */
+	.reservation-actions {
+	    display: flex;
+	    gap: 10px;
+	}
+	
+	.reservation-actions .action-btn {
+	    background-color: white;
+	    color: #3f78c5;
+	    border: none;
+	    padding: 5px 10px;
+	    font-weight: bold;
+	    border-radius: 4px;
+	    cursor: pointer;
+	    font-size: 13px;
+	}
+	
+	/*예약 리스트*/
+	.reservation-list {
+	    list-style: none;
+	    padding: 0;
+	    margin-top: 15px; /* 검색창과 거리 */
+	    max-height: 720px;
+	    overflow-y: auto;
+	}
+	
+	.reservation-item {
+	    display: flex;
+	    gap: 10px;
+	    padding: 10px;
+	    border-bottom: 1px solid #ddd;
+	    font-size: 14px;
+	}
+	
+	.reservation-item .time {
+	    color: green;
+	    font-weight: bold;
+	    width: 70px;
+	    white-space: nowrap;
+	}
+	
+	.reservation-item .info .name {
+	    font-weight: bold;
+	}
+	
+	.reservation-item .info .details {
+	    font-size: 13px;
+	    color: #555;
+	}
+	
+	
+	/*접수 영역*/
+	
+	/* 날짜 헤더 */
+	.date-header {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  margin-bottom: 10px;
+	  font-size: 16px;
+	  height: 78px;
+	}
+	/*화살표*/
+	.date-header .nav-btn {
+	  background-color: transparent;
+	  border: none;
+	  cursor: pointer;
+	  font-size: 15px;
+	}
+	
+	.date-nav {
+	  display: flex;
+	  align-items: center;
+	  gap: 8px;
+	  flex-grow: 1;
+	  justify-content: center; /* 가운데 정렬 */
+	}
+	
+	.nav-arrow {
+	  background-color: transparent;
+	  border: none;
+	  font-size: 18px;
+	  font-weight: bold;
+	  cursor: pointer;
+	  color: #333;
+	}
+	
+	/* 접수 상단 */
+	.reception-topbar {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  background-color: #3f78c5;
+	  color: white;
+	  padding: 8px 12px;
+	  border-radius: 5px;
+	  margin-bottom: 10px;
+	  font-size: 14px;
+	  height:48px;
+	}
+	
+	.reception-title {
+	  font-weight: bold;
+	}
+	
+	.filter-options label {
+	  margin-left: 10px;
+	  font-size: 13px;
+	  cursor: pointer;
+	}
+	
+	/* 접수 리스트 */
+	.reception-list {
+	  list-style: none;
+	  padding: 0;
+	  margin-top: 19px;
+	  max-height: 720px;
+	  overflow-y: auto;
+	}
+	
+	.reception-item {
+	  display: flex;
+	  gap: 10px;
+	  padding: 10px;
+	  border-bottom: 1px solid #ddd;
+	  font-size: 13px;
+	}
+	
+	.reception-item .times {
+	  display: flex;
+	  flex-direction: column;
+	  width: 70px;
+	  color: #d32f2f; /* 빨간 시간 텍스트 */
+	  font-weight: bold;
+	}
+	
+	.reception-item .time2 {
+	  color: #2e7d32; /* 초록 내원 텍스트 */
+	  font-weight: bold;
+	}
+	
+	.reception-item .info .name {
+	  font-weight: bold;
+	}
+	
+	.reception-item .info .details {
+	  font-size: 13px;
+	  color: #555;
+	}	
+	
+	/* 상단 탭 버튼 */
+	.treatment-tabs {
+	  display: flex;
+	  align-items: center;
+	  margin-bottom: 10px;
+	}
+	
+	.treatment-tabs-option {
+	  position: absolute;  /* 위치 자유 조정 가능하게 설정 */
+	  right: 20px;          /* 오른쪽에서 10px */
+	  top: 10px;             /* 위쪽에서 6px */
+	  font-size: 13px;
+	  padding: 5px;
+	}
+	
+	.tab-btn {
+	  background-color: white;
+	  border: 1px solid #ddd;
+	  padding: 6px 10px;
+	  margin-right: 5px;
+	  cursor: pointer;
+	  font-size: 13px;
+	  border-radius: 4px;
+	}
+	
+	.tab-btn.active {
+	  background-color: #3f78c5;
+	  color: white;
+	  border-color: #3f78c5;
+	}
+	
+	.select-all {
+	  padding: 5px;
+	  font-size: 13px;
+	}
+	
+	/* 파란 상태 바 */
+	.treatment-status-bar {
+	  background-color: #3f78c5;
+	  color: white;
+	  padding: 10px;
+	  border-radius: 5px;
+	  font-size: 13px;
+	  margin-bottom: 10px;
+	  line-height: 1.4;
+	}
+	
+	/* 진료 리스트 */
+	.treatment-list {
+	  list-style: none;
+	  padding: 0;
+	  margin: 0;
+	  overflow-y: auto;
+	  max-height: 700px;
+	}
+	
+	.treatment-item {
+	  border-bottom: 1px solid #ddd;
+	  margin-bottom: 10px;
+	}
+	
+	.treatment-top {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  font-size: 14px;
+	  padding: 5px 0;
+	}
+	
+	.left-time {
+	  display: flex;
+	  flex-direction: column;
+	  color: #d32f2f;
+	  font-weight: bold;
+	  margin-left: 10px;
+	}
+	
+	.time-sub {
+	  color: #2e7d32;
+	  font-size: 13px;
+	  
+	}
+	
+	/* 진료내역 */
+	.treatment-info {
+	  font-size: 13px;
+	  background-color: white; /* 연노랑 */
+	  padding: 8px;
+	  border-radius: 4px;
+	  line-height: 1.6;
+	}
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
