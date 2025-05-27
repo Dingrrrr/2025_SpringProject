@@ -46,7 +46,7 @@ public class Admission {
     @Column(name = "admitted_at", nullable = false)
     private LocalDateTime admittedAt;// 입원 일시
 
-    @Column(name = "discharge_at", nullable = false)
+    @Column(name = "discharge_at")
     private LocalDateTime dischargeAt;// 퇴원 일시
 
     @Column(name = "admission_reason")
