@@ -110,7 +110,7 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-					</excludes>
+				 <groupId>com.mysema.maven</groupId>	</excludes>
 				</configuration>
 			</plugin>
 			
