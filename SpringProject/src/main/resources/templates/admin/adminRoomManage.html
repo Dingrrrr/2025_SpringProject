@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>병실 관리</title>
+  <title>병상 관리</title>
   <link rel="stylesheet" href="/css/adminstyle.css">
 </head>
 <body>
@@ -26,52 +26,81 @@
   </div>
 
   <div class="main">
-    <!-- 병실 유형 블록들 -->
+    <!-- 병동: 301호 -->
     <div class="room-type">
       <div class="room-header">
-        <span>디럭스</span>
-        <button class="btn-config">🏴‍☠️ 타입설정</button>
+        <span>병동 301호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+          <button class="btn-action">수정</button>
+          <button class="btn-action">삭제</button>
+        </div>
       </div>
       <div class="room-list">
-        <div class="room-box">807호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">808호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">810호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">809호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">1동<br><span>객실 테마 없음</span></div>
+        <div class="room-box">
+          <strong>bed_id: 101</strong><br>
+          침대 번호: 1A<br>
+          상태: 사용 중<br>
+          입원 환자: 김철수
+        </div>
+        <div class="room-box">
+          <strong>bed_id: 102</strong><br>
+          침대 번호: 1B<br>
+          상태: 사용 중<br>
+          입원 환자: 이영희
+        </div>
       </div>
     </div>
 
+    <!-- 병동: 302호 -->
     <div class="room-type">
       <div class="room-header">
-        <span>스탠다드</span>
-        <button class="btn-config">🏴‍☠️ 타입설정</button>
+        <span>병동 302호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+          <button class="btn-action">수정</button>
+          <button class="btn-action">삭제</button>
+        </div>
       </div>
       <div class="room-list">
-        <div class="room-box">507호<br><span>비흡연</span></div>
-        <div class="room-box">601호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">2동<br><span>객실 테마 없음</span></div>
-        <div class="room-box">209호<br><span>객실 테마 없음</span></div>
-        <div class="room-box">201호실<br><span>객실 테마 없음</span></div>
+        <div class="room-box">
+          <strong>bed_id: 103</strong><br>
+          침대 번호: 2A<br>
+          상태: 사용 중<br>
+          입원 환자: 박민준
+        </div>
+        <div class="room-box">
+          <strong>bed_id: 104</strong><br>
+          침대 번호: 2B<br>
+          상태: 사용 가능<br>
+          입원 환자: 없음
+        </div>
       </div>
     </div>
 
+    <!-- 병동: 303호 -->
     <div class="room-type">
       <div class="room-header">
-        <span>슈페리어 더블</span>
-        <button class="btn-config">🏴‍☠️ 타입설정</button>
+        <span>병동 303호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+          <button class="btn-action">수정</button>
+          <button class="btn-action">삭제</button>
+        </div>
       </div>
       <div class="room-list">
-        <div class="room-box">304호<br><span>객실 테마 없음</span></div>
-      </div>
-    </div>
-
-    <div class="room-type">
-      <div class="room-header">
-        <span>디럭스 더블 옵션뷰</span>
-        <button class="btn-config">🏴‍☠️ 타입설정</button>
-      </div>
-      <div class="room-list">
-        <!-- 추가 병실 가능 -->
+        <div class="room-box">
+          <strong>bed_id: 105</strong><br>
+          침대 번호: 3A<br>
+          상태: 사용 중<br>
+          입원 환자: 정수빈
+        </div>
+        <div class="room-box">
+          <strong>bed_id: 106</strong><br>
+          침대 번호: 3B<br>
+          상태: 사용 가능<br>
+          입원 환자: 없음
+        </div>
       </div>
     </div>
   </div>
