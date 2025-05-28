@@ -163,6 +163,73 @@
 		</div>
     </div>
   </div>
+	  
+<!-- ✅ 정보 확인 및 수정 모달 -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <form id="editForm">
+      <div id="formFields"></div>
+      <div style="margin-top: 20px;">
+        <button type="button" id="saveBtn" class="btn-action">저장</button>
+        <button type="button" id="deleteBtn" class="btn-action" style="background-color: #e74c3c;">삭제</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+ 
+.btn-action {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background-color: #2980b9;
+}
+
+  
+  </style>
 
   <script>
     // 탭 전환
@@ -216,6 +283,48 @@
         rows.forEach(row => tbody.appendChild(row));
       });
     });
+    
+    let selectedRow = null;
+
+ // 테이블 행 클릭 시 모달 표시 및 input 생성
+    document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        selectedRow = row;
+
+        const cells = Array.from(row.cells);
+        const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+
+        const formFields = headers.map((th, idx) => {
+          return `
+            <label>${th.textContent}</label><br>
+            <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+          `;
+        }).join('');
+        document.getElementById('formFields').innerHTML = formFields;
+
+        infoModal.style.display = 'block';
+      });
+    });
+ 
+    document.getElementById('saveBtn').addEventListener('click', () => {
+    	  const inputs = document.querySelectorAll('#formFields input');
+    	  inputs.forEach(input => {
+    	    const idx = input.getAttribute('data-idx');
+    	    selectedRow.cells[idx].textContent = input.value;
+    	  });
+
+    	  infoModal.style.display = 'none';
+    	  selectedRow = null;
+    	});
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+    	  if (confirm('정말 삭제하시겠습니까?')) {
+    	    selectedRow.remove();
+    	    infoModal.style.display = 'none';
+    	    selectedRow = null;
+    	  }
+    	});
+
   </script>
 </body>
 </html>
