@@ -26,5 +26,5 @@ public class Ward {
 	private int wardId;// 병원 고유 번호
 	
 	@Column(length = 100, nullable = false)
-	private String name;// 병동명
+	private String name;// 병실명
 }

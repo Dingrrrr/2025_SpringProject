@@ -38,7 +38,7 @@ public class Vital_sign {
 	private Patient patient; //환자 아이디
 	
 	@ManyToOne
-	@JoinColumn(name = "nurse_id", nullable = false)
+	@JoinColumn(name = "users_id", nullable = false)
 	private User nurse;// 간호사 아이디
 	
 	@CreationTimestamp

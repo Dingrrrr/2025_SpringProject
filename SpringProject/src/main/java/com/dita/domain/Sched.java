@@ -32,7 +32,7 @@ public class Sched {
 	private int scheduleId;//스케줄 고유 번호
 	
 	@ManyToOne
-	@JoinColumn(name = "staff_id", nullable = false)
+	@JoinColumn(name = "users_id", nullable = false)
 	private User user;// 직원 ID
 	
 	@Column(name = "start_time", nullable = false)

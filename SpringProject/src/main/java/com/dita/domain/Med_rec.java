@@ -37,7 +37,7 @@ public class Med_rec {
 	private Appt appt;//예약 아이디
 	
 	@ManyToOne
-	@JoinColumn(name = "doctor_id", nullable = false)
+	@JoinColumn(name = "users_id", nullable = false)
 	private User doctor;// 의사 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
