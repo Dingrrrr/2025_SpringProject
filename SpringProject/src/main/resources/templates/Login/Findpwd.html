@@ -11,15 +11,15 @@
 			<div class="left-panel"></div>
 			<div class="right-panel">
 				<form class="find-id-form" method="post" action="/Login/Findid">
-					<h2>아이디 찾기</h2>
+					<h2>비밀번호 찾기</h2>
 
 					<label for="role">직무</label> <select id="role" name="role" required>
 						<option disabled selected>직무를 선택해주세요</option>
 						<option>관리자</option>
 						<option>의사</option>
 						<option>간호사</option>
-					</select> <label for="name">이름</label> <input type="text" id="name"
-						name="name" placeholder="이름 입력" required> <label
+					</select> <label for="name">아이디</label> <input type="text" id="name"
+						name="name" placeholder="아이디 입력" required> <label
 						for="email">이메일주소</label>
 					<div class="inline">
 						<input type="email" id="email" placeholder="이메일 주소 입력" required>
@@ -28,7 +28,7 @@
 
 					<input type="text" id="code" name="code" placeholder="인증번호 입력" disabled>
 
-					<button type="submit" id="nextBtn" onclick="location.href='Resultid'" disabled>다음</button>
+					<button type="submit" id="nextBtn" onclick="location.href='Resultpwd'" disabled>다음</button>
 
 					<div class="links">
 						<a href="Findid">아이디찾기</a> | <a href="Findpwd">비밀번호 찾기</a>
