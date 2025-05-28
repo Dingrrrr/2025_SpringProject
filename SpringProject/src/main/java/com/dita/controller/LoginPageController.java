@@ -17,13 +17,30 @@ public class LoginPageController {
 		// 필요 시 model에 데이터 추가 가능
 		return "Login/Login";
 	}
+	
 	@GetMapping("/Join")
 	public String showJoinPage(Model model) {
 		return "Login/Join";
 	}
+	
 	@GetMapping("/Findid")
 	public String showFindidpage(Model model) {
 		return "Login/Findid";
+	}
+	
+	@GetMapping("/Resultid")
+	public String showResultid(Model model) {
+		return "Login/Resultid";
+	}
+	
+	@GetMapping("/Findpwd")
+	public String showFindpwdpage(Model model) {
+		return "Login/Findpwd";
+	}
+	
+	@GetMapping("/Resultpwd")
+	public String showResultpwd(Model model) {
+		return "Login/Resultpwd";
 	}
 	
 }
