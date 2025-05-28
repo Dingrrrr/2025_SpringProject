@@ -33,7 +33,7 @@ public class Notif {
 	private int notifId; //알림 아이디
 	
 	@ManyToOne
-	@JoinColumn(name ="user_id", nullable= false)
+	@JoinColumn(name ="users_id", nullable= false)
 	private User user;// 유저 아이디
 	
 	@ManyToOne
