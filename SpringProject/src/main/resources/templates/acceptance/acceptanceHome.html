@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수납 홈</title>
-<link rel="stylesheet" href="/css/acceptanceHomestyle.css">
+<link rel="stylesheet" href="/css/AcceptanceHomestyle.css">
 
 <style>
 
@@ -28,15 +28,27 @@
 		<span>홈</span>
 	</div>
 	
-	<div class = "menu-item">
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
 		<div class = "menu-icon">📋</div>
 		<span>진료</span>
 	</div>
+	<ul class="submenu">
+	<a href="acceptanceDoctor">
+   	 	<li class="submenu-item active">의사 스케줄</li></a>
+   	 <a href ="acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+
+	</ul>
 	
-	<div class = "menu-item">
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
 		<div class = "menu-icon">👥</div>
 		<span>예약</span>
 	</div>
+	
+	<ul class="submenu">
+    	<li class="submenu-item active">예약 접수</li>
+    	<li class="submenu-item">예약 관리</li>
+	</ul>
 	
 	<div class = "menu-item">
 		<div class = "menu-icon">✏️</div>
@@ -200,6 +212,38 @@
 
     </div>
 </div>
+
+<script>
+function toggleSubMenu(menuItem) {
+    const allMenuItems = document.querySelectorAll('.menu-item');
+    const allSubmenus = document.querySelectorAll('.submenu');
+
+    // 현재 이미 열려 있는 경우 닫기
+    const isActive = menuItem.classList.contains('active');
+    allMenuItems.forEach(item => item.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.style.display = 'none');
+
+    // 다시 열기 (닫기 상태였다면)
+    if (!isActive) {
+        menuItem.classList.add('active');
+        const submenu = menuItem.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'block';
+        }
+    }
+}
+
+// 하위 메뉴 클릭 시 활성화 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            submenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
+</script>
 
 
 </body>

@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>출퇴근 내역</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>관리자 회원 관리</title>
+  <link rel="stylesheet" href="/css/adminstyle.css">
 </head>
 <body>
   <div class="sidebar">
@@ -12,13 +12,9 @@
         <img src="/icons/profile.png" alt="프로필 아이콘">
         <span class="profile-text">내 프로필</span>
       </div>
-      <ul class="alert-list">
-        <li>알림</li>
-      </ul>
     </div>
 
     <ul class="nav-menu">
-      <li>홈</li>
       <li>회원 관리</li>
       <li>일정 관리</li>
       <li>병실 관리</li>
@@ -35,76 +31,210 @@
       <div class="tab-buttons">
         <button class="tab-btn active" data-tab="doctor">의사</button>
         <button class="tab-btn" data-tab="nurse">간호사</button>
-        <button class="tab-btn" data-tab="patient">환자</button>
+        <button class="tab-btn" data-tab="billing">수납원</button>
+        <button class="tab-btn" data-tab="staff">환자</button>
       </div>
 
-      <!-- 의사 탭 -->
+      <!-- 탭 반복 구조 -->
       <div class="tab-content active" id="doctor">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
-          <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="1">전공순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
-            <tr><th>이름</th><th>전공</th><th>진료 시간</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>담당 과목</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>김의사</td><td>내과</td><td>09:00 ~ 17:00</td></tr>
-            <tr><td>이의사</td><td>정형외과</td><td>10:00 ~ 18:00</td></tr>
+            <tr><td>doc001</td><td>김의사</td><td>010-1234-5678</td><td>내과</td><td>월~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
+            <tr><td>doc002</td><td>이의사</td><td>010-2345-6789</td><td>외과</td><td>월~목</td><td>08:30 ~ 16:30</td><td>출근</td></tr>
+            <tr><td>doc003</td><td>박의사</td><td>010-3456-7890</td><td>소아과</td><td>화~토</td><td>10:00 ~ 18:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 간호사 탭 -->
       <div class="tab-content" id="nurse">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
-          <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="1">병동순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
-            <tr><th>이름</th><th>근무 병동</th><th>근무 시간</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>박간호사</td><td>응급실</td><td>08:00 ~ 16:00</td></tr>
-            <tr><td>최간호사</td><td>병동2층</td><td>09:00 ~ 17:00</td></tr>
+            <tr><td>nur001</td><td>박간호사</td><td>010-8888-9999</td><td>월~토</td><td>08:00 ~ 16:00</td><td>출근</td></tr>
+            <tr><td>nur002</td><td>정간호사</td><td>010-7777-2222</td><td>화~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
+            <tr><td>nur003</td><td>한간호사</td><td>010-9999-1111</td><td>수~일</td><td>10:00 ~ 18:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 환자 탭 -->
-      <div class="tab-content" id="patient">
+      <div class="tab-content" id="billing">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
-          <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="2">병상순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
-            <tr><th>이름</th><th>입원일</th><th>병상</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>이환자</td><td>2023-10-10</td><td>A-201</td></tr>
-            <tr><td>정환자</td><td>2023-10-09</td><td>B-105</td></tr>
+            <tr><td>bill001</td><td>정수납</td><td>010-1111-2222</td><td>화~금</td><td>09:00 ~ 18:00</td><td>출근</td></tr>
+            <tr><td>bill002</td><td>이수납</td><td>010-4444-5555</td><td>월~목</td><td>08:00 ~ 16:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
+
+      <div class="tab-content" id="staff">
+		  <div class="table-controls">
+		    <div class="left-controls">
+		      <select class="filter-select">
+		        <option value="0">ID</option>
+		        <option value="1">이름</option>
+		      </select>
+		      <input type="text" class="search-input" placeholder="검색어 입력">
+		    </div>
+		    <select class="sort-select">
+		      <option value="0">ID순</option>
+		      <option value="1">이름순</option>
+		    </select>
+		  </div>
+		  <table>
+		    <thead>
+		      <tr>
+		        <th>ID</th>
+		        <th>이름</th>
+		        <th>생년월일</th>
+		        <th>전화번호</th>
+		        <th>입원 여부</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td>sta001</td>
+		        <td>홍인원</td>
+		        <td>1990-02-15</td>
+		        <td>010-3333-4444</td>
+		        <td>O</td>
+		      </tr>
+		      <tr>
+		        <td>sta002</td>
+		        <td>강인원</td>
+		        <td>1985-10-08</td>
+		        <td>010-5555-6666</td>
+		        <td>X</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</div>
     </div>
   </div>
+	  
+<!-- ✅ 정보 확인 및 수정 모달 -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <form id="editForm">
+      <div id="formFields"></div>
+      <div style="margin-top: 20px;">
+        <button type="button" id="saveBtn" class="btn-action">저장</button>
+        <button type="button" id="deleteBtn" class="btn-action" style="background-color: #e74c3c;">삭제</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+ 
+.btn-action {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background-color: #2980b9;
+}
+
+  
+  </style>
 
   <script>
     // 탭 전환
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-tab');
@@ -117,24 +247,26 @@
       });
     });
 
-    // 검색 기능
+    // 검색
     document.querySelectorAll('.tab-content').forEach(tab => {
       const searchInput = tab.querySelector('.search-input');
+      const filterSelect = tab.querySelector('.filter-select');
       const rows = tab.querySelectorAll('tbody tr');
-      if (searchInput) {
+
+      if (searchInput && filterSelect) {
         searchInput.addEventListener('input', () => {
-          const value = searchInput.value.toLowerCase();
+          const keyword = searchInput.value.toLowerCase();
+          const colIndex = parseInt(filterSelect.value);
+
           rows.forEach(row => {
-            const match = Array.from(row.cells).some(cell =>
-              cell.textContent.toLowerCase().includes(value)
-            );
-            row.style.display = match ? '' : 'none';
+            const cellText = row.cells[colIndex].textContent.toLowerCase();
+            row.style.display = cellText.includes(keyword) ? '' : 'none';
           });
         });
       }
     });
 
-    // 정렬 기능
+    // 정렬
     document.querySelectorAll('.sort-select').forEach(select => {
       select.addEventListener('change', () => {
         const table = select.closest('.tab-content').querySelector('table');
@@ -151,6 +283,48 @@
         rows.forEach(row => tbody.appendChild(row));
       });
     });
+    
+    let selectedRow = null;
+
+ // 테이블 행 클릭 시 모달 표시 및 input 생성
+    document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        selectedRow = row;
+
+        const cells = Array.from(row.cells);
+        const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+
+        const formFields = headers.map((th, idx) => {
+          return `
+            <label>${th.textContent}</label><br>
+            <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+          `;
+        }).join('');
+        document.getElementById('formFields').innerHTML = formFields;
+
+        infoModal.style.display = 'block';
+      });
+    });
+ 
+    document.getElementById('saveBtn').addEventListener('click', () => {
+    	  const inputs = document.querySelectorAll('#formFields input');
+    	  inputs.forEach(input => {
+    	    const idx = input.getAttribute('data-idx');
+    	    selectedRow.cells[idx].textContent = input.value;
+    	  });
+
+    	  infoModal.style.display = 'none';
+    	  selectedRow = null;
+    	});
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+    	  if (confirm('정말 삭제하시겠습니까?')) {
+    	    selectedRow.remove();
+    	    infoModal.style.display = 'none';
+    	    selectedRow = null;
+    	  }
+    	});
+
   </script>
 </body>
 </html>

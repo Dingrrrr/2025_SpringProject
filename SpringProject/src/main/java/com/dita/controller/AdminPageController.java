@@ -18,4 +18,22 @@ public class AdminPageController {
         return "admin/adminMemberManage"; // templates/admin/adminMemberManage.html 호출
     }
 	
+	@GetMapping("/adminCalendarManage")
+    public String showCalendarPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "admin/adminCalendarManage"; // templates/admin/adminCalendarManage.html 호출
+    }
+	
+	@GetMapping("/adminRoomManage")
+    public String showRoomPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "admin/adminRoomManage"; // templates/admin/adminRoomManage.html 호출
+    }
+	
+	@GetMapping("/adminTotalManage")
+    public String showTotalPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "admin/adminTotalManage"; // templates/admin/adminTotalManage.html 호출
+    }
+	
 }
