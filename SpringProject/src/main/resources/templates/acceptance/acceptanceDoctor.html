@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang = "ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>의사 스케줄</title>
+<link rel="stylesheet" href="/css/AcceptanceDoctorstyle.css">
+
+<style>
+
+</style>
+</head>
+<body>
+<!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span>내 프로필</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	
+	<a href="acceptanceHome" class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	<ul class="submenu">
+   	 	<li class="submenu-item active">의사 스케줄</li>
+   	 <a href = "acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+	</ul>
+	
+	<a href="acceptanceReception" class="menu-item">
+	  <div class="menu-icon">👥</div>
+	  <span>예약</span>
+	</a>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">👥</div>
+		<span>입원</span>
+	</div>
+</div>
+<div class="content">
+    <div class="schedule-header">
+        <h2>의사 스케줄</h2>
+        <span id="month-title">2025년 6월</span>
+    </div>
+    <div class="calendar">
+        <div class="calendar-row calendar-header">
+            <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+        </div>
+        <!-- JS가 생성할 달력 -->
+        <div id="calendar-body"></div>
+    </div>
+</div>
+
+<script>
+
+function toggleSubMenu(menuItem) {
+    const allMenuItems = document.querySelectorAll('.menu-item');
+    const allSubmenus = document.querySelectorAll('.submenu');
+
+    // 현재 이미 열려 있는 경우 닫기
+    const isActive = menuItem.classList.contains('active');
+    allMenuItems.forEach(item => item.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.style.display = 'none');
+
+    // 다시 열기 (닫기 상태였다면)
+    if (!isActive) {
+        menuItem.classList.add('active');
+        const submenu = menuItem.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'block';
+        }
+    }
+}
+
+// 하위 메뉴 클릭 시 활성화 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            submenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
+
+function generateCalendar(year, month) {
+    const calendarBody = document.getElementById('calendar-body');
+    calendarBody.innerHTML = ''; // 초기화
+
+    const firstDay = new Date(year, month - 1, 1); // JS는 0~11월
+    const lastDate = new Date(year, month, 0).getDate(); // 말일
+    const startDayOfWeek = firstDay.getDay(); // 0:일 ~ 6:토
+
+    const totalCells = Math.ceil((startDayOfWeek + lastDate) / 7) * 7;
+    let day = 1;
+
+    for (let i = 0; i < totalCells / 7; i++) {
+        const row = document.createElement('div');
+        row.className = 'calendar-row';
+
+        for (let j = 0; j < 7; j++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+
+            const cellIndex = i * 7 + j;
+
+            if (cellIndex >= startDayOfWeek && day <= lastDate) {
+                const dateSpan = document.createElement('span');
+                dateSpan.className = 'date';
+                dateSpan.textContent = day;
+
+                cell.appendChild(dateSpan);
+
+                // 예시로 특정 날짜에 의사 추가
+                if (day === 3 || day === 5 ||day === 10 ||day === 12 || day === 17) {
+                    const doctor1 = document.createElement('div');
+                    doctor1.className = 'doctor blue';
+                    doctor1.textContent = '이준수';
+                    cell.appendChild(doctor1);
+                }
+                if (day === 5 || day === 12 || day === 19 ||day === 30) {
+                    const doctor2 = document.createElement('div');
+                    doctor2.className = 'doctor yellow';
+                    doctor2.textContent = '김승환';
+                    cell.appendChild(doctor2);
+                }
+                if (day === 3 || day === 4 || day === 17 ||day === 30) {
+                    const doctor2 = document.createElement('div');
+                    doctor2.className = 'doctor red';
+                    doctor2.textContent = '이화진';
+                    cell.appendChild(doctor2);
+                }
+                	
+
+                day++;
+            }
+
+            row.appendChild(cell);
+        }
+
+        calendarBody.appendChild(row);
+    }
+}
+
+// 예: 2025년 6월
+generateCalendar(2025, 6);
+</script>
+</body>
+</html>
+
