@@ -38,12 +38,18 @@
       <!-- 탭 반복 구조 -->
       <div class="tab-content active" id="doctor">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
-          <select class="sort-select">
-            <option value="0">ID순</option>
-            <option value="1">이름순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
             <tr>
@@ -60,12 +66,18 @@
 
       <div class="tab-content" id="nurse">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
-          <select class="sort-select">
-            <option value="0">ID순</option>
-            <option value="1">이름순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
             <tr>
@@ -82,12 +94,18 @@
 
       <div class="tab-content" id="billing">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
-          <select class="sort-select">
-            <option value="0">ID순</option>
-            <option value="1">이름순</option>
-          </select>
-        </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
         <table>
           <thead>
             <tr>
@@ -102,25 +120,47 @@
       </div>
 
       <div class="tab-content" id="staff">
-        <div class="table-controls">
-          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
-          <select class="sort-select">
-            <option value="0">ID순</option>
-            <option value="1">이름순</option>
-          </select>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>sta001</td><td>홍인원</td><td>010-3333-4444</td><td>수~일</td><td>10:00 ~ 19:00</td><td>출근</td></tr>
-            <tr><td>sta002</td><td>강인원</td><td>010-5555-6666</td><td>월~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
-          </tbody>
-        </table>
-      </div>
+		  <div class="table-controls">
+		    <div class="left-controls">
+		      <select class="filter-select">
+		        <option value="0">ID</option>
+		        <option value="1">이름</option>
+		      </select>
+		      <input type="text" class="search-input" placeholder="검색어 입력">
+		    </div>
+		    <select class="sort-select">
+		      <option value="0">ID순</option>
+		      <option value="1">이름순</option>
+		    </select>
+		  </div>
+		  <table>
+		    <thead>
+		      <tr>
+		        <th>ID</th>
+		        <th>이름</th>
+		        <th>생년월일</th>
+		        <th>전화번호</th>
+		        <th>입원 여부</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td>sta001</td>
+		        <td>홍인원</td>
+		        <td>1990-02-15</td>
+		        <td>010-3333-4444</td>
+		        <td>O</td>
+		      </tr>
+		      <tr>
+		        <td>sta002</td>
+		        <td>강인원</td>
+		        <td>1985-10-08</td>
+		        <td>010-5555-6666</td>
+		        <td>X</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</div>
     </div>
   </div>
 
@@ -143,14 +183,17 @@
     // 검색
     document.querySelectorAll('.tab-content').forEach(tab => {
       const searchInput = tab.querySelector('.search-input');
+      const filterSelect = tab.querySelector('.filter-select');
       const rows = tab.querySelectorAll('tbody tr');
-      if (searchInput) {
+
+      if (searchInput && filterSelect) {
         searchInput.addEventListener('input', () => {
-          const value = searchInput.value.toLowerCase();
+          const keyword = searchInput.value.toLowerCase();
+          const colIndex = parseInt(filterSelect.value);
+
           rows.forEach(row => {
-            const id = row.cells[0].textContent.toLowerCase();
-            const name = row.cells[1].textContent.toLowerCase();
-            row.style.display = id.includes(value) || name.includes(value) ? '' : 'none';
+            const cellText = row.cells[colIndex].textContent.toLowerCase();
+            row.style.display = cellText.includes(keyword) ? '' : 'none';
           });
         });
       }
@@ -163,11 +206,13 @@
         const tbody = table.querySelector('tbody');
         const rows = Array.from(tbody.querySelectorAll('tr'));
         const index = parseInt(select.value);
+
         rows.sort((a, b) => {
           const aText = a.cells[index].textContent;
           const bText = b.cells[index].textContent;
           return aText.localeCompare(bText);
         });
+
         rows.forEach(row => tbody.appendChild(row));
       });
     });

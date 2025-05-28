@@ -32,7 +32,6 @@
         <div class="btn-group">
           <button class="btn-action">추가</button>
           <button class="btn-action">수정</button>
-          <button class="btn-action">삭제</button>
         </div>
       </div>
       <div class="room-list">
@@ -56,7 +55,6 @@
         <div class="btn-group">
           <button class="btn-action">추가</button>
           <button class="btn-action">수정</button>
-          <button class="btn-action">삭제</button>
         </div>
       </div>
       <div class="room-list">
@@ -80,7 +78,6 @@
         <div class="btn-group">
           <button class="btn-action">추가</button>
           <button class="btn-action">수정</button>
-          <button class="btn-action">삭제</button>
         </div>
       </div>
       <div class="room-list">
@@ -97,5 +94,87 @@
       </div>
     </div>
   </div>
+  
+  <!-- ✅ 모달 -->
+    <div id="roomModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <pre id="modalText"></pre>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .modal-content pre {
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #333;
+    }
+  </style>
+  
+  <script>
+    // 모달 요소
+    const modal = document.getElementById('roomModal');
+    const modalText = document.getElementById('modalText');
+    const closeBtn = document.querySelector('.close');
+
+    // 각 room-box 클릭 시 모달 열기
+    document.querySelectorAll('.room-box').forEach(box => {
+      box.addEventListener('click', () => {
+        modalText.textContent = box.innerText;
+        modal.style.display = 'block';
+      });
+    });
+
+    // 닫기 버튼
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    // 외부 클릭 시 닫기
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+  
+  
 </body>
 </html>
