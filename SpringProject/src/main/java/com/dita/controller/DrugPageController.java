@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DrugPageController {
 
     @GetMapping("/Drug")
-    public String showDrugPage() {
-        return "/Drug/Drug";  // templates/Drug.html 파일이 필요!
+    public String showDrugPage() { //Drug페이지
+        return "/Drug/Drug";  
     }
 }
