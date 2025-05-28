@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입</title>
+  <link rel="stylesheet" href="/css/Joinstyle.css">
+</head>
+<body>
+  <div class="container">
+    <h2>회원가입</h2>
+    <form class="register-form">
+      <label>사용자 직군</label>
+      <select>
+        <option disabled selected>사용자 유형 선택해주세요</option>
+        <option>의사</option>
+        <option>간호사</option>
+        <option>수납</option>
+      </select>
+
+      <label>이름</label>
+      <input type="text" placeholder="이름을 입력해주세요">
+
+      <label>생년월일</label>
+      <input type="date">
+
+      <label>주민등록번호</label>
+		<div class="inline jumin-wrapper">
+		  <input type="text" id="juminFront" maxlength="6" placeholder="앞 6자리">
+		  <span>-</span>
+		  <input type="text" id="juminBack" maxlength="1" placeholder="1~4">
+		  <div class="mask">●●●●●●</div>
+		</div>
+
+      <label>성별</label>
+      <select>
+        <option disabled selected>성별을 선택해주세요</option>
+        <option>남</option>
+        <option>여</option>
+      </select>
+
+      <label>아이디</label>
+      <div class="inline">
+        <input type="text" placeholder="영문 소문자 또는 영문+숫자 조합">
+        <button type="button">중복확인</button>
+      </div>
+
+      <label>비밀번호</label>
+      <input type="password" placeholder="영문 소문자 또는 영문+숫자+특수조합">
+
+      <label>비밀번호 확인</label>
+      <input type="password" placeholder="비밀번호 확인">
+
+      <label>휴대전화번호</label>
+      <input type="tel" id="phone" placeholder="010-xxxx-xxxx" maxlength="13">
+
+      <label>이메일</label>
+      <div class="inline">
+        <input type="email" placeholder="이메일을 입력하세요">
+        <button type="button">이메일인증</button>
+      </div>
+
+      <label>주소</label>
+      <input type="text" placeholder="주소를 입력해주세요">
+
+      <fieldset class="terms">
+        <legend>약관 전체 동의</legend>
+        <label><input type="checkbox"> 개인정보 처리방침 (필수)</label>
+        <label><input type="checkbox"> 스팸정보 이용약관 동의 (필수)</label>
+        <label><input type="checkbox"> 마케팅 수신 동의 (선택)</label>
+      </fieldset>
+
+      <button class="submit-btn" type="submit">가입하기</button>
+    </form>
+
+    <!-- ✅ 기능 JavaScript -->
+    <script>
+      // 주민등록번호 뒷자리 첫 숫자 제한 (1~4)
+      document.getElementById('juminBack').addEventListener('input', function () {
+        const val = this.value;
+        
+        if (val === '') {
+        	//백스페이스나 삭제 허용
+        	return;
+        }
+        
+        if (!/^[1-4]$/.test(val)) {
+          this.value = ''; // 1~4 외 입력시 초기화
+          alert("뒷번호 첫 자리는 1~4만 입력 가능합니다.");
+        }
+      });
+
+      // 전화번호 자동 포맷 (010-xxxx-xxxx)
+      const phoneInput = document.getElementById('phone');
+
+      phoneInput.addEventListener('input', function () {
+        let input = this.value.replace(/\D/g, ''); // 숫자만
+
+        if (!input.startsWith('010')) {
+          input = '010' + input;
+        }
+
+        if (input.length <= 3) {
+          this.value = input;
+        } else if (input.length <= 7) {
+          this.value = input.slice(0, 3) + '-' + input.slice(3);
+        } else {
+          this.value = input.slice(0, 3) + '-' + input.slice(3, 7) + '-' + input.slice(7, 11);
+        }
+      });
+
+      phoneInput.addEventListener('focus', function () {
+        if (!this.value.startsWith('010')) {
+          this.value = '010-';
+        }
+      });
+      
+   	  // 포커스 아웃 시 010-만 남아있으면 제거
+      phoneInput.addEventListener('blur', function () {
+        if (this.value === '010', '010-', '010-01') {
+          this.value = ''; // 입력 없이 벗어나면 placeholder 보이게
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>

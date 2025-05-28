@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>출퇴근 내역</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>관리자 회원 관리</title>
+  <link rel="stylesheet" href="/css/adminstyle.css">
 </head>
 <body>
   <div class="sidebar">
@@ -12,13 +12,9 @@
         <img src="/icons/profile.png" alt="프로필 아이콘">
         <span class="profile-text">내 프로필</span>
       </div>
-      <ul class="alert-list">
-        <li>알림</li>
-      </ul>
     </div>
 
     <ul class="nav-menu">
-      <li>홈</li>
       <li>회원 관리</li>
       <li>일정 관리</li>
       <li>병실 관리</li>
@@ -35,65 +31,93 @@
       <div class="tab-buttons">
         <button class="tab-btn active" data-tab="doctor">의사</button>
         <button class="tab-btn" data-tab="nurse">간호사</button>
-        <button class="tab-btn" data-tab="patient">환자</button>
+        <button class="tab-btn" data-tab="billing">수납원</button>
+        <button class="tab-btn" data-tab="staff">환자</button>
       </div>
 
-      <!-- 의사 탭 -->
+      <!-- 탭 반복 구조 -->
       <div class="tab-content active" id="doctor">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
+          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
           <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="1">전공순</option>
+            <option value="0">ID순</option>
+            <option value="1">이름순</option>
           </select>
         </div>
         <table>
           <thead>
-            <tr><th>이름</th><th>전공</th><th>진료 시간</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>담당 과목</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>김의사</td><td>내과</td><td>09:00 ~ 17:00</td></tr>
-            <tr><td>이의사</td><td>정형외과</td><td>10:00 ~ 18:00</td></tr>
+            <tr><td>doc001</td><td>김의사</td><td>010-1234-5678</td><td>내과</td><td>월~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
+            <tr><td>doc002</td><td>이의사</td><td>010-2345-6789</td><td>외과</td><td>월~목</td><td>08:30 ~ 16:30</td><td>출근</td></tr>
+            <tr><td>doc003</td><td>박의사</td><td>010-3456-7890</td><td>소아과</td><td>화~토</td><td>10:00 ~ 18:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 간호사 탭 -->
       <div class="tab-content" id="nurse">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
+          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
           <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="1">병동순</option>
+            <option value="0">ID순</option>
+            <option value="1">이름순</option>
           </select>
         </div>
         <table>
           <thead>
-            <tr><th>이름</th><th>근무 병동</th><th>근무 시간</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>박간호사</td><td>응급실</td><td>08:00 ~ 16:00</td></tr>
-            <tr><td>최간호사</td><td>병동2층</td><td>09:00 ~ 17:00</td></tr>
+            <tr><td>nur001</td><td>박간호사</td><td>010-8888-9999</td><td>월~토</td><td>08:00 ~ 16:00</td><td>출근</td></tr>
+            <tr><td>nur002</td><td>정간호사</td><td>010-7777-2222</td><td>화~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
+            <tr><td>nur003</td><td>한간호사</td><td>010-9999-1111</td><td>수~일</td><td>10:00 ~ 18:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 환자 탭 -->
-      <div class="tab-content" id="patient">
+      <div class="tab-content" id="billing">
         <div class="table-controls">
-          <input type="text" class="search-input" placeholder="이름 검색">
+          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
           <select class="sort-select">
-            <option value="0">이름순</option>
-            <option value="2">병상순</option>
+            <option value="0">ID순</option>
+            <option value="1">이름순</option>
           </select>
         </div>
         <table>
           <thead>
-            <tr><th>이름</th><th>입원일</th><th>병상</th></tr>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>이환자</td><td>2023-10-10</td><td>A-201</td></tr>
-            <tr><td>정환자</td><td>2023-10-09</td><td>B-105</td></tr>
+            <tr><td>bill001</td><td>정수납</td><td>010-1111-2222</td><td>화~금</td><td>09:00 ~ 18:00</td><td>출근</td></tr>
+            <tr><td>bill002</td><td>이수납</td><td>010-4444-5555</td><td>월~목</td><td>08:00 ~ 16:00</td><td>출근</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="staff">
+        <div class="table-controls">
+          <input type="text" class="search-input" placeholder="ID 또는 이름 검색">
+          <select class="sort-select">
+            <option value="0">ID순</option>
+            <option value="1">이름순</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>sta001</td><td>홍인원</td><td>010-3333-4444</td><td>수~일</td><td>10:00 ~ 19:00</td><td>출근</td></tr>
+            <tr><td>sta002</td><td>강인원</td><td>010-5555-6666</td><td>월~금</td><td>09:00 ~ 17:00</td><td>출근</td></tr>
           </tbody>
         </table>
       </div>
@@ -104,7 +128,6 @@
     // 탭 전환
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-tab');
@@ -117,7 +140,7 @@
       });
     });
 
-    // 검색 기능
+    // 검색
     document.querySelectorAll('.tab-content').forEach(tab => {
       const searchInput = tab.querySelector('.search-input');
       const rows = tab.querySelectorAll('tbody tr');
@@ -125,29 +148,26 @@
         searchInput.addEventListener('input', () => {
           const value = searchInput.value.toLowerCase();
           rows.forEach(row => {
-            const match = Array.from(row.cells).some(cell =>
-              cell.textContent.toLowerCase().includes(value)
-            );
-            row.style.display = match ? '' : 'none';
+            const id = row.cells[0].textContent.toLowerCase();
+            const name = row.cells[1].textContent.toLowerCase();
+            row.style.display = id.includes(value) || name.includes(value) ? '' : 'none';
           });
         });
       }
     });
 
-    // 정렬 기능
+    // 정렬
     document.querySelectorAll('.sort-select').forEach(select => {
       select.addEventListener('change', () => {
         const table = select.closest('.tab-content').querySelector('table');
         const tbody = table.querySelector('tbody');
         const rows = Array.from(tbody.querySelectorAll('tr'));
         const index = parseInt(select.value);
-
         rows.sort((a, b) => {
           const aText = a.cells[index].textContent;
           const bText = b.cells[index].textContent;
           return aText.localeCompare(bText);
         });
-
         rows.forEach(row => tbody.appendChild(row));
       });
     });

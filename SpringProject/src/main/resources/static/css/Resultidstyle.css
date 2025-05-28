@@ -61,39 +61,10 @@ body {
   margin-bottom: 20px;
 }
 
-.login-form {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
-.login-form input {
-  margin-bottom: 15px;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.checkbox {
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-.login-form button {
-  background-color: #3B5BFE;
-  color: white;
-  border: none;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 .links {
   margin-top: 15px;
   font-size: 15px;
-  margin-left: 20px;
+  margin-left: 5px;
   color: gray;
 }
 
@@ -107,4 +78,23 @@ footer {
 a {
 	text-decoration: none;
 	color: gray;
+}
+
+.small-btn {
+  padding: 10px;
+  font-size: 12px;
+  border: none;
+  background-color: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.find-id-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
 }
