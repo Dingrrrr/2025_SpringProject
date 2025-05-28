@@ -12,4 +12,9 @@ public class DrugPageController {
     public String showDrugPage() { //Drug페이지
         return "/Drug/Drug";  
     }
+    
+    @GetMapping("/Add")
+    public String showAddDrugPopup() { // AddDrug 팝업 페이지
+        return "/Drug/AddDrug";
+    }
 }
