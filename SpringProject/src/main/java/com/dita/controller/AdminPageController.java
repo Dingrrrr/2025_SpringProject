@@ -30,4 +30,10 @@ public class AdminPageController {
         return "admin/adminRoomManage"; // templates/admin/adminRoomManage.html 호출
     }
 	
+	@GetMapping("/adminTotalManage")
+    public String showTotalPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "admin/adminTotalManage"; // templates/admin/adminTotalManage.html 호출
+    }
+	
 }

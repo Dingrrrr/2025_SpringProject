@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이화진 환자 대시보드</title>
+    <link rel="stylesheet" href="/css/adminstyle.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="profile-section">
+            <div class="profile-header">
+                <img src="/icons/profile.png" alt="프로필 아이콘">
+                <span class="profile-text">내 프로필</span>
+            </div>
+        </div>
+        <ul class="nav-menu">
+            <li>회원 관리</li>
+            <li>일정 관리</li>
+            <li>병실 관리</li>
+            <li class="active">통계</li>
+        </ul>
+        <div class="logout-section">
+            <li class="logout-item">로그아웃</li>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="dashboard-grid">
+            <div class="chart-card">
+                <h3>월별 외래환자 수</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyOutpatientChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>진료 유형별 환자 수</h3>
+                <div class="chart-container">
+                    <canvas id="visitTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>방문 목적 비율</h3>
+                <div class="chart-container">
+                    <canvas id="visitPurposeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>일자별 외래환자 수</h3>
+                <div class="chart-container">
+                    <canvas id="dailyOutpatientChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>보험 유형 비율</h3>
+                <div class="chart-container">
+                    <canvas id="insuranceTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>지역별 환자 수</h3>
+                <div class="chart-container">
+                    <canvas id="regionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>수납 상태</h3>
+                <div class="chart-container">
+                    <canvas id="paymentStatusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>진료과별 환자 수</h3>
+                <div class="chart-container">
+                    <canvas id="departmentChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>상병 코드 순위</h3>
+                <div class="chart-container">
+                    <canvas id="diagnosisCodeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const createBarChart = (id, labels, data, label) => {
+            new Chart(document.getElementById(id), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label,
+                        data,
+                        backgroundColor: '#42a5f5',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        };
+
+        const createDoughnutChart = (id, labels, data, colors) => {
+            new Chart(document.getElementById(id), {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    cutout: '50%'
+                }
+            });
+        };
+
+        // 개별 차트 생성
+        createBarChart('monthlyOutpatientChart', ['1월', '2월', '3월', '4월', '5월', '6월'], [320, 400, 390, 410, 380, 370], '외래환자 수');
+        createBarChart('visitTypeChart', ['일반', '응급', '입원', '건강검진'], [120, 90, 60, 30], '유형별 환자 수');
+        createDoughnutChart('visitPurposeChart', ['진료', '검사', '상담', '기타'], [45, 30, 15, 10], ['#2196f3', '#4caf50', '#ff9800', '#e91e63']);
+        createBarChart('dailyOutpatientChart', ['5/1', '5/2', '5/3', '5/4', '5/5'], [60, 75, 70, 90, 85], '일일 외래환자');
+        createDoughnutChart('insuranceTypeChart', ['건강보험', '의료급여', '자동차보험'], [65, 25, 10], ['#3f51b5', '#009688', '#ff5722']);
+        createBarChart('regionChart', ['서울', '부산', '대구', '광주', '인천'], [130, 90, 70, 60, 80], '지역별 수');
+        createDoughnutChart('paymentStatusChart', ['완납', '미납'], [85, 15], ['#8bc34a', '#ffc107']);
+        createBarChart('departmentChart', ['내과', '외과', '소아과', '정형외과'], [80, 70, 60, 90], '진료과별 환자');
+        createBarChart('diagnosisCodeChart', ['A01', 'B02', 'C03', 'D04', 'E05', 'F06', 'G07', 'H08', 'I09', 'J10'], [15, 12, 10, 9, 8, 7, 6, 5, 4, 3], '상병 코드');
+    </script>
+</body>
+</html>
