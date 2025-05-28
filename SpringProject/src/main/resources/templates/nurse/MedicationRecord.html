@@ -18,22 +18,12 @@
             <div class="menu-icon">🔔</div>
             <span>알림</span>
         </a>
-        
-        <a href="#" class="menu-item">
-            <div class="menu-icon">🏠</div>
-            <span>홈</span>
-        </a>
-        
+                
         <a href="VitalRecord" class="menu-item">
             <div class="menu-icon">💜</div>
             <span>바이탈 기록</span>
         </a>
-        
-        <a href="#" class="menu-item">
-            <div class="menu-icon">✏️</div>
-            <span>예약</span>
-        </a>
-        
+            
         <a href="NurseChart" class="menu-item">
             <div class="menu-icon">📋</div>
             <span>차트</span>
@@ -129,22 +119,6 @@
                     <label class="filter-label">PT CNT</label>
                     <input type="text" class="filter-input" style="width: 80px;">
                 </div>
-            </div>
-        </div>
-
-        <!-- 카테고리 탭 -->
-        <div class="category-tabs">
-            <div class="category-tab active">
-                처치
-                <span class="category-count">0</span>
-            </div>
-            <div class="category-tab">
-                보안부담 
-                <span class="category-count">0</span>
-            </div>
-            <div class="category-tab">
-                청구액
-                <span class="category-count">0</span>
             </div>
         </div>
 
@@ -251,9 +225,7 @@
             <!-- 액션 버튼 -->
             <div class="action-buttons">
                 <button class="btn btn-primary">새 처방 추가</button>
-                <button class="btn btn-success">저장</button>
-                <button class="btn btn-warning">처방전 인쇄</button>
-                <button class="btn btn-primary">약물 상호작용 확인</button>
+                <button class="btn btn-success">저장</button>    
             </div>
         </div>
     </div>
@@ -312,13 +284,7 @@
                         break;
                     case '저장':
                         alert('처방 정보가 저장되었습니다.');
-                        break;
-                    case '처방전 인쇄':
-                        alert('처방전을 인쇄합니다.');
-                        break;
-                    case '약물 상호작용 확인':
-                        alert('약물 상호작용을 확인합니다.');
-                        break;
+                        break;               
                 }
             });
         });
