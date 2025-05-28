@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환자 진료 기록 관리</title>
+      <link rel="stylesheet" href="/css/AcceptanceReceipt.css">
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span>내 프로필</span>
+        </div>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">🔔</div>
+            <span>알림</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">🏠</div>
+            <span>홈</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">👤</div>
+            <span>진료</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">✏️</div>
+            <span>예약</span>
+        </a>
+        
+        <a href="#" class="menu-item active">
+            <div class="menu-icon">📋</div>
+            <span>수납</span>
+        </a>
+        <div class="submenu">
+            <div class="submenu-item">환자 접수</div>
+            <div class="submenu-item active">수납 처리</div>
+        </div>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">👥</div>
+            <span>재고</span>
+        </a>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">📊</div>
+            <span>업무</span>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <!-- 좌측 환자 정보 패널 -->
+        <div class="patient-panel">
+            <div class="patient-header">
+                고객정보
+                <button class="edit-patient-btn" onclick="togglePatientEdit()">수정</button>
+            </div>
+            
+            <div class="patient-info">
+                <div class="info-row">
+                    <div class="info-label">고객명:</div>
+                    <div class="info-value">
+                        <span class="display-text">김건우</span>
+                        <input type="text" class="edit-input" value="김건우" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">고객번호:</div>
+                    <div class="info-value">
+                        <span class="display-text">2023001</span>
+                        <input type="text" class="edit-input" value="2023001" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">주민번호:</div>
+                    <div class="info-value">
+                        <span class="display-text">830815-1****</span>
+                        <input type="text" class="edit-input" value="830815-1****" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">생년월일:</div>
+                    <div class="info-value">
+                        <span class="display-text">1983-08-15</span>
+                        <input type="date" class="edit-input" value="1983-08-15" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">연령:</div>
+                    <div class="info-value">
+                        <span class="display-text">40세</span>
+                        <input type="text" class="edit-input" value="40세" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">성별:</div>
+                    <div class="info-value">
+                        <span class="display-text">남</span>
+                        <select class="edit-input" style="display:none;">
+                            <option value="남" selected>남</option>
+                            <option value="여">여</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">연락처:</div>
+                    <div class="info-value">
+                        <span class="display-text">010-1234-5678</span>
+                        <input type="tel" class="edit-input" value="010-1234-5678" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">주소:</div>
+                    <div class="info-value">
+                        <span class="display-text">서울시 강남구</span>
+                        <input type="text" class="edit-input" value="서울시 강남구" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">보험유형:</div>
+                    <div class="info-value">
+                        <span class="display-text">건강보험</span>
+                        <select class="edit-input" style="display:none;">
+                            <option value="건강보험" selected>건강보험</option>
+                            <option value="의료급여">의료급여</option>
+                            <option value="산재보험">산재보험</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">최종방문:</div>
+                    <div class="info-value">
+                        <span class="display-text">2023-08-18</span>
+                        <input type="date" class="edit-input" value="2023-08-18" style="display:none;">
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">총방문:</div>
+                    <div class="info-value">
+                        <span class="display-text">15회</span>
+                        <input type="number" class="edit-input" value="15" min="0" style="display:none;">
+                    </div>
+                </div>
+                
+                <div class="patient-edit-buttons" style="display:none; margin-top: 15px;">
+                    <button class="save-patient-btn" onclick="savePatientInfo()">저장</button>
+                    <button class="cancel-patient-btn" onclick="cancelPatientEdit()">취소</button>
+                </div>
+            </div>
+
+            <div class="patient-notes">
+                <div class="notes-title">
+                    메모/특이사항
+                    <button class="edit-notes-btn" onclick="toggleNotesEdit()">수정</button>
+                </div>
+                <div class="notes-content">
+                    <div class="notes-display">
+                        - 고혈압 병력 있음<br>
+                        - 당뇨 가족력<br>
+                        - 정기검진 필요<br>
+                        - 약물 알레르기: 페니실린<br>
+                        - 흡연력: 금연 2년차<br>
+                        - 운동: 주 3회 헬스<br>
+                        - 기타: 야간 근무로 인한 수면 패턴 불규칙
+                    </div>
+                    <textarea class="notes-edit" style="display:none; width:100%; height:150px; padding:10px; border:1px solid #ddd; border-radius:4px; resize:vertical;">- 고혈압 병력 있음
+						- 당뇨 가족력
+						- 정기검진 필요
+						- 약물 알레르기: 페니실린
+						- 흡연력: 금연 2년차
+						- 운동: 주 3회 헬스
+						- 기타: 야간 근무로 인한 수면 패턴 불규칙</textarea>
+                </div>
+                
+                <div class="notes-edit-buttons" style="display:none; margin-top: 10px;">
+                    <button class="save-notes-btn" onclick="saveNotes()">저장</button>
+                    <button class="cancel-notes-btn" onclick="cancelNotesEdit()">취소</button>
+                </div>
+            </div>
+        </div>
+        <!-- 우측 기록 테이블 -->
+        <div class="records-panel">
+            <div class="records-header">
+                <div class="records-title">진료 기록 및 수납 내역</div>
+                <div class="header-buttons">
+                    <button class="header-btn active">전체</button>
+                    <button class="header-btn">미수납</button>
+                    <button class="header-btn green">완료수납</button>
+                    <button class="header-btn teal">미결제금</button>
+                    <button class="header-btn orange">검사 예약</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>구분</th>
+                            <th>진료내용</th>
+                            <th>담당의</th>
+                            <th>진료비</th>
+                            <th>보험청구</th>
+                            <th>환자부담</th>
+                            <th>수납액</th>
+                            <th>미수납액</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="date-cell">2023-08-17</td>
+                            <td>초진</td>
+                            <td class="diagnosis-cell">고혈압 정기검진 및 처방</td>
+                            <td>김의사</td>
+                            <td class="amount-cell">30,000</td>
+                            <td class="amount-cell">21,000</td>
+                            <td class="amount-cell">9,000</td>
+                            <td class="amount-cell">9,000</td>
+                            <td class="amount-cell">0</td>
+                            <td class="status-cell status-완료">완료</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-08-10</td>
+                            <td>재진</td>
+                            <td class="diagnosis-cell">당뇨 검사 및 상담</td>
+                            <td>이의사</td>
+                            <td class="amount-cell">25,000</td>
+                            <td class="amount-cell">17,500</td>
+                            <td class="amount-cell">7,500</td>
+                            <td class="amount-cell">7,500</td>
+                            <td class="amount-cell">0</td>
+                            <td class="status-cell status-완료">완료</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-08-10</td>
+                            <td>재진</td>
+                            <td class="diagnosis-cell">혈압약 처방 및 모니터링</td>
+                            <td>김의사</td>
+                            <td class="amount-cell">200,000</td>
+                            <td class="amount-cell">140,000</td>
+                            <td class="amount-cell">60,000</td>
+                            <td class="amount-cell">30,000</td>
+                            <td class="amount-cell">30,000</td>
+                            <td class="status-cell status-대기">미수납</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-08-10</td>
+                            <td>초진</td>
+                            <td class="diagnosis-cell">종합건강검진 1차</td>
+                            <td>박의사</td>
+                            <td class="amount-cell">70,000</td>
+                            <td class="amount-cell">49,000</td>
+                            <td class="amount-cell">21,000</td>
+                            <td class="amount-cell">21,000</td>
+                            <td class="amount-cell">0</td>
+                            <td class="status-cell status-완료">완료</td>
+                        </tr>
+                        <tr class="highlighted-row">
+                            <td class="date-cell">2023-08-10</td>
+                            <td>검사</td>
+                            <td class="diagnosis-cell">혈액검사 및 소변검사 1차</td>
+                            <td>최의사</td>
+                            <td class="amount-cell">70,000</td>
+                            <td class="amount-cell">49,000</td>
+                            <td class="amount-cell">21,000</td>
+                            <td class="amount-cell">21,000</td>
+                            <td class="amount-cell">0</td>
+                            <td class="status-cell status-완료">완료</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-07-25</td>
+                            <td>미용</td>
+                            <td class="diagnosis-cell">피부관리 및 미용시술</td>
+                            <td>정의사</td>
+                            <td class="amount-cell">수술비용</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">수술비용</td>
+                            <td class="amount-cell">수술비용</td>
+                            <td class="amount-cell">0</td>
+                            <td class="status-cell status-완료">완료</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-07-24</td>
+                            <td>예약</td>
+                            <td class="diagnosis-cell">정기검진 예약</td>
+                            <td>김의사</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="status-cell status-대기">예약중</td>
+                        </tr>
+                        <tr class="highlighted-row">
+                            <td class="date-cell">2023-07-24</td>
+                            <td>취소</td>
+                            <td class="diagnosis-cell">검진 취소 - 개인사정</td>
+                            <td>-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="status-cell status-취소">취소</td>
+                        </tr>
+                        <tr>
+                            <td class="date-cell">2023-07-19</td>
+                            <td>예약</td>
+                            <td class="diagnosis-cell">보험/치과 검진예약</td>
+                            <td>이의사</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="amount-cell">-</td>
+                            <td class="status-cell status-대기">예약중</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stats-group">
+                    <div class="stat-item">
+                        <span class="stat-label">총진료비:</span>
+                        <span class="stat-value">1,567,472</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">보험청구:</span>
+                        <span class="stat-value">1,097,230</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">환자부담:</span>
+                        <span class="stat-value">470,242</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">수납완료:</span>
+                        <span class="stat-value">440,242</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">미수납:</span>
+                        <span class="stat-value" style="color: #dc3545;">30,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 메뉴 클릭 이벤트
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 서브메뉴 클릭 이벤트
+        document.querySelectorAll('.submenu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 헤더 버튼 클릭 이벤트
+        document.querySelectorAll('.header-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.header-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filterType = this.textContent.trim();
+                console.log('필터 적용:', filterType);
+                // 실제 구현시 테이블 필터링 로직 추가
+            });
+        });
+
+        // 테이블 행 클릭 이벤트
+        document.querySelectorAll('.records-table tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                // 기존 선택 해제
+                document.querySelectorAll('.records-table tbody tr').forEach(r => {
+                    if (!r.classList.contains('highlighted-row')) {
+                        r.style.backgroundColor = '';
+                    }
+                });
+                // 현재 행 선택 (highlighted-row가 아닌 경우만)
+                if (!this.classList.contains('highlighted-row')) {
+                    this.style.backgroundColor = '#e3f2fd';
+                }
+            });
+        });
+		// 고객 정보 수정 기능
+        let isPatientEditing = false;
+        let originalPatientData = {};
+
+        function togglePatientEdit() {
+            const editBtn = document.querySelector('.edit-patient-btn');
+            const displayTexts = document.querySelectorAll('.patient-info .display-text');
+            const editInputs = document.querySelectorAll('.patient-info .edit-input');
+            const editButtons = document.querySelector('.patient-edit-buttons');
+
+            if (!isPatientEditing) {
+                // 수정 모드로 전환
+                isPatientEditing = true;
+                editBtn.textContent = '수정중...';
+                editBtn.disabled = true;
+                
+                // 원본 데이터 저장
+                displayTexts.forEach((text, index) => {
+                    originalPatientData[index] = text.textContent;
+                });
+
+                // 입력 필드 표시
+                displayTexts.forEach(text => text.style.display = 'none');
+                editInputs.forEach(input => input.style.display = 'block');
+                editButtons.style.display = 'block';
+            }
+        }
+
+        function savePatientInfo() {
+            const displayTexts = document.querySelectorAll('.patient-info .display-text');
+            const editInputs = document.querySelectorAll('.patient-info .edit-input');
+            const editButtons = document.querySelector('.patient-edit-buttons');
+            const editBtn = document.querySelector('.edit-patient-btn');
+
+            // 값 업데이트
+            editInputs.forEach((input, index) => {
+                if (displayTexts[index]) {
+                    if (input.tagName === 'SELECT') {
+                        displayTexts[index].textContent = input.options[input.selectedIndex].text;
+                    } else if (input.type === 'number') {
+                        displayTexts[index].textContent = input.value + '회';
+                    } else {
+                        displayTexts[index].textContent = input.value;
+                    }
+                }
+            });
+
+            // 표시 모드로 전환
+            displayTexts.forEach(text => text.style.display = 'block');
+            editInputs.forEach(input => input.style.display = 'none');
+            editButtons.style.display = 'none';
+            
+            editBtn.textContent = '수정';
+            editBtn.disabled = false;
+            isPatientEditing = false;
+
+            alert('고객 정보가 저장되었습니다.');
+        }
+
+        function cancelPatientEdit() {
+            const displayTexts = document.querySelectorAll('.patient-info .display-text');
+            const editInputs = document.querySelectorAll('.patient-info .edit-input');
+            const editButtons = document.querySelector('.patient-edit-buttons');
+            const editBtn = document.querySelector('.edit-patient-btn');
+
+            // 원본 값으로 복원
+            editInputs.forEach((input, index) => {
+                if (originalPatientData[index]) {
+                    if (input.tagName === 'SELECT') {
+                        input.value = originalPatientData[index];
+                    } else if (input.type === 'number') {
+                        input.value = originalPatientData[index].replace('회', '');
+                    } else {
+                        input.value = originalPatientData[index];
+                    }
+                }
+            });
+
+            // 표시 모드로 전환
+            displayTexts.forEach(text => text.style.display = 'block');
+            editInputs.forEach(input => input.style.display = 'none');
+            editButtons.style.display = 'none';
+            
+            editBtn.textContent = '수정';
+            editBtn.disabled = false;
+            isPatientEditing = false;
+        }
+
+        // 메모 수정 기능
+        let isNotesEditing = false;
+        let originalNotesData = '';
+
+        function toggleNotesEdit() {
+            const editBtn = document.querySelector('.edit-notes-btn');
+            const notesDisplay = document.querySelector('.notes-display');
+            const notesEdit = document.querySelector('.notes-edit');
+            const editButtons = document.querySelector('.notes-edit-buttons');
+
+            if (!isNotesEditing) {
+                // 수정 모드로 전환
+                isNotesEditing = true;
+                editBtn.textContent = '수정중...';
+                editBtn.disabled = true;
+                
+                // 원본 데이터 저장
+                originalNotesData = notesDisplay.innerHTML;
+
+                // 편집 필드 표시
+                notesDisplay.style.display = 'none';
+                notesEdit.style.display = 'block';
+                editButtons.style.display = 'block';
+            }
+        }
+
+        function saveNotes() {
+            const editBtn = document.querySelector('.edit-notes-btn');
+            const notesDisplay = document.querySelector('.notes-display');
+            const notesEdit = document.querySelector('.notes-edit');
+            const editButtons = document.querySelector('.notes-edit-buttons');
+
+            // 값 업데이트 (줄바꿈을 <br>로 변환)
+            const newContent = notesEdit.value.replace(/\n/g, '<br>');
+            notesDisplay.innerHTML = newContent;
+
+            // 표시 모드로 전환
+            notesDisplay.style.display = 'block';
+            notesEdit.style.display = 'none';
+            editButtons.style.display = 'none';
+            
+            editBtn.textContent = '수정';
+            editBtn.disabled = false;
+            isNotesEditing = false;
+
+            alert('메모가 저장되었습니다.');
+        }
+
+        function cancelNotesEdit() {
+            const editBtn = document.querySelector('.edit-notes-btn');
+            const notesDisplay = document.querySelector('.notes-display');
+            const notesEdit = document.querySelector('.notes-edit');
+            const editButtons = document.querySelector('.notes-edit-buttons');
+
+            // 원본 값으로 복원
+            notesEdit.value = originalNotesData.replace(/<br>/g, '\n');
+
+            // 표시 모드로 전환
+            notesDisplay.style.display = 'block';
+            notesEdit.style.display = 'none';
+            editButtons.style.display = 'none';
+            
+            editBtn.textContent = '수정';
+            editBtn.disabled = false;
+            isNotesEditing = false;
+        }
+        // 더블클릭시 상세 정보 모달
+        document.querySelectorAll('.records-table tbody tr').forEach(row => {
+            row.addEventListener('dblclick', function() {
+                const date = this.cells[0].textContent;
+                const diagnosis = this.cells[2].textContent;
+                alert(`상세 정보\n날짜: ${date}\n진료내용: ${diagnosis}`);
+            });
+        });
+    </script>
+</body>
+</html>
