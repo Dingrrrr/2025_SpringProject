@@ -215,3 +215,55 @@ body {
   border: 1px solid #eee;
   font-size: 14px;
 }
+
+.room-type {
+  margin-bottom: 30px;
+}
+
+.room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #3e3e4d;
+  padding: 10px 15px;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px 6px 0 0;
+}
+
+.btn-config {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.room-list {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #454558;
+  padding: 10px;
+  gap: 10px;
+  border-radius: 0 0 6px 6px;
+}
+
+.room-box {
+  width: 120px;
+  background: #55566a;
+  color: white;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.room-box span {
+  display: block;
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 6px;
+}
+
