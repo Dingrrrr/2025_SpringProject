@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>입원 대기 환자 목록</title>
+  <link rel="stylesheet" href="/css/patientWaitingPopup.css">
+</head>
+<body>
+  <h2>입원 대기 환자</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>성별</th>
+        <th>나이</th>
+        <th>진단명</th>
+        <th>입원일</th>
+        <th>진료과</th>
+        <th>담당의</th>
+        <th>병동</th>
+        <th>입원</th>
+      </tr>
+    </thead>
+    <tbody id="waiting-table-body"></tbody>
+  </table>
+
+  <script>
+    // 더미 데이터 (입원대기 상태)
+    const waitingPatients = [
+      { name: "강감찬", gender: "남", age: 60, diagnosis: "폐렴", date: "2025-05-28", dept: "호흡기내과", doctor: "이의사", ward: "1병동 A", room: "102" },
+      { name: "유관순", gender: "여", age: 28, diagnosis: "복통", date: "2025-05-28", dept: "소화기내과", doctor: "박의사", ward: "2병동", room: "202" }
+    ];
+
+    const tbody = document.getElementById("waiting-table-body");
+
+    waitingPatients.forEach(patient => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${patient.name}</td>
+        <td>${patient.gender}</td>
+        <td>${patient.age}</td>
+        <td>${patient.diagnosis}</td>
+        <td>${patient.date}</td>
+        <td>${patient.dept}</td>
+        <td>${patient.doctor}</td>
+        <td>${patient.ward}</td>
+        <td><button class="admit">입원</button></td>
+      `;
+
+      tr.querySelector(".admit").addEventListener("click", () => {
+        // 메인 페이지에 환자 추가
+        const newPatient = {
+          ...patient,
+          status: "입원중"
+        };
+        window.opener.bedData.push(newPatient);
+        window.opener.location.reload();
+        window.close();
+      });
+
+      tbody.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
