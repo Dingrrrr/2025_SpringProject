@@ -18,4 +18,10 @@ public class AcceptPageController {
         return "acceptance/acceptanceHome"; 
     }
 	
+	@GetMapping("/AcceptanceReceipt")
+    public String showAcceptanceReceiptPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "acceptance/AcceptanceReceipt"; 
+    }
+	
 }
