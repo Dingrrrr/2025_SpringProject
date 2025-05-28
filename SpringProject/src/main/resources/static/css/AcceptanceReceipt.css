@@ -10,14 +10,21 @@
             background-color: #f5f5f5;
             display: flex;
             height: 100vh;
+             overflow: hidden;
+             
         }
 
         /* 사이드바 */
         .sidebar {
             width: 200px;
-            background-color: white;
-            border-right: 1px solid #ddd;
-            padding: 20px 0;
+		    background-color: white;
+		    border-right: 1px solid #ddd;
+		    padding: 20px 0 0 0; /* 하단 패딩 제거 */
+		    min-width: 200px;
+		    flex-shrink: 0;
+		    display: flex;
+		    flex-direction: column;
+		    height: 100vh;
         }
 
         .sidebar .profile {
@@ -86,13 +93,51 @@
             background-color: #e8f5e8;
             color: #2e7d32;
         }
+        
+        .logout-section {
+		  margin-top: auto;
+	      border-top: 1px solid #ddd;
+	      padding: 0;
+	      margin-bottom: 0; /* 하단 마진 제거 */
+		}
+		
+		.logout-item {
+		display: flex;
+	    align-items: center;
+	    padding: 15px 20px;
+	    font-size: 14px;
+	    color: #e53935;
+	    cursor: pointer;
+	    transition: background-color 0.2s ease;
+	    margin: 0;
+	    border: none;
+		}
+		
+		.logout-item::before {
+		  content: "";
+		  display: inline-block;
+		  width: 22px;
+		  height: 22px;
+		  margin-right: 12px;
+		  background-image: url("/icons/logout.png");
+		  background-size: contain;
+		  background-repeat: no-repeat;
+		  background-position: center;
+		}
+		
+		.logout-item:hover {
+		  background-color: #fbe9e7;
+   		  width: 100%; /* 전체 너비로 호버 */
+		}
 
         /* 메인 컨텐츠 */
         .main-content {
-            flex: 1;
-            display: flex;
-            background-color: #333;
-            overflow: hidden;
+             flex: 1;
+		    display: flex;
+		    height: 100vh;
+		    width: calc(100vw - 200px); /* 사이드바 200px 제외 */
+		    background-color: #333;
+		    overflow: hidden;
         }
         
 		a{
@@ -102,11 +147,14 @@
 		
         /* 좌측 환자 정보 패널 */
         .patient-panel {
-            width: 400px;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #ddd;
+            width: 280px; /* 280px로 조정 */
+		    height: 100vh;
+		    min-width: 280px;
+		    flex-shrink: 0; /* 줄어들지 않도록 고정 */
+		    background-color: white;
+		    display: flex;
+		    flex-direction: column;
+		    border-right: 1px solid #ddd;
         }
 
         .patient-header {
@@ -129,11 +177,11 @@
         }
 
         .info-label {
-            width: 80px;
-            font-weight: bold;
-            color: #555;
-            font-size: 14px;
-        }
+            width: 70px;
+		    font-weight: bold;
+		    color: #555;
+		    font-size: 14px;	
+		}
 
         .info-value {
             flex: 1;
@@ -143,6 +191,8 @@
 
         .patient-notes {
             flex: 1;
+            display: flex;
+   			flex-direction: column;
             padding: 20px;
             background-color: #f9f9f9;
         }
@@ -156,6 +206,7 @@
         }
 
         .notes-content {
+        	flex: 1;
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -169,9 +220,10 @@
         /* 우측 기록 테이블 */
         .records-panel {
             flex: 1;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
+		    height: 100vh;
+		    background-color: white;
+		    display: flex;
+		    flex-direction: column;
         }
 
         .records-header {
@@ -234,15 +286,18 @@
         /* 테이블 컨테이너 */
         .table-container {
             flex: 1;
-            overflow: auto;
-            padding: 20px;
+		    overflow: auto;
+		    height: calc(100vh - 120px);
+		    width: 100%;
+		    padding: 10px 20px; /* 좌우 패딩 줄임 */
         }
 
         .records-table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            background-color: white;
+		    table-layout: fixed; /* 테이블 레이아웃 고정 */
+		    border-collapse: collapse;
+		    font-size: 13px;
+		    background-color: white;
         }
 
         .records-table th {
@@ -256,10 +311,11 @@
         }
 
         .records-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            vertical-align: middle;
+            width: auto; /* 자동 너비 조정 */
+		    border: 1px solid #ddd;
+		    padding: 8px;
+		    text-align: center;
+		    vertical-align: middle;
         }
 
         .records-table tbody tr:hover {
@@ -289,10 +345,10 @@
 
         .diagnosis-cell {
             text-align: left;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+		    width: 25%; /* 진료내용 컬럼을 25% 너비로 고정 */
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    white-space: nowrap;
         }
 
         .amount-cell {
@@ -339,6 +395,27 @@
             font-weight: bold;
             color: #333;
         }
+        
+        /* 각 항목별 색상 지정 */
+		.stat-item:nth-child(1) .stat-value {
+		    color: #2e7d32; /* 총진료비 - 초록 */
+		}
+		
+		.stat-item:nth-child(2) .stat-value {
+		    color: #1976d2; /* 보험청구 - 파랑 */
+		}
+		
+		.stat-item:nth-child(3) .stat-value {
+		    color: #f57c00; /* 환자부담 - 주황 */
+		}
+		
+		.stat-item:nth-child(4) .stat-value {
+		    color: #388e3c; /* 수납완료 - 녹색 */
+		}
+		
+		.stat-item:nth-child(5) .stat-value {
+		    color: #d32f2f; /* 미수납 - 빨강 */
+		}
 
         /* 스크롤바 스타일 */
         .table-container::-webkit-scrollbar {
@@ -362,7 +439,7 @@
         /* 반응형 디자인 */
         @media (max-width: 1200px) {
             .patient-panel {
-                width: 300px;
+                width: 400px;
             }
             
             .records-table {
