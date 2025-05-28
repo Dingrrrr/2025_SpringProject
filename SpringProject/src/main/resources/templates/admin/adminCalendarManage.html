@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>근무 스케줄 관리</title>
+  <link rel="stylesheet" href="/css/adminstyle.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="profile-section">
+      <div class="profile-header">
+        <img src="/icons/profile.png" alt="프로필 아이콘">
+        <span class="profile-text">내 프로필</span>
+      </div>
+    </div>
+
+    <ul class="nav-menu">
+      <li>홈</li>
+      <li>회원 관리</li>
+      <li>일정 관리</li>
+      <li>병실 관리</li>
+      <li>통계</li>
+    </ul>
+
+    <div class="logout-section">
+      <li class="logout-item">로그아웃</li>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="doctor">의사</button>
+      <button class="tab-btn" data-tab="nurse">간호사</button>
+    </div>
+
+    <!-- 의사 스케줄 -->
+    <div class="tab-content active" id="doctor">
+      <div class="table-controls">
+        <input type="text" class="search-input" placeholder="직원 ID 검색">
+        <select class="sort-select">
+          <option value="0">스케줄 ID순</option>
+          <option value="1">직원 ID순</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>스케줄 ID</th>
+            <th>직원 ID</th>
+            <th>근무 시작 시각</th>
+            <th>근무 종료 시각</th>
+            <th>스케줄 유형</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1001</td>
+            <td>doc001</td>
+            <td>2024-06-01 09:00</td>
+            <td>2024-06-01 17:00</td>
+            <td>출근</td>
+          </tr>
+          <tr>
+            <td>1003</td>
+            <td>doc002</td>
+            <td>2024-06-02 09:00</td>
+            <td>2024-06-02 17:00</td>
+            <td>퇴근</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 간호사 스케줄 -->
+    <div class="tab-content" id="nurse">
+      <div class="table-controls">
+        <input type="text" class="search-input" placeholder="직원 ID 검색">
+        <select class="sort-select">
+          <option value="0">스케줄 ID순</option>
+          <option value="1">직원 ID순</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>스케줄 ID</th>
+            <th>직원 ID</th>
+            <th>근무 시작 시각</th>
+            <th>근무 종료 시각</th>
+            <th>스케줄 유형</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1002</td>
+            <td>nur002</td>
+            <td>2024-06-01 08:00</td>
+            <td>2024-06-01 16:00</td>
+            <td>출근</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // 탭 전환
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tabContents.forEach(c => {
+          c.classList.remove('active');
+          if (c.id === target) c.classList.add('active');
+        });
+      });
+    });
+
+    // 검색
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      const searchInput = tab.querySelector('.search-input');
+      const rows = tab.querySelectorAll('tbody tr');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          const value = searchInput.value.toLowerCase();
+          rows.forEach(row => {
+            const id = row.cells[1].textContent.toLowerCase();
+            row.style.display = id.includes(value) ? '' : 'none';
+          });
+        });
+      }
+    });
+
+    // 정렬
+    document.querySelectorAll('.sort-select').forEach(select => {
+      select.addEventListener('change', () => {
+        const table = select.closest('.tab-content').querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const index = parseInt(select.value);
+        rows.sort((a, b) => {
+          const aText = a.cells[index].textContent;
+          const bText = b.cells[index].textContent;
+          return aText.localeCompare(bText);
+        });
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+  </script>
+</body>
+</html>
