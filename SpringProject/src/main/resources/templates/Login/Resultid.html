@@ -3,36 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <title>메디링크 로그인</title>
-<link rel="stylesheet" href="/css/Findidstyle.css">
+<link rel="stylesheet" href="/css/Resultidstyle.css">
 </head>
 <body>
 	<div class="container">
 		<div class="login-box">
 			<div class="left-panel"></div>
 			<div class="right-panel">
-				<form class="find-id-form" method="post" action="/Login/Findid">
-					<h2>아이디 찾기</h2>
-
-					<label for="role">직무</label> <select id="role" name="role" required>
-						<option disabled selected>직무를 선택해주세요</option>
-						<option>관리자</option>
-						<option>의사</option>
-						<option>간호사</option>
-					</select> <label for="name">이름</label> <input type="text" id="name"
-						name="name" placeholder="이름 입력" required> <label
-						for="email">이메일주소</label>
-					<div class="inline">
-						<input type="email" id="email" placeholder="이메일 주소 입력" required>
-						<button type="button" id="sendCodeBtn" class="small-btn">인증번호받기</button>
-					</div>
-
-					<input type="text" id="code" name="code" placeholder="인증번호 입력" disabled>
-
-					<button type="submit" id="nextBtn" onclick="location.href='Resultid'" disabled>다음</button>
-
-					<div class="links">
-						<a href="Findid">아이디찾기</a> | <a href="Findpwd">비밀번호 찾기</a>
-					</div>
+				<form class="find-id-result" action="/Login/Login" method="get">
+				  <h2>아이디 찾기</h2>
+				  <p>
+				    아이디 찾기가 완료되었습니다.<br>
+				    회원님의 아이디는 <strong>${users_Id}</strong> 입니다.
+				  </p>
+				
+				  <button type="submit">로그인 하러 가기</button>
+				
+				  <div class="links">
+				    <a href="/Login/Findid">아이디찾기</a> |
+				    <a href="#">비밀번호 찾기</a>
+				  </div>
 				</form>
 				<footer>
 					<p>
@@ -49,11 +39,10 @@
 			const sendBtn = document.getElementById('sendCodeBtn');
 			const codeInput = document.getElementById('code');
 
-			if (sendBtn && codeInput && nextBtn) {
+			if (sendBtn && codeInput) {
 				sendBtn.addEventListener('click', function() {
 					codeInput.disabled = false;
 					codeInput.focus();
-					nextBtn.disabled = false;
 				});
 			} else {
 				console.error("요소를 찾지 못했습니다.");
