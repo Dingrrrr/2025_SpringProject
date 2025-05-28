@@ -189,12 +189,16 @@ body {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .search-input, .sort-select {
   padding: 6px 10px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  flex: 1;
+  max-width: 180px;
 }
 
 /* 테이블 */
@@ -209,4 +213,5 @@ body {
   padding: 12px;
   text-align: center;
   border: 1px solid #eee;
+  font-size: 14px;
 }
