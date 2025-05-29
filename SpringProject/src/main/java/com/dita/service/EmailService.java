@@ -30,7 +30,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(msg, "UTF-8");
         helper.setTo(toEmail);
         helper.setFrom("netflix720222@gmail.com");
-        helper.setSubject("메디링크 회원가입 이메일 인증번호");
+        helper.setSubject("메디링크 이메일 인증번호");
         helper.setText(
             "<p>안녕하세요. 메디링크입니다.</p>" +
             "<p>회원가입 인증번호는 <b>" + code + "</b> 입니다.</p>" +

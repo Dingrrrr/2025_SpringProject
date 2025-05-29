@@ -55,7 +55,7 @@ public class User {
 	 private String usersAddress;
 	 
 	 @Enumerated(EnumType.STRING)
-	 @Column(nullable = false)
+	 @Column(length = 20,nullable = false)
 	 private Grade grade;
 	 
 	 @OneToOne
