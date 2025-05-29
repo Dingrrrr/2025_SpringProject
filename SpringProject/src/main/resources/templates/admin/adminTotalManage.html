@@ -195,12 +195,18 @@
         	    const modal = document.getElementById('chartModal');
         	    modal.style.display = 'block';
 
-        	    setTimeout(() => {
-        	      if (modalChart) modalChart.destroy();
-        	      modalChart = new Chart(document.getElementById('modalChart'), JSON.parse(JSON.stringify(currentChartData)));
-        	    }, 100);
+        	    requestAnimationFrame(() => {
+        	    	  if (modalChart) modalChart.destroy();
+        	    	  const ctx = document.getElementById('modalChart').getContext('2d');
+        	    	  modalChart = new Chart(ctx, JSON.parse(JSON.stringify(currentChartData)));
+        	    	});
         	  });
         	});
+        
+     	// ✅ 추가: 닫기 버튼 이벤트
+        document.querySelector('.close-chart-modal').addEventListener('click', () => {
+          document.getElementById('chartModal').style.display = 'none';
+        });
         		
         </script>
     
@@ -244,7 +250,7 @@
 	
 	.modal-left canvas {
 	  width: 100% !important;
-	  height: 100% !important;
+	  height: auto !important;
 	  max-height: 100%;
 	}
 	
