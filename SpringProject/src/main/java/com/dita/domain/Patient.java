@@ -1,9 +1,10 @@
 package com.dita.domain;
 
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,4 +39,8 @@ public class Patient {
 	
 	@Column(name = "patient_symptom")
 	private String patientSymptom;// 환자 증상
+	
+	@Enumerated(EnumType.STRING) 
+	@Column(name = "patient_type")
+	private PatientType patientType;// 입원여부 판단, 환자 상태: 외래, 입원대기, 입원중, 퇴원
 }
