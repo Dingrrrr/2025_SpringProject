@@ -131,6 +131,24 @@
 		  margin-bottom: 10px;
 		}
 		
+		.top-center-date {
+		  position: absolute;
+		  top: 20px;
+		  left: 50%;
+		  transform: translateX(-50%);
+		  font-weight: bold;
+		  font-size: 25px;
+		  display: block; /* 기본적으로 보이게 */
+		}
+		
+		.date-nav {
+		  background-color: transparent;
+		  border: none;
+		  font-size: 20px;
+		  cursor: pointer;
+		  margin: 0 10px;
+		}
+		
 		.top-right-btn {
 		  display: flex;
 		  justify-content: flex-end;  /* 오른쪽 정렬 */
@@ -314,4 +332,11 @@
 		  background-color: #2196f3;
 		  color: white;
 		}
-						
+				
+.schedule-view {
+  display: none;
+}
+
+.schedule-view.active {
+  display: block;
+}
