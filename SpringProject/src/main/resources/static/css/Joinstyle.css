@@ -56,6 +56,12 @@ h2 {
   cursor: pointer;
 }
 
+verifyEmailBtn {
+	padding: 10px 12px;
+  	background-color: #6078ea;
+  	color: white;
+}
+
 .terms {
   margin-top: 20px;
   padding: 15px;
@@ -110,4 +116,25 @@ h2 {
   color: black;
   white-space: nowrap;
   margin-left: 4px;
+}
+
+.id-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+  color: red;  /* 실패 시 */
+}
+
+.id-result.success {
+  color: green;
+}
+
+.pwd-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+}
+.pwd-result.success {
+  color: green;
+}
+.pwd-result.error {
+  color: red;
 }
