@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "admission")
+@Table(name = "admission")//입원 테이블
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,0 +1,94 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+h2 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.room {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.room h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+.beds {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.bed {
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #e9f5e9;
+  transition: all 0.2s ease-in-out;
+}
+
+.bed:hover {
+  transform: scale(1.05);
+}
+
+.occupied {
+  background-color: #f8d7da;
+  color: #999;
+  pointer-events: none;
+}
+
+.selected {
+  border: 2px solid #007bff;
+  background-color: #d0e8ff;
+}
+
+.footer {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer #selectedInfo {
+  font-weight: bold;
+  color: #333;
+}
+
+.footer button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.footer button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.footer button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
