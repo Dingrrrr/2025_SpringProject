@@ -36,7 +36,7 @@ public class Admission {
     private Patient patient;//환자 아이디
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false)
     private User doctor;// 담당 의사 아이디
 
     @ManyToOne(fetch = FetchType.LAZY)

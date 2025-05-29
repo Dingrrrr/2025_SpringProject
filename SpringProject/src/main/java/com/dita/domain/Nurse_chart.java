@@ -37,7 +37,7 @@ public class Nurse_chart {
 	private Admission admission;// 입원 기록
 	
 	@ManyToOne
-	@JoinColumn(name = "nurse_id", nullable = false)
+	@JoinColumn(name = "users_id", nullable = false)
 	private User nurse;// 작성 간호사 아이디
 	
 	@CreationTimestamp
