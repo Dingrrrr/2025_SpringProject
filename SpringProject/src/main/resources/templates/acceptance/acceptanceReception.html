@@ -62,20 +62,38 @@
 </div>
 
 <div class="main-content">
-    <div class="schedule-wrapper">
-      <!-- Day/Week/Month 탭 -->
-      <div class="tab-header">
-        <button class="tab active">Day</button>
-        <button class="tab">Week</button>
-        <button class="tab">Month</button>
-      </div>
-      
-<div class="top-right-btn">
-  <button class="register-btn-fixed">예약 등록</button>
+  <div class="schedule-wrapper">
+    <!-- Day/Week/Month 탭 -->
+    <div class="tab-header">
+      <button class="tab active" onclick="showTab('day')">Day</button>
+      <button class="tab" onclick="showTab('week')">Week</button>
+    </div>
+    
+	<div class="top-center-date">
+	  <button onclick="changeDate(-1)" class="date-nav">&lt;</button>
+	  <span class="date-icon">📅</span>
+	  <span id="currentDate">2025-05-29</span>
+	  <button onclick="changeDate(1)" class="date-nav">&gt;</button>
+	</div>
+    <div class="top-right-btn">
+      <button class="register-btn-fixed">예약 등록</button>
+    </div>
+    
+<div id="calendarModal" class="modal" style="display: none;">
+  <div class="modal-content" style="width: 300px; padding: 20px;">
+    <h3 style="margin-bottom: 10px;">날짜 선택</h3>
+    <input type="date" id="calendarDateInput" style="width: 100%; padding: 10px; font-size: 16px;" />
+    <div style="margin-top: 20px; text-align: right;">
+      <button onclick="closeCalendarModal()" style="padding: 8px 14px; background-color: #ccc;">취소</button>
+      <button onclick="applyCalendarDate()" style="padding: 8px 14px; background-color: #2196f3; color: white;">적용</button>
+    </div>
+  </div>
 </div>
 
-      <!-- 시간표 테이블 -->
+    <!-- Day View -->
+    <div id="dayView" class="schedule-view active">
       <div class="schedule-table">
+        <!-- 기존 day 시간표 테이블 유지 -->
         <div class="header-row">
           <div class="time-col-header"></div>
           <div class="header-col">진료실1</div>
@@ -141,6 +159,39 @@
   </div>
 </div>
 
+ <!-- Week View -->
+    <div id="weekView" class="schedule-view">
+      <div class="schedule-table">
+        <div class="header-row">
+          <div class="time-col-header"></div>
+          <div class="header-col">월</div>
+          <div class="header-col">화</div>
+          <div class="header-col">수</div>
+          <div class="header-col">목</div>
+          <div class="header-col">금</div>
+        </div>
+        <!-- 시간대별 행 반복 -->
+        <div class="schedule-row"><div class="time-col">09:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+        <div class="schedule-row"><div class="time-col">09:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+        <div class="schedule-row"><div class="time-col">10:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+        <div class="schedule-row"><div class="time-col">10:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+        <div class="schedule-row"><div class="time-col">11:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    	<div class="schedule-row"><div class="time-col">11:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">12:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">12:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">13:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">13:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">14:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">14:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">15:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">15:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">16:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">16:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+	    <div class="schedule-row"><div class="time-col">17:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>  
+      </div>
+    </div>
+
+
 <div id="reservationModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h2>예약 등록</h2>
@@ -165,6 +216,9 @@
         <option>진료실3</option>
         <option>진료실4</option>
       </select>
+      
+      <label>병명</label>
+		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
 
       <label>담당 의사</label>
       <input type="text" name="doctor" required>
@@ -172,6 +226,50 @@
       <div class="modal-buttons">
         <button type="button" class="cancel-btn" onclick="closeModal()">취소</button>
         <button type="submit" class="save-btn">저장</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 예약 상세 조회/수정용 모달 -->
+<div id="reservationDetailModal" class="modal" style="display: none;">
+<div class="modal-content" style="position: relative;">
+    <h2>예약 정보</h2>
+    <button type="button" class="cancel-reservation-btn" onclick="cancelReservation()" 
+      style="position: absolute; height: 30px; top: 32px; right: 30px; background: #f55; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px;">
+      예약 취소
+    </button>
+    <form id="editReservationForm">
+      <label>이름</label>
+      <input type="text" name="editName" required>
+
+      <label>주민번호</label>
+      <input type="text" name="editRRN" required>
+
+      <label>연락처</label>
+      <input type="text" name="editPhone" required>
+
+      <label>예약 일시</label>
+      <input type="datetime-local" name="editDate" required>
+
+      <label>진료실</label>
+      <select name="editDepartment" required>
+        <option value="">선택</option>
+        <option>진료실1</option>
+        <option>진료실2</option>
+        <option>진료실3</option>
+        <option>진료실4</option>
+      </select>
+
+      <label>병명</label>
+      <input type="text" name="editDisease" required>
+
+      <label>담당 의사</label>
+      <input type="text" name="editDoctor" required>
+
+      <div class="modal-buttons">
+        <button type="button" class="cancel-btn" onclick="closeDetailModal()">닫기</button>
+        <button type="submit" class="save-btn">수정</button>
       </div>
     </form>
   </div>
@@ -209,30 +307,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-  // "예약 등록" 버튼 클릭 시 모달 열기
-  document.querySelector('.register-btn-fixed').addEventListener('click', function () {
-    document.getElementById('reservationModal').style.display = 'flex';
-  });
+ // "예약 등록" 버튼 클릭 시 모달 열기
+document.querySelector('.register-btn-fixed').addEventListener('click', function () {
+  document.getElementById('reservationForm').reset();
+  document.getElementById('reservationModal').style.display = 'flex';
+});
 
-  // 모달 닫기 함수
-  function closeModal() {
-    document.getElementById('reservationModal').style.display = 'none';
-  }
+// 모달 닫기 함수
+function closeModal() {
+  document.getElementById('reservationModal').style.display = 'none';
+}
 
-  // 저장 버튼 클릭 시 동작
-  document.getElementById('reservationForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // 페이지 리로드 방지
-    alert('예약이 저장되었습니다.');
-    closeModal();
-  });
-  
-  document.getElementById('reservationForm').addEventListener('submit', function (e) {
+// ✅ 저장 버튼 클릭 시 동작 - 하나로 통합한 버전
+document.getElementById('reservationForm').addEventListener('submit', function (e) {
   e.preventDefault(); // 새로고침 방지
 
   // 입력값 가져오기
   const name = this.name.value;
   const date = new Date(this.date.value);
   const department = this.department.value;
+  const disease = this.disease.value;
 
   const hour = String(date.getHours()).padStart(2, '0');
   const minute = String(date.getMinutes()).padStart(2, '0');
@@ -251,28 +345,263 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // 시간에 맞는 셀 찾기
   const rows = document.querySelectorAll('.schedule-row');
   let inserted = false;
 
-  rows.forEach(row => {
+for (const row of rows) {
+  const timeCol = row.querySelector('.time-col');
+  if (timeCol && timeCol.textContent.trim() === timeStr) {
+    const cells = row.querySelectorAll('.cell');
+    const targetCell = cells[roomIndex - 1];
+
+if (targetCell.innerHTML.trim() !== '') {
+  alert("해당 시간대에 이미 예약이 존재합니다.");
+  return;  // 중복 시 함수 종료
+}
+
+    targetCell.classList.add('green');
+    targetCell.innerHTML = `[${name}]<br>${disease}`;
+
+    targetCell.dataset.name = name;
+    targetCell.dataset.rrn = this.rrn.value;
+    targetCell.dataset.phone = this.phone.value;
+    targetCell.dataset.date = this.date.value;
+    targetCell.dataset.department = department;
+    targetCell.dataset.disease = disease;
+    targetCell.dataset.doctor = this.doctor.value;
+
+    targetCell.addEventListener('click', function () {
+      document.querySelector('input[name="editName"]').value = this.dataset.name || '';
+      document.querySelector('input[name="editRRN"]').value = this.dataset.rrn || '';
+      document.querySelector('input[name="editPhone"]').value = this.dataset.phone || '';
+      document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
+      document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
+      document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
+      document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
+
+      selectedCell = this;
+      document.getElementById('reservationDetailModal').style.display = 'flex';
+    });
+
+    inserted = true;
+    break; // ✅ 처리 완료 후 루프 중단
+  }
+}
+
+
+if (!inserted) {
+  // 아무 셀에도 넣지 못했을 경우만 메시지 표시
+  alert("입력한 시간에 해당하는 셀이 없습니다.");
+} else if (!document.getElementById('reservationModal').style.display.includes('none')) {
+  // 정상 등록되었을 경우만 모달 닫기
+  alert('예약이 저장되었습니다.');
+  closeModal();
+}
+});
+
+
+
+let selectedCell = null;
+// 예약 셀 클릭 시 상세 보기 모달 열기
+document.querySelectorAll('.cell.green').forEach(cell => {
+  cell.addEventListener('click', function () {
+    const [nameLine, diseaseLine] = this.innerHTML.split('<br>');
+
+    document.querySelector('input[name="editName"]').value = nameLine.replace(/\[|\]/g, '');
+    document.querySelector('input[name="editDisease"]').value = diseaseLine || '';
+
+    // 수정 시 다시 넣기 위해 클릭한 셀 저장
+    selectedCell = this;
+
+    document.getElementById('reservationDetailModal').style.display = 'flex';
+  });
+});
+
+//수정완료시 셀 내용 반영
+document.getElementById('editReservationForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const newName = this.editName.value;
+  const newRRN = this.editRRN.value;
+  const newPhone = this.editPhone.value;
+  const newDate = this.editDate.value;
+  const newDepartment = this.editDepartment.value;
+  const newDisease = this.editDisease.value;
+  const newDoctor = this.editDoctor.value;
+
+  if (!selectedCell) return;
+
+  // 날짜와 시간 파싱
+  const dateObj = new Date(newDate);
+  const hour = String(dateObj.getHours()).padStart(2, '0');
+  const minute = String(dateObj.getMinutes()).padStart(2, '0');
+  const timeStr = `${hour}:${minute}`;
+
+  const roomIndex = {
+    '진료실1': 1,
+    '진료실2': 2,
+    '진료실3': 3,
+    '진료실4': 4
+  }[newDepartment];
+
+  if (roomIndex === undefined) {
+    alert("진료실을 정확히 선택해주세요.");
+    return;
+  }
+
+  const rows = document.querySelectorAll('.schedule-row');
+  let newCell = null;
+  let foundRow = false;
+
+  for (const row of rows) {
     const timeCol = row.querySelector('.time-col');
     if (timeCol && timeCol.textContent.trim() === timeStr) {
       const cells = row.querySelectorAll('.cell');
-      const targetCell = cells[roomIndex - 1]; // 0부터 시작
-
-      targetCell.classList.add('green');
-      targetCell.innerHTML = `[${name}]<br>${department}`;
-      inserted = true;
+      newCell = cells[roomIndex - 1];
+      foundRow = true;
+      break;
     }
-  });
-
-  if (!inserted) {
-    alert("입력한 시간에 해당하는 셀이 없습니다.");
   }
 
-  closeModal(); // 모달 닫기
+  if (!foundRow || !newCell) {
+    alert("입력한 시간에 해당하는 셀이 없습니다.");
+    return;
+  }
+
+  // 중복 체크: 새 셀에 예약이 있고, 그게 자기 셀이 아닌 경우
+  if (newCell !== selectedCell && newCell.innerHTML.trim() !== '') {
+    alert("해당 시간대에 이미 예약이 존재합니다.");
+    return;
+  }
+
+  // ✅ 기존 셀 초기화
+  selectedCell.classList.remove('green');
+  selectedCell.innerHTML = '';
+  selectedCell.removeAttribute('data-name');
+  selectedCell.removeAttribute('data-rrn');
+  selectedCell.removeAttribute('data-phone');
+  selectedCell.removeAttribute('data-date');
+  selectedCell.removeAttribute('data-department');
+  selectedCell.removeAttribute('data-disease');
+  selectedCell.removeAttribute('data-doctor');
+
+  // ✅ 새 셀에 예약 정보 등록
+  newCell.classList.add('green');
+  newCell.innerHTML = `[${newName}]<br>${newDisease}`;
+  newCell.dataset.name = newName;
+  newCell.dataset.rrn = newRRN;
+  newCell.dataset.phone = newPhone;
+  newCell.dataset.date = newDate;
+  newCell.dataset.department = newDepartment;
+  newCell.dataset.disease = newDisease;
+  newCell.dataset.doctor = newDoctor;
+
+  // ✅ 셀 클릭 시 다시 수정할 수 있게 이벤트 등록
+  newCell.addEventListener('click', function () {
+    document.querySelector('input[name="editName"]').value = this.dataset.name || '';
+    document.querySelector('input[name="editRRN"]').value = this.dataset.rrn || '';
+    document.querySelector('input[name="editPhone"]').value = this.dataset.phone || '';
+    document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
+    document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
+    document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
+    document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
+
+    selectedCell = this;
+    document.getElementById('reservationDetailModal').style.display = 'flex';
+  });
+
+  // ✅ 수정 완료 시 모달 닫기
+  closeDetailModal();
 });
+
+//모달 닫기
+function closeDetailModal() {
+  document.getElementById('reservationDetailModal').style.display = 'none';
+}
+function cancelReservation() {
+  if (!selectedCell) return;
+
+  if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
+    // 셀 초기화
+    selectedCell.classList.remove('green');
+    selectedCell.innerHTML = '';
+    selectedCell.removeAttribute('data-name');
+    selectedCell.removeAttribute('data-rrn');
+    selectedCell.removeAttribute('data-phone');
+    selectedCell.removeAttribute('data-date');
+    selectedCell.removeAttribute('data-department');
+    selectedCell.removeAttribute('data-disease');
+    selectedCell.removeAttribute('data-doctor');
+
+    // 모달 닫기
+    closeDetailModal();
+
+    // 선택 해제
+    selectedCell = null;
+  }
+}
+
+function showTab(view) {
+  const tabs = document.querySelectorAll('.tab');
+  const views = document.querySelectorAll('.schedule-view');
+  const dateWrapper = document.querySelector('.top-center-date');
+
+  tabs.forEach(tab => tab.classList.remove('active'));
+  views.forEach(v => v.classList.remove('active'));
+
+  if (view === 'day') {
+    tabs[0].classList.add('active');
+    document.getElementById('dayView').classList.add('active');
+    dateWrapper.style.display = 'flex';
+  } else if (view === 'week') {
+    tabs[1].classList.add('active');
+    document.getElementById('weekView').classList.add('active');
+    dateWrapper.style.display = 'none';
+  }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  const today = new Date();
+  const formatted = today.toISOString().split('T')[0]; // YYYY-MM-DD
+  document.getElementById('currentDate').textContent = `📅 ${formatted}`;
+});
+
+//날짜 이동함수
+let currentDateObj = new Date(); // 전역 변수로 현재 날짜 저장
+
+function updateDateDisplay() {
+  const formatted = currentDateObj.toISOString().split('T')[0];
+  document.getElementById('currentDate').textContent = formatted;  // 이모지 제거
+}
+
+function changeDate(days) {
+  currentDateObj.setDate(currentDateObj.getDate() + days);
+  updateDateDisplay();
+}
+
+// 초기 날짜 표시
+document.addEventListener('DOMContentLoaded', function () {
+  updateDateDisplay();
+});
+
+document.querySelector('.date-icon').addEventListener('click', function () {
+  document.getElementById('calendarDateInput').value = currentDateObj.toISOString().split('T')[0];
+  document.getElementById('calendarModal').style.display = 'flex';
+});
+
+// 모달 닫기
+function closeCalendarModal() {
+  document.getElementById('calendarModal').style.display = 'none';
+}
+
+// 날짜 선택 후 적용
+function applyCalendarDate() {
+  const selectedDate = document.getElementById('calendarDateInput').value;
+  if (selectedDate) {
+    currentDateObj = new Date(selectedDate);
+    updateDateDisplay();
+  }
+  closeCalendarModal();
+}
 </script>
 
 
