@@ -1,46 +1,34 @@
 package com.dita.domain;
 
-import java.time.LocalDate;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "drug") // 약품
+@Table(name = "drug")
 @Getter @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder// 빌더 방식으로 사용
+@AllArgsConstructor
+@Builder
 public class Drug {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "drug_id",nullable = false)
-	private int drugId;//약품 아이디
-	
-	@Column(name = "drug_name", length= 100, nullable = false)
-	private String drugName;//약품 명
-	
-	private String description;// 설명
-	
-	@Column(length=20, nullable = false)
-	private int stock;// 재고 수량
-	
-	private String unit;// 단위
 
-	@Column(name = "expiry_date")
-	private LocalDate expiryDate;// 유통기한
-	
-	@Column(name = "drug_img", updatable = false)
-	private String drugImg;// 약품 이미지
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "drug_id")
+    private Integer drugId; // 약품 고유 ID (PK)
 
+    @Column(name = "drug_code", length = 50)
+    private String drugCode; // 공공데이터 기준 약품코드
+
+    @Column(name = "drug_name", length = 100)
+    private String drugName; // 성분명 + 용량 문자열
+
+    @Column(name = "main_ingredient", length = 100)
+    private String mainIngredient; // 한글 주성분명
+
+    @Column(name = "category", length = 20)
+    private Drug_category category; // '일반', '향정', '대마' 등
+
+    @Column(name = "form_type", length = 20)
+    private Form_Type formType; // '내복약', '외용약', '주사', '수액', '기타'
 }
+
