@@ -324,6 +324,13 @@
     	    selectedRow = null;
     	  }
     	});
+    
+    const infoModal = document.getElementById('infoModal');
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      infoModal.style.display = 'none';
+      selectedRow = null;
+    });
 
   </script>
 </body>

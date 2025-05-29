@@ -92,6 +92,22 @@
             </div>
         </div>
     </div>
+    
+    <div id="chartModal" class="modal">
+	  <div class="modal-content chart-modal-content">
+	    <span class="close-chart-modal">&times;</span>
+	    <div class="modal-flex">
+	      <div class="modal-left">
+	        <canvas id="modalChart"></canvas>
+	      </div>
+	      <div class="modal-right">
+	        <h4 id="modalChartTitle">차트 제목</h4>
+	        <p id="modalChartInfo">여기에 차트 설명이 표시됩니다.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+    
 
     <script>
         const createBarChart = (id, labels, data, label) => {
@@ -144,6 +160,109 @@
         createDoughnutChart('paymentStatusChart', ['완납', '미납'], [85, 15], ['#8bc34a', '#ffc107']);
         createBarChart('departmentChart', ['내과', '외과', '소아과', '정형외과'], [80, 70, 60, 90], '진료과별 환자');
         createBarChart('diagnosisCodeChart', ['A01', 'B02', 'C03', 'D04', 'E05', 'F06', 'G07', 'H08', 'I09', 'J10'], [15, 12, 10, 9, 8, 7, 6, 5, 4, 3], '상병 코드');
-    </script>
+    
+        const chartDescriptions = {
+        		  monthlyOutpatientChart: '월별 외래환자 수는 병원의 월별 방문량을 보여줍니다.',
+        		  visitTypeChart: '진료 유형별 환자 수는 일반, 응급, 입원 등으로 나뉩니다.',
+        		  visitPurposeChart: '방문 목적은 진료, 검사, 상담 등으로 분류됩니다.',
+        		  dailyOutpatientChart: '일자별 외래환자 수는 최근 며칠간의 환자 방문 통계를 보여줍니다.',
+        		  insuranceTypeChart: '보험 유형은 건강보험, 의료급여, 자동차보험으로 나뉩니다.',
+        		  regionChart: '지역별 환자 분포를 나타냅니다.',
+        		  paymentStatusChart: '수납 상태는 완납/미납으로 구분됩니다.',
+        		  departmentChart: '진료과별 환자 수는 병원의 과목별 통계를 보여줍니다.',
+        		  diagnosisCodeChart: '상병 코드는 가장 많이 기록된 질병 코드의 순위를 보여줍니다.'
+        		};
+
+        let currentChartData = null;
+        let modalChart = null;
+
+        document.querySelectorAll('canvas').forEach(canvas => {
+        	  canvas.addEventListener('click', () => {
+        	    const id = canvas.id;
+        	    const chartInstance = Chart.getChart(id);
+        	    if (!chartInstance) return;
+
+        	    currentChartData = chartInstance.config;
+
+        	    // 안전한 제목 설정
+        	    const chartType = chartInstance.config.type || 'Chart';
+        	    const chartTitle = chartInstance.config.options?.plugins?.title?.text || chartType.toUpperCase();
+
+        	    document.getElementById('modalChartTitle').textContent = chartTitle;
+        	    document.getElementById('modalChartInfo').textContent =
+        	      chartDescriptions[id] || '차트 정보 없음';
+
+        	    const modal = document.getElementById('chartModal');
+        	    modal.style.display = 'block';
+
+        	    setTimeout(() => {
+        	      if (modalChart) modalChart.destroy();
+        	      modalChart = new Chart(document.getElementById('modalChart'), JSON.parse(JSON.stringify(currentChartData)));
+        	    }, 100);
+        	  });
+        	});
+        		
+        </script>
+    
+    <style>
+    .modal {
+	  display: none;
+	  position: fixed;
+	  z-index: 2000;
+	  left: 0;
+	  top: 0;
+	  width: 100%;
+	  height: 100%;
+	  background-color: rgba(0,0,0,0.5);
+	}
+	
+	.chart-modal-content {
+	  background-color: #fff;
+	  width: 80%;
+	  height: 80%;
+	  margin: 5% auto;
+	  padding: 20px;
+	  border-radius: 8px;
+	  position: relative;
+	  display: flex;
+	  flex-direction: column;
+	}
+	
+	.modal-flex {
+	  display: flex;
+	  height: 100%;
+	  gap: 20px;
+	}
+	
+	.modal-left {
+	  flex: 2;
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  min-height: 300px;
+	}
+	
+	.modal-left canvas {
+	  width: 100% !important;
+	  height: 100% !important;
+	  max-height: 100%;
+	}
+	
+	.modal-right {
+	  flex: 1;
+	  overflow-y: auto;
+	}
+	
+	.close-chart-modal {
+	  position: absolute;
+	  top: 10px;
+	  right: 15px;
+	  font-size: 20px;
+	  font-weight: bold;
+	  cursor: pointer;
+	}
+    
+    
+    </style>
 </body>
 </html>
