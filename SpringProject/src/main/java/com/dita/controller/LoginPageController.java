@@ -2,12 +2,15 @@ package com.dita.controller;
 
 import com.dita.domain.Grade;
 import com.dita.domain.User;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dita.persistence.LoginPageRepository;
 
@@ -44,6 +47,8 @@ public class LoginPageController {
             @RequestParam String usersPhone,
             @RequestParam String usersEmail,
             @RequestParam String usersAddress,
+            @RequestParam String usersGender,
+            @RequestParam String usersIdcard,
             @RequestParam Grade grade
             // deptId가 필요하면 추가: @RequestParam Integer deptId
     ) {
@@ -55,6 +60,8 @@ public class LoginPageController {
         u.setUsersPhone(usersPhone);
         u.setUsersEmail(usersEmail);
         u.setUsersAddress(usersAddress);
+        u.setUsersGender(usersGender);
+        u.setUsersIdcard(usersIdcard);
         u.setGrade(grade);
         // u.setDeptId(deptId);
 
@@ -83,5 +90,12 @@ public class LoginPageController {
 	public String showResultpwd(Model model) {
 		return "Login/Resultpwd";
 	}
+	
+	@GetMapping("/checkId")
+    @ResponseBody
+    public ResponseEntity<Boolean> checkId(@RequestParam String usersId) {
+        boolean exists = repo.existsById(usersId);
+        return ResponseEntity.ok(!exists);
+    }
 	
 }

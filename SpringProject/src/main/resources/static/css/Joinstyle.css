@@ -111,3 +111,24 @@ h2 {
   white-space: nowrap;
   margin-left: 4px;
 }
+
+.id-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+  color: red;  /* 실패 시 */
+}
+
+.id-result.success {
+  color: green;
+}
+
+.pwd-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+}
+.pwd-result.success {
+  color: green;
+}
+.pwd-result.error {
+  color: red;
+}
