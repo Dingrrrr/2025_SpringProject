@@ -3,6 +3,8 @@ package com.dita.controller;
 import com.dita.domain.Grade;
 import com.dita.domain.User;
 
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +23,7 @@ import lombok.extern.java.Log;
 
 @Controller
 @Log
-@RequestMapping("/Login/")
+@RequestMapping("/Login")
 public class LoginPageController {
 
 	private final LoginPageRepository repo;
@@ -77,6 +79,33 @@ public class LoginPageController {
 	public String showResultid(Model model) {
 		return "Login/Resultid";
 	}
+	
+	@PostMapping("/Findid")
+    public String processFindId(
+            @RequestParam String usersName,
+            @RequestParam String usersEmail,
+            @RequestParam String code,
+            HttpSession session,
+            Model model
+    ) {
+        // 1) 세션에 저장된 인증번호 검증
+        String savedCode = (String) session.getAttribute("emailCode");
+        if (savedCode == null || !savedCode.equals(code)) {
+            model.addAttribute("error", "인증번호가 일치하지 않습니다.");
+            return "Login/Findid";
+        }
+
+        // 2) 이름+이메일로 사용자 조회
+        Optional<User> opt = repo.findByUsersNameAndUsersEmail(usersName, usersEmail);
+        if (opt.isEmpty()) {
+            model.addAttribute("error", "일치하는 회원 정보가 없습니다.");
+            return "Login/Findid";
+        }
+
+        // 3) 조회된 아이디를 모델에 담고 Resultid 뷰로 이동
+        model.addAttribute("usersId", opt.get().getUsersId());
+        return "Login/Resultid";
+    }
 
 	@GetMapping("/Findpwd")
 	public String showFindpwdpage(Model model) {
@@ -117,8 +146,9 @@ public class LoginPageController {
 		// 인증 성공 시 세션에서 제거(Optional)
 		boolean ok = saved != null && saved.equals(code);
 		if (ok) {
-			session.removeAttribute("emailCode");
-		}
+			// 인증 완료 플래그만 남기고, 코드 자체는 삭제하지 않습니다.
+		    session.setAttribute("emailVerified", true);
+	   }
 		return ResponseEntity.ok(ok);
 	}
 
