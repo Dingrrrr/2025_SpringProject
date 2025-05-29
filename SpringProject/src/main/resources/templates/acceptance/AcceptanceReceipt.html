@@ -7,7 +7,7 @@
       <link rel="stylesheet" href="/css/AcceptanceReceipt.css">
 </head>
 <body>
-    <!-- 사이드바 -->
+   <!-- 사이드바 -->
     <div class="sidebar">
         <div class="profile">
             <div class="profile-icon">👤</div>
@@ -19,7 +19,7 @@
             <span>알림</span>
         </a>
         
-        <a href="#" class="menu-item">
+        <a href="/home" class="menu-item">
             <div class="menu-icon">🏠</div>
             <span>홈</span>
         </a>
@@ -45,21 +45,15 @@
         
         <a href="#" class="menu-item">
             <div class="menu-icon">👥</div>
-            <span>재고</span>
+            <span>제고</span>
         </a>
         
         <a href="#" class="menu-item">
             <div class="menu-icon">📊</div>
             <span>업무</span>
-        </a>
-        
-       <div class="logout-section">
-   		<div class="logout-item">
-       	<span>로그아웃</span>
-   		</div>
-		</div>
-	</div>
-    	
+        </div>
+    </div>
+
     <!-- 메인 컨텐츠 -->
     <div class="main-content">
         <!-- 좌측 환자 정보 패널 -->
@@ -177,12 +171,12 @@
                         - 기타: 야간 근무로 인한 수면 패턴 불규칙
                     </div>
                     <textarea class="notes-edit" style="display:none; width:100%; height:150px; padding:10px; border:1px solid #ddd; border-radius:4px; resize:vertical;">- 고혈압 병력 있음
-						- 당뇨 가족력
-						- 정기검진 필요
-						- 약물 알레르기: 페니실린
-						- 흡연력: 금연 2년차
-						- 운동: 주 3회 헬스
-						- 기타: 야간 근무로 인한 수면 패턴 불규칙</textarea>
+- 당뇨 가족력
+- 정기검진 필요
+- 약물 알레르기: 페니실린
+- 흡연력: 금연 2년차
+- 운동: 주 3회 헬스
+- 기타: 야간 근무로 인한 수면 패턴 불규칙</textarea>
                 </div>
                 
                 <div class="notes-edit-buttons" style="display:none; margin-top: 10px;">
@@ -191,16 +185,13 @@
                 </div>
             </div>
         </div>
+
         <!-- 우측 기록 테이블 -->
         <div class="records-panel">
             <div class="records-header">
                 <div class="records-title">진료 기록 및 수납 내역</div>
                 <div class="header-buttons">
-                    <button class="header-btn active">전체</button>
-                    <button class="header-btn">미수납</button>
-                    <button class="header-btn green">완료수납</button>
-                    <button class="header-btn teal">미결제금</button>
-                    <button class="header-btn orange">검사 예약</button>
+                    <button class="header-btn add-record-btn" onclick="showAddRecordModal()">추가</button>
                 </div>
             </div>
 
@@ -218,68 +209,94 @@
                             <th>수납액</th>
                             <th>미수납액</th>
                             <th>상태</th>
+                            <th>작업</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="date-cell">2023-08-17</td>
-                            <td>초진</td>
-                            <td class="diagnosis-cell">고혈압 정기검진 및 처방</td>
-                            <td>김의사</td>
-                            <td class="amount-cell">30,000</td>
-                            <td class="amount-cell">21,000</td>
-                            <td class="amount-cell">9,000</td>
-                            <td class="amount-cell">9,000</td>
-                            <td class="amount-cell">0</td>
-                            <td class="status-cell status-완료">완료</td>
+                            <td class="date-cell" data-field="date">2023-08-17</td>
+                            <td data-field="type">초진</td>
+                            <td class="diagnosis-cell" data-field="diagnosis">고혈압 정기검진 및 처방</td>
+                            <td data-field="doctor">김의사</td>
+                            <td class="amount-cell" data-field="total">30,000</td>
+                            <td class="amount-cell" data-field="insurance">21,000</td>
+                            <td class="amount-cell" data-field="patient">9,000</td>
+                            <td class="amount-cell" data-field="paid">9,000</td>
+                            <td class="amount-cell" data-field="unpaid">0</td>
+                            <td class="status-cell status-완료" data-field="status">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="date-cell">2023-08-10</td>
-                            <td>재진</td>
-                            <td class="diagnosis-cell">당뇨 검사 및 상담</td>
-                            <td>이의사</td>
-                            <td class="amount-cell">25,000</td>
-                            <td class="amount-cell">17,500</td>
-                            <td class="amount-cell">7,500</td>
-                            <td class="amount-cell">7,500</td>
-                            <td class="amount-cell">0</td>
-                            <td class="status-cell status-완료">완료</td>
+                            <td class="date-cell" data-field="date">2023-08-10</td>
+                            <td data-field="type">재진</td>
+                            <td class="diagnosis-cell" data-field="diagnosis">당뇨 검사 및 상담</td>
+                            <td data-field="doctor">이의사</td>
+                            <td class="amount-cell" data-field="total">25,000</td>
+                            <td class="amount-cell" data-field="insurance">17,500</td>
+                            <td class="amount-cell" data-field="patient">7,500</td>
+                            <td class="amount-cell" data-field="paid">7,500</td>
+                            <td class="amount-cell" data-field="unpaid">0</td>
+                            <td class="status-cell status-완료" data-field="status">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="date-cell">2023-08-10</td>
-                            <td>재진</td>
-                            <td class="diagnosis-cell">혈압약 처방 및 모니터링</td>
-                            <td>김의사</td>
-                            <td class="amount-cell">200,000</td>
-                            <td class="amount-cell">140,000</td>
-                            <td class="amount-cell">60,000</td>
-                            <td class="amount-cell">30,000</td>
-                            <td class="amount-cell">30,000</td>
-                            <td class="status-cell status-대기">미수납</td>
+                            <td class="date-cell" data-field="date">2023-08-10</td>
+                            <td data-field="type">재진</td>
+                            <td class="diagnosis-cell" data-field="diagnosis">혈압약 처방 및 모니터링</td>
+                            <td data-field="doctor">김의사</td>
+                            <td class="amount-cell" data-field="total">200,000</td>
+                            <td class="amount-cell" data-field="insurance">140,000</td>
+                            <td class="amount-cell" data-field="patient">60,000</td>
+                            <td class="amount-cell" data-field="paid">30,000</td>
+                            <td class="amount-cell" data-field="unpaid">30,000</td>
+                            <td class="status-cell status-대기" data-field="status">미수납</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="date-cell">2023-08-10</td>
-                            <td>초진</td>
-                            <td class="diagnosis-cell">종합건강검진 1차</td>
-                            <td>박의사</td>
-                            <td class="amount-cell">70,000</td>
-                            <td class="amount-cell">49,000</td>
-                            <td class="amount-cell">21,000</td>
-                            <td class="amount-cell">21,000</td>
-                            <td class="amount-cell">0</td>
-                            <td class="status-cell status-완료">완료</td>
+                            <td class="date-cell" data-field="date">2023-08-10</td>
+                            <td data-field="type">초진</td>
+                            <td class="diagnosis-cell" data-field="diagnosis">종합건강검진 1차</td>
+                            <td data-field="doctor">박의사</td>
+                            <td class="amount-cell" data-field="total">70,000</td>
+                            <td class="amount-cell" data-field="insurance">49,000</td>
+                            <td class="amount-cell" data-field="patient">21,000</td>
+                            <td class="amount-cell" data-field="paid">21,000</td>
+                            <td class="amount-cell" data-field="unpaid">0</td>
+                            <td class="status-cell status-완료" data-field="status">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr class="highlighted-row">
-                            <td class="date-cell">2023-08-10</td>
-                            <td>검사</td>
-                            <td class="diagnosis-cell">혈액검사 및 소변검사 1차</td>
-                            <td>최의사</td>
-                            <td class="amount-cell">70,000</td>
-                            <td class="amount-cell">49,000</td>
-                            <td class="amount-cell">21,000</td>
-                            <td class="amount-cell">21,000</td>
-                            <td class="amount-cell">0</td>
-                            <td class="status-cell status-완료">완료</td>
+                            <td class="date-cell" data-field="date">2023-08-10</td>
+                            <td data-field="type">검사</td>
+                            <td class="diagnosis-cell" data-field="diagnosis">혈액검사 및 소변검사 1차</td>
+                            <td data-field="doctor">최의사</td>
+                            <td class="amount-cell" data-field="total">70,000</td>
+                            <td class="amount-cell" data-field="insurance">49,000</td>
+                            <td class="amount-cell" data-field="patient">21,000</td>
+                            <td class="amount-cell" data-field="paid">21,000</td>
+                            <td class="amount-cell" data-field="unpaid">0</td>
+                            <td class="status-cell status-완료" data-field="status">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
                             <td class="date-cell">2023-07-25</td>
@@ -292,42 +309,62 @@
                             <td class="amount-cell">수술비용</td>
                             <td class="amount-cell">0</td>
                             <td class="status-cell status-완료">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
                             <td class="date-cell">2023-07-24</td>
-                            <td>예약</td>
-                            <td class="diagnosis-cell">정기검진 예약</td>
+                            <td>초진</td>
+                            <td class="diagnosis-cell">초진</td>
                             <td>김의사</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
-                            <td class="status-cell status-대기">예약중</td>
+                            <td class="status-cell status-대기">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr class="highlighted-row">
                             <td class="date-cell">2023-07-24</td>
-                            <td>취소</td>
-                            <td class="diagnosis-cell">검진 취소 - 개인사정</td>
+                            <td>재진</td>
+                            <td class="diagnosis-cell">아픔</td>
                             <td>-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
-                            <td class="status-cell status-취소">취소</td>
+                            <td class="status-cell status-취소">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                         <tr>
                             <td class="date-cell">2023-07-19</td>
-                            <td>예약</td>
-                            <td class="diagnosis-cell">보험/치과 검진예약</td>
+                            <td>초진</td>
+                            <td class="diagnosis-cell">보험/치과</td>
                             <td>이의사</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
                             <td class="amount-cell">-</td>
-                            <td class="status-cell status-대기">예약중</td>
+                            <td class="status-cell status-대기">완료</td>
+                            <td class="action-cell">
+                                <button class="edit-btn" onclick="editRow(this)">수정</button>
+                                <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+                                <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -360,215 +397,604 @@
         </div>
     </div>
 
-    <script>
-        // 메뉴 클릭 이벤트
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (this.getAttribute('href') === '#') {
-                    e.preventDefault();
-                }
-                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
+    <!-- 기록 추가 모달 -->
+    <div id="addRecordModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>새 진료 기록 추가</h3>
+                <span class="close" onclick="closeAddRecordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addRecordForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>날짜</label>
+                            <input type="date" id="recordDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>구분</label>
+                            <select id="recordType" required>
+                                <option value="">선택하세요</option>
+                                <option value="초진">초진</option>
+                                <option value="재진">재진</option>
+                                <option value="검사">검사</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>진료내용</label>
+                            <input type="text" id="recordContent" placeholder="진료 내용을 입력하세요" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>담당의</label>
+                            <select id="recordDoctor" required>
+                                <option value="">선택하세요</option>
+                                <option value="김의사">김의사</option>
+                                <option value="이의사">이의사</option>
+                                <option value="박의사">박의사</option>
+                                <option value="최의사">최의사</option>
+                                <option value="정의사">정의사</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>상태</label>
+                            <select id="recordStatus" required>
+                                <option value="">선택하세요</option>
+                                <option value="완료">완료</option>
+                                <option value="미수납">미수납</option>                               
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>진료비</label>
+                            <input type="number" id="recordFee" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>보험청구</label>
+                            <input type="number" id="recordInsurance" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>환자부담</label>
+                            <input type="number" id="recordPatientPay" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>수납액</label>
+                            <input type="number" id="recordPaid" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>미수납액</label>
+                            <input type="number" id="recordUnpaid" placeholder="0" min="0">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeAddRecordModal()">취소</button>
+                <button type="button" class="btn-save" onclick="addNewRecord()">저장</button>
+            </div>
+        </div>
+    </div>
+
+   <script>
+// 메뉴 클릭 이벤트
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        if (this.getAttribute('href') === '#') {
+            e.preventDefault();
+        }
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+    });
+}); // 이 부분이 누락되어 있었음!
+
+// 기록 추가 함수 (모달 대신 직접 테이블에 추가)
+function showAddRecordModal() {
+    const tableBody = document.querySelector('.records-table tbody');
+    const newRow = document.createElement('tr');
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    newRow.innerHTML = `
+        <td class="date-cell edit-input-cell">
+            <input type="date" value="${today}" />
+        </td>
+        <td class="edit-input-cell">
+            <select class="form-control">
+                <option value="">선택하세요</option>
+                <option value="초진">초진</option>
+                <option value="재진">재진</option>
+                <option value="검사">검사</option>               
+            </select>
+        </td>
+        <td class="edit-input-cell">
+            <input type="text" placeholder="진료 내용을 입력하세요" />
+        </td>
+        <td class="edit-input-cell">
+            <select class="form-control">
+                <option value="">선택하세요</option>
+                <option value="김의사">김의사</option>
+                <option value="이의사">이의사</option>
+                <option value="박의사">박의사</option>
+                <option value="최의사">최의사</option>
+                <option value="정의사">정의사</option>
+            </select>
+        </td>
+        <td class="edit-input-cell">
+            <input type="number" placeholder="0" min="0" />
+        </td>
+        <td class="edit-input-cell">
+            <input type="number" placeholder="0" min="0" />
+        </td>
+        <td class="edit-input-cell">
+            <input type="number" placeholder="0" min="0" />
+        </td>
+        <td class="edit-input-cell">
+            <input type="number" placeholder="0" min="0" />
+        </td>
+        <td class="edit-input-cell">
+            <input type="number" placeholder="0" min="0" />
+        </td>
+        <td class="edit-input-cell">
+            <select class="form-control">
+                <option value="">선택하세요</option>
+                <option value="완료">완료</option>
+                <option value="미수납">미수납</option>
+            </select>
+        </td>
+        <td class="action-cell">
+            <button class="save-btn" onclick="saveNewRow(this)">저장</button>
+            <button class="cancel-btn" onclick="cancelNewRow(this)">취소</button>
+        </td>
+    `;
+    
+    tableBody.insertBefore(newRow, tableBody.firstChild);
+    newRow.querySelector('select').focus();
+}
+
+function saveNewRow(button) {
+    const row = button.closest('tr');
+    
+    const dateInput = row.querySelector('td:nth-child(1) input');
+    const typeSelect = row.querySelector('td:nth-child(2) select');
+    const contentInput = row.querySelector('td:nth-child(3) input');
+    const doctorSelect = row.querySelector('td:nth-child(4) select');
+    const feeInput = row.querySelector('td:nth-child(5) input');
+    const insuranceInput = row.querySelector('td:nth-child(6) input');
+    const patientInput = row.querySelector('td:nth-child(7) input');
+    const paidInput = row.querySelector('td:nth-child(8) input');
+    const unpaidInput = row.querySelector('td:nth-child(9) input');
+    const statusSelect = row.querySelector('td:nth-child(10) select');
+    
+    if (!dateInput.value || !typeSelect.value || !contentInput.value.trim() || 
+        !doctorSelect.value || !statusSelect.value) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+    
+    let statusClass = 'status-cell ';
+    switch(statusSelect.value) {
+        case '완료': statusClass += 'status-완료'; break;
+        case '미수납': statusClass += 'status-대기'; break;
+        case '취소': statusClass += 'status-취소'; break;
+        default: statusClass += 'status-대기';
+    }
+    
+    row.innerHTML = `
+        <td class="date-cell">${dateInput.value}</td>
+        <td>${typeSelect.value}</td>
+        <td class="diagnosis-cell">${contentInput.value}</td>
+        <td>${doctorSelect.value}</td>
+        <td class="amount-cell">${feeInput.value || '-'}</td>
+        <td class="amount-cell">${insuranceInput.value || '-'}</td>
+        <td class="amount-cell">${patientInput.value || '-'}</td>
+        <td class="amount-cell">${paidInput.value || '-'}</td>
+        <td class="amount-cell">${unpaidInput.value || '-'}</td>
+        <td class="${statusClass}">${statusSelect.value}</td>
+        <td class="action-cell">
+            <button class="edit-btn" onclick="editRow(this)">수정</button>
+            <button class="save-btn" onclick="saveRow(this)" style="display:none;">저장</button>
+            <button class="cancel-btn" onclick="cancelEdit(this)" style="display:none;">취소</button>
+        </td>
+    `;
+    
+    alert('새 진료 기록이 추가되었습니다.');
+}
+
+function cancelNewRow(button) {
+    const row = button.closest('tr');
+    row.remove();
+}
+
+// 서브메뉴 클릭 이벤트
+document.querySelectorAll('.submenu-item').forEach(item => {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// 헤더 버튼 클릭 이벤트
+document.querySelectorAll('.header-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.header-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filterType = this.textContent.trim();
+        console.log('필터 적용:', filterType);
+    });
+});
+
+// 테이블 행 클릭 이벤트
+document.querySelectorAll('.records-table tbody tr').forEach(row => {
+    row.addEventListener('click', function() {
+        document.querySelectorAll('.records-table tbody tr').forEach(r => {
+            if (!r.classList.contains('highlighted-row')) {
+                r.style.backgroundColor = '';
+            }
+        });
+        if (!this.classList.contains('highlighted-row')) {
+            this.style.backgroundColor = '#e3f2fd';
+        }
+    });
+});
+
+// 고객 정보 수정 기능
+let isPatientEditing = false;
+let originalPatientData = {};
+
+function togglePatientEdit() {
+    const editBtn = document.querySelector('.edit-patient-btn');
+    const displayTexts = document.querySelectorAll('.patient-info .display-text');
+    const editInputs = document.querySelectorAll('.patient-info .edit-input');
+    const editButtons = document.querySelector('.patient-edit-buttons');
+
+    if (!isPatientEditing) {
+        isPatientEditing = true;
+        editBtn.textContent = '수정중...';
+        editBtn.disabled = true;
+        
+        displayTexts.forEach((text, index) => {
+            originalPatientData[index] = text.textContent;
         });
 
-        // 서브메뉴 클릭 이벤트
-        document.querySelectorAll('.submenu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        displayTexts.forEach(text => text.style.display = 'none');
+        editInputs.forEach(input => input.style.display = 'block');
+        editButtons.style.display = 'block';
+    }
+}
 
-        // 헤더 버튼 클릭 이벤트
-        document.querySelectorAll('.header-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.header-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const filterType = this.textContent.trim();
-                console.log('필터 적용:', filterType);
-                // 실제 구현시 테이블 필터링 로직 추가
-            });
-        });
+function savePatientInfo() {
+    const displayTexts = document.querySelectorAll('.patient-info .display-text');
+    const editInputs = document.querySelectorAll('.patient-info .edit-input');
+    const editButtons = document.querySelector('.patient-edit-buttons');
+    const editBtn = document.querySelector('.edit-patient-btn');
 
-        // 테이블 행 클릭 이벤트
-        document.querySelectorAll('.records-table tbody tr').forEach(row => {
-            row.addEventListener('click', function() {
-                // 기존 선택 해제
-                document.querySelectorAll('.records-table tbody tr').forEach(r => {
-                    if (!r.classList.contains('highlighted-row')) {
-                        r.style.backgroundColor = '';
-                    }
-                });
-                // 현재 행 선택 (highlighted-row가 아닌 경우만)
-                if (!this.classList.contains('highlighted-row')) {
-                    this.style.backgroundColor = '#e3f2fd';
-                }
-            });
-        });
-		// 고객 정보 수정 기능
-        let isPatientEditing = false;
-        let originalPatientData = {};
-
-        function togglePatientEdit() {
-            const editBtn = document.querySelector('.edit-patient-btn');
-            const displayTexts = document.querySelectorAll('.patient-info .display-text');
-            const editInputs = document.querySelectorAll('.patient-info .edit-input');
-            const editButtons = document.querySelector('.patient-edit-buttons');
-
-            if (!isPatientEditing) {
-                // 수정 모드로 전환
-                isPatientEditing = true;
-                editBtn.textContent = '수정중...';
-                editBtn.disabled = true;
-                
-                // 원본 데이터 저장
-                displayTexts.forEach((text, index) => {
-                    originalPatientData[index] = text.textContent;
-                });
-
-                // 입력 필드 표시
-                displayTexts.forEach(text => text.style.display = 'none');
-                editInputs.forEach(input => input.style.display = 'block');
-                editButtons.style.display = 'block';
+    editInputs.forEach((input, index) => {
+        if (displayTexts[index]) {
+            if (input.tagName === 'SELECT') {
+                displayTexts[index].textContent = input.options[input.selectedIndex].text;
+            } else if (input.type === 'number') {
+                displayTexts[index].textContent = input.value + '회';
+            } else {
+                displayTexts[index].textContent = input.value;
             }
         }
+    });
 
-        function savePatientInfo() {
-            const displayTexts = document.querySelectorAll('.patient-info .display-text');
-            const editInputs = document.querySelectorAll('.patient-info .edit-input');
-            const editButtons = document.querySelector('.patient-edit-buttons');
-            const editBtn = document.querySelector('.edit-patient-btn');
+    displayTexts.forEach(text => text.style.display = 'block');
+    editInputs.forEach(input => input.style.display = 'none');
+    editButtons.style.display = 'none';
+    
+    editBtn.textContent = '수정';
+    editBtn.disabled = false;
+    isPatientEditing = false;
 
-            // 값 업데이트
-            editInputs.forEach((input, index) => {
-                if (displayTexts[index]) {
-                    if (input.tagName === 'SELECT') {
-                        displayTexts[index].textContent = input.options[input.selectedIndex].text;
-                    } else if (input.type === 'number') {
-                        displayTexts[index].textContent = input.value + '회';
-                    } else {
-                        displayTexts[index].textContent = input.value;
-                    }
-                }
-            });
+    alert('고객 정보가 저장되었습니다.');
+}
 
-            // 표시 모드로 전환
-            displayTexts.forEach(text => text.style.display = 'block');
-            editInputs.forEach(input => input.style.display = 'none');
-            editButtons.style.display = 'none';
-            
-            editBtn.textContent = '수정';
-            editBtn.disabled = false;
-            isPatientEditing = false;
+function cancelPatientEdit() {
+    const displayTexts = document.querySelectorAll('.patient-info .display-text');
+    const editInputs = document.querySelectorAll('.patient-info .edit-input');
+    const editButtons = document.querySelector('.patient-edit-buttons');
+    const editBtn = document.querySelector('.edit-patient-btn');
 
-            alert('고객 정보가 저장되었습니다.');
-        }
-
-        function cancelPatientEdit() {
-            const displayTexts = document.querySelectorAll('.patient-info .display-text');
-            const editInputs = document.querySelectorAll('.patient-info .edit-input');
-            const editButtons = document.querySelector('.patient-edit-buttons');
-            const editBtn = document.querySelector('.edit-patient-btn');
-
-            // 원본 값으로 복원
-            editInputs.forEach((input, index) => {
-                if (originalPatientData[index]) {
-                    if (input.tagName === 'SELECT') {
-                        input.value = originalPatientData[index];
-                    } else if (input.type === 'number') {
-                        input.value = originalPatientData[index].replace('회', '');
-                    } else {
-                        input.value = originalPatientData[index];
-                    }
-                }
-            });
-
-            // 표시 모드로 전환
-            displayTexts.forEach(text => text.style.display = 'block');
-            editInputs.forEach(input => input.style.display = 'none');
-            editButtons.style.display = 'none';
-            
-            editBtn.textContent = '수정';
-            editBtn.disabled = false;
-            isPatientEditing = false;
-        }
-
-        // 메모 수정 기능
-        let isNotesEditing = false;
-        let originalNotesData = '';
-
-        function toggleNotesEdit() {
-            const editBtn = document.querySelector('.edit-notes-btn');
-            const notesDisplay = document.querySelector('.notes-display');
-            const notesEdit = document.querySelector('.notes-edit');
-            const editButtons = document.querySelector('.notes-edit-buttons');
-
-            if (!isNotesEditing) {
-                // 수정 모드로 전환
-                isNotesEditing = true;
-                editBtn.textContent = '수정중...';
-                editBtn.disabled = true;
-                
-                // 원본 데이터 저장
-                originalNotesData = notesDisplay.innerHTML;
-
-                // 편집 필드 표시
-                notesDisplay.style.display = 'none';
-                notesEdit.style.display = 'block';
-                editButtons.style.display = 'block';
+    editInputs.forEach((input, index) => {
+        if (originalPatientData[index]) {
+            if (input.tagName === 'SELECT') {
+                input.value = originalPatientData[index];
+            } else if (input.type === 'number') {
+                input.value = originalPatientData[index].replace('회', '');
+            } else {
+                input.value = originalPatientData[index];
             }
         }
+    });
 
-        function saveNotes() {
-            const editBtn = document.querySelector('.edit-notes-btn');
-            const notesDisplay = document.querySelector('.notes-display');
-            const notesEdit = document.querySelector('.notes-edit');
-            const editButtons = document.querySelector('.notes-edit-buttons');
+    displayTexts.forEach(text => text.style.display = 'block');
+    editInputs.forEach(input => input.style.display = 'none');
+    editButtons.style.display = 'none';
+    
+    editBtn.textContent = '수정';
+    editBtn.disabled = false;
+    isPatientEditing = false;
+}
 
-            // 값 업데이트 (줄바꿈을 <br>로 변환)
-            const newContent = notesEdit.value.replace(/\n/g, '<br>');
-            notesDisplay.innerHTML = newContent;
+// 메모 수정 기능
+let isNotesEditing = false;
+let originalNotesData = '';
 
-            // 표시 모드로 전환
-            notesDisplay.style.display = 'block';
-            notesEdit.style.display = 'none';
-            editButtons.style.display = 'none';
-            
-            editBtn.textContent = '수정';
-            editBtn.disabled = false;
-            isNotesEditing = false;
+function toggleNotesEdit() {
+    const editBtn = document.querySelector('.edit-notes-btn');
+    const notesDisplay = document.querySelector('.notes-display');
+    const notesEdit = document.querySelector('.notes-edit');
+    const editButtons = document.querySelector('.notes-edit-buttons');
 
-            alert('메모가 저장되었습니다.');
+    if (!isNotesEditing) {
+        isNotesEditing = true;
+        editBtn.textContent = '수정중...';
+        editBtn.disabled = true;
+        
+        originalNotesData = notesDisplay.innerHTML;
+
+        notesDisplay.style.display = 'none';
+        notesEdit.style.display = 'block';
+        editButtons.style.display = 'block';
+    }
+}
+
+function saveNotes() {
+    const editBtn = document.querySelector('.edit-notes-btn');
+    const notesDisplay = document.querySelector('.notes-display');
+    const notesEdit = document.querySelector('.notes-edit');
+    const editButtons = document.querySelector('.notes-edit-buttons');
+
+    const newContent = notesEdit.value.replace(/\n/g, '<br>');
+    notesDisplay.innerHTML = newContent;
+
+    notesDisplay.style.display = 'block';
+    notesEdit.style.display = 'none';
+    editButtons.style.display = 'none';
+    
+    editBtn.textContent = '수정';
+    editBtn.disabled = false;
+    isNotesEditing = false;
+
+    alert('메모가 저장되었습니다.');
+}
+
+function cancelNotesEdit() {
+    const editBtn = document.querySelector('.edit-notes-btn');
+    const notesDisplay = document.querySelector('.notes-display');
+    const notesEdit = document.querySelector('.notes-edit');
+    const editButtons = document.querySelector('.notes-edit-buttons');
+
+    notesEdit.value = originalNotesData.replace(/<br>/g, '\n');
+
+    notesDisplay.style.display = 'block';
+    notesEdit.style.display = 'none';
+    editButtons.style.display = 'none';
+    
+    editBtn.textContent = '수정';
+    editBtn.disabled = false;
+    isNotesEditing = false;
+}
+
+// 테이블 행 수정 기능
+let editingRow = null;
+let originalRowData = {};
+
+function editRow(button) {
+    if (editingRow && editingRow !== button.closest('tr')) {
+        cancelEdit(editingRow.querySelector('.cancel-btn'));
+    }
+
+    const row = button.closest('tr');
+    editingRow = row;
+    
+    const cells = row.querySelectorAll('td');
+    originalRowData = {};
+    cells.forEach((cell, index) => {
+        originalRowData[index] = cell.textContent.trim();
+    });
+
+    convertCellsToInputs(row);
+
+    const editBtn = row.querySelector('.edit-btn');
+    const saveBtn = row.querySelector('.save-btn');
+    const cancelBtn = row.querySelector('.cancel-btn');
+    
+    editBtn.style.display = 'none';
+    saveBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'inline-block';
+}
+
+function saveRow(button) {
+    const row = button.closest('tr');
+    
+    const typeSelect = row.querySelector('td:nth-child(2) select');
+    const contentInput = row.querySelector('td:nth-child(3) input');
+    const doctorSelect = row.querySelector('td:nth-child(4) select');
+    const statusSelect = row.querySelector('td:nth-child(10) select');
+
+    if (!typeSelect.value || !contentInput.value.trim() || !doctorSelect.value || !statusSelect.value) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+
+    convertInputsToCells(row);
+
+    const editBtn = row.querySelector('.edit-btn');
+    const saveBtn = row.querySelector('.save-btn');
+    const cancelBtn = row.querySelector('.cancel-btn');
+    
+    editBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+
+    editingRow = null;
+    alert('수정사항이 저장되었습니다.');
+}
+
+function cancelEdit(button) {
+    const row = button.closest('tr');
+    
+    const cells = row.querySelectorAll('td');
+    cells.forEach((cell, index) => {
+        if (originalRowData[index] !== undefined && index < 10) {
+            cell.innerHTML = originalRowData[index];
+            cell.className = getCellClassName(index, originalRowData[index]);
         }
+    });
 
-        function cancelNotesEdit() {
-            const editBtn = document.querySelector('.edit-notes-btn');
-            const notesDisplay = document.querySelector('.notes-display');
-            const notesEdit = document.querySelector('.notes-edit');
-            const editButtons = document.querySelector('.notes-edit-buttons');
+    const editBtn = row.querySelector('.edit-btn');
+    const saveBtn = row.querySelector('.save-btn');
+    const cancelBtn = row.querySelector('.cancel-btn');
+    
+    editBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
 
-            // 원본 값으로 복원
-            notesEdit.value = originalNotesData.replace(/<br>/g, '\n');
+    editingRow = null;
+}
 
-            // 표시 모드로 전환
-            notesDisplay.style.display = 'block';
-            notesEdit.style.display = 'none';
-            editButtons.style.display = 'none';
-            
-            editBtn.textContent = '수정';
-            editBtn.disabled = false;
-            isNotesEditing = false;
+function convertCellsToInputs(row) {
+    const cells = row.querySelectorAll('td');
+    
+    // 구분 (2번째 컬럼)
+    const typeCell = cells[1];
+    const typeValue = typeCell.textContent.trim();
+    typeCell.innerHTML = `
+        <select class="form-control">
+            <option value="초진" ${typeValue === '초진' ? 'selected' : ''}>초진</option>
+            <option value="재진" ${typeValue === '재진' ? 'selected' : ''}>재진</option>
+            <option value="검사" ${typeValue === '검사' ? 'selected' : ''}>검사</option>          
+        </select>
+    `;
+    typeCell.className = 'edit-input-cell';
+
+    // 진료내용 (3번째 컬럼)
+    const contentCell = cells[2];
+    const contentValue = contentCell.textContent.trim();
+    contentCell.innerHTML = `<input type="text" value="${contentValue}" />`;
+    contentCell.className = 'edit-input-cell';
+
+    // 담당의 (4번째 컬럼)
+    const doctorCell = cells[3];
+    const doctorValue = doctorCell.textContent.trim();
+    doctorCell.innerHTML = `
+        <select class="form-control">
+            <option value="김의사" ${doctorValue === '김의사' ? 'selected' : ''}>김의사</option>
+            <option value="이의사" ${doctorValue === '이의사' ? 'selected' : ''}>이의사</option>
+            <option value="박의사" ${doctorValue === '박의사' ? 'selected' : ''}>박의사</option>
+            <option value="최의사" ${doctorValue === '최의사' ? 'selected' : ''}>최의사</option>
+            <option value="정의사" ${doctorValue === '정의사' ? 'selected' : ''}>정의사</option>
+            <option value="-" ${doctorValue === '-' ? 'selected' : ''}>-</option>
+        </select>
+    `;
+    doctorCell.className = 'edit-input-cell';
+
+    // 진료비 ~ 미수납액 (5~9번째 컬럼)
+    for (let i = 4; i <= 8; i++) {
+        const cell = cells[i];
+        const value = cell.textContent.trim();
+        if (value !== '-') {
+            cell.innerHTML = `<input type="number" value="${value.replace(/,/g, '')}" min="0" />`;
+        } else {
+            cell.innerHTML = `<input type="text" value="-" />`;
         }
-        // 더블클릭시 상세 정보 모달
-        document.querySelectorAll('.records-table tbody tr').forEach(row => {
-            row.addEventListener('dblclick', function() {
-                const date = this.cells[0].textContent;
-                const diagnosis = this.cells[2].textContent;
-                alert(`상세 정보\n날짜: ${date}\n진료내용: ${diagnosis}`);
-            });
-        });
-    </script>
+        cell.className = 'edit-input-cell';
+    }
+
+    // 상태 (10번째 컬럼)
+    const statusCell = cells[9];
+    const statusValue = statusCell.textContent.trim();
+    statusCell.innerHTML = `
+        <select class="form-control">
+            <option value="완료" ${statusValue === '완료' ? 'selected' : ''}>완료</option>
+            <option value="미수납" ${statusValue === '미수납' ? 'selected' : ''}>미수납</option>   
+        </select>
+    `;
+    statusCell.className = 'edit-input-cell';
+}
+
+function convertInputsToCells(row) {
+    const cells = row.querySelectorAll('td');
+    
+    const typeSelect = cells[1].querySelector('select');
+    cells[1].innerHTML = typeSelect.value;
+    cells[1].className = '';
+
+    const contentInput = cells[2].querySelector('input');
+    cells[2].innerHTML = contentInput.value;
+    cells[2].className = 'diagnosis-cell';
+
+    const doctorSelect = cells[3].querySelector('select');
+    cells[3].innerHTML = doctorSelect.value;
+    cells[3].className = '';
+
+    for (let i = 4; i <= 8; i++) {
+        const input = cells[i].querySelector('input');
+        let value = input.value;
+        if (input.type === 'number' && value && value !== '0') {
+            value = parseInt(value).toLocaleString();
+        } else if (value === '0' || value === '') {
+            value = '-';
+        }
+        cells[i].innerHTML = value;
+        cells[i].className = 'amount-cell';
+    }
+
+    const statusSelect = cells[9].querySelector('select');
+    const statusValue = statusSelect.value;
+    let statusClass = 'status-cell ';
+    switch(statusValue) {
+        case '완료':
+            statusClass += 'status-완료';
+            break;
+        case '미수납':
+            statusClass += 'status-대기';
+            break;
+        case '취소':
+            statusClass += 'status-취소';
+            break;
+        default:
+            statusClass += 'status-대기';
+    }
+    cells[9].innerHTML = statusValue;
+    cells[9].className = statusClass;
+}
+
+function getCellClassName(index, value) {
+    switch(index) {
+        case 0:
+            return 'date-cell';
+        case 2:
+            return 'diagnosis-cell';
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+            return 'amount-cell';
+        case 9:
+            let statusClass = 'status-cell ';
+            if (value === '완료') statusClass += 'status-완료';
+            else if (value === '미수납') statusClass += 'status-대기';
+            else if (value === '취소') statusClass += 'status-취소';
+            else statusClass += 'status-대기';
+            return statusClass;
+        default:
+            return '';
+    }
+}
+</script>
 </body>
 </html>
