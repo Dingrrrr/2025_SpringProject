@@ -18,13 +18,13 @@ public class AcceptPageController {
         return "acceptance/acceptanceHome"; 
     }
 	@GetMapping("/acceptanceDoctor")
-    public String AcceptanceDoctor(Model model) {
+    public String AcceptanceDoctorPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능
         return "acceptance/acceptanceDoctor"; 
     }
 	
 	@GetMapping("/acceptanceCondition")
-    public String AcceptanceCondition(Model model) {
+    public String AcceptanceConditionPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능
         return "acceptance/acceptanceCondition"; 
 	}
@@ -32,6 +32,13 @@ public class AcceptPageController {
     public String showAcceptanceReceiptPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능
         return "acceptance/AcceptanceReceipt"; 
+
+    }
+	
+	@GetMapping("/acceptanceReception")
+    public String showAcceptanceReceptionPage(Model model) {
+		// 필요 시 model에 데이터 추가 가능
+        return "acceptance/acceptanceReception"; 
 
     }
 	

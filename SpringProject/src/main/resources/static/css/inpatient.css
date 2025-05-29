@@ -1,0 +1,179 @@
+/* 기본 설정 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 220px;
+  background-color: white;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #666;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.profile-name {
+  font-weight: bold;
+}
+
+.profile-role {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu > li {
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.menu > li.active {
+  background-color: #eef2f7;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.submenu {
+  list-style: none;
+  margin: 5px 0 0 10px;
+  padding: 0;
+}
+
+.submenu li {
+  font-size: 0.9rem;
+  margin: 5px 0;
+  cursor: pointer;
+}
+
+.submenu li.selected {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.page-header h1 {
+  margin-top: 0;
+}
+
+/* 병동 탭 */
+.ward-tabs {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.tab {
+  padding: 10px 20px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tab.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* 병상 보드 */
+.ward-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.bed-card {
+  width: 230px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.bed-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.status {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+}
+
+.status.입원중 {
+  background-color: #ff6b6b;
+}
+.status.대기 {
+  background-color: #f39c12;
+}
+.status.퇴원예정 {
+  background-color: #3498db;
+}
+
+.patient-info p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+.add-btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.add-btn:hover {
+  background-color: #0056b3;
+}

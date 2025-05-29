@@ -41,7 +41,7 @@ public class Appt {
 	private Patient patient;// 환자아이디 
 	
 	@ManyToOne
-	@JoinColumn(name = "doctor_id", nullable = false)
+	@JoinColumn(name = "users_id", nullable = false)
 	private User doctor;// 의사 아이디
 	
 	@ManyToOne //N:1관계

@@ -30,22 +30,29 @@
     <div class="tab-buttons">
       <button class="tab-btn active" data-tab="doctor">의사</button>
       <button class="tab-btn" data-tab="nurse">간호사</button>
+      <button class="tab-btn" data-tab="billing">수납원</button>
     </div>
 
     <!-- 의사 스케줄 -->
     <div class="tab-content active" id="doctor">
       <div class="table-controls">
-        <input type="text" class="search-input" placeholder="직원 ID 검색">
-        <select class="sort-select">
-          <option value="0">스케줄 ID순</option>
-          <option value="1">직원 ID순</option>
-        </select>
-      </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
       <table>
         <thead>
           <tr>
-            <th>스케줄 ID</th>
             <th>직원 ID</th>
+            <th>이름</th>
             <th>근무 시작 시각</th>
             <th>근무 종료 시각</th>
             <th>스케줄 유형</th>
@@ -53,15 +60,15 @@
         </thead>
         <tbody>
           <tr>
-            <td>1001</td>
             <td>doc001</td>
+            <td>김의사</td>
             <td>2024-06-01 09:00</td>
             <td>2024-06-01 17:00</td>
             <td>출근</td>
           </tr>
           <tr>
-            <td>1003</td>
             <td>doc002</td>
+            <td>이의사</td>
             <td>2024-06-02 09:00</td>
             <td>2024-06-02 17:00</td>
             <td>퇴근</td>
@@ -73,17 +80,23 @@
     <!-- 간호사 스케줄 -->
     <div class="tab-content" id="nurse">
       <div class="table-controls">
-        <input type="text" class="search-input" placeholder="직원 ID 검색">
-        <select class="sort-select">
-          <option value="0">스케줄 ID순</option>
-          <option value="1">직원 ID순</option>
-        </select>
-      </div>
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
       <table>
         <thead>
           <tr>
-            <th>스케줄 ID</th>
             <th>직원 ID</th>
+            <th>이름</th>
             <th>근무 시작 시각</th>
             <th>근무 종료 시각</th>
             <th>스케줄 유형</th>
@@ -91,8 +104,8 @@
         </thead>
         <tbody>
           <tr>
-            <td>1002</td>
-            <td>nur002</td>
+            <td>nur001</td>
+            <td>박간호사</td>
             <td>2024-06-01 08:00</td>
             <td>2024-06-01 16:00</td>
             <td>출근</td>
@@ -100,7 +113,103 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 수납원 스케줄 -->
+    <div class="tab-content" id="billing">
+      <div class="table-controls">
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
+      <table>
+        <thead>
+          <tr>
+            <th>직원 ID</th>
+            <th>이름</th>
+            <th>근무 시작 시각</th>
+            <th>근무 종료 시각</th>
+            <th>스케줄 유형</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>bill001</td>
+            <td>정수납</td>
+            <td>2024-06-03 09:00</td>
+            <td>2024-06-03 18:00</td>
+            <td>출근</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+  
+  <!-- ✅ 모달 구성 -->
+  <div id="scheduleModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <form id="scheduleForm">
+        <div id="formFields"></div>
+        <button type="button" id="saveBtn" class="btn-action">저장</button>
+        <button type="button" id="deleteBtn" class="btn-action" style="background-color: #e74c3c;">삭제</button>
+      </form>
+    </div>
+  </div>
+
+	<style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 350px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .close-modal:hover {
+      color: #333;
+    }
+    .btn-action {
+      padding: 6px 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn-action:hover {
+      background-color: #2980b9;
+    }
+  </style>
 
   <script>
     // 탭 전환
@@ -118,16 +227,20 @@
       });
     });
 
-    // 검색
+ 	// 검색
     document.querySelectorAll('.tab-content').forEach(tab => {
       const searchInput = tab.querySelector('.search-input');
+      const filterSelect = tab.querySelector('.filter-select');
       const rows = tab.querySelectorAll('tbody tr');
-      if (searchInput) {
+
+      if (searchInput && filterSelect) {
         searchInput.addEventListener('input', () => {
-          const value = searchInput.value.toLowerCase();
+          const keyword = searchInput.value.toLowerCase();
+          const colIndex = parseInt(filterSelect.value);
+
           rows.forEach(row => {
-            const id = row.cells[1].textContent.toLowerCase();
-            row.style.display = id.includes(value) ? '' : 'none';
+            const cellText = row.cells[colIndex].textContent.toLowerCase();
+            row.style.display = cellText.includes(keyword) ? '' : 'none';
           });
         });
       }
@@ -147,6 +260,54 @@
         });
         rows.forEach(row => tbody.appendChild(row));
       });
+    });
+    
+    let selectedRow = null;
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        selectedRow = row;
+        const cells = Array.from(row.cells);
+        const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+        const formFields = headers.map((th, idx) => {
+          return `
+            <label>${th.textContent}</label><br>
+            <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+          `;
+        }).join('');
+        document.getElementById('formFields').innerHTML = formFields;
+        document.getElementById('scheduleModal').style.display = 'block';
+      });
+    });
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('scheduleModal').style.display = 'none';
+      selectedRow = null;
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('scheduleModal')) {
+        document.getElementById('scheduleModal').style.display = 'none';
+        selectedRow = null;
+      }
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const inputs = document.querySelectorAll('#formFields input');
+      inputs.forEach(input => {
+        const idx = input.getAttribute('data-idx');
+        selectedRow.cells[idx].textContent = input.value;
+      });
+      document.getElementById('scheduleModal').style.display = 'none';
+      selectedRow = null;
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+      if (confirm('정말 삭제하시겠습니까?')) {
+        selectedRow.remove();
+        document.getElementById('scheduleModal').style.display = 'none';
+        selectedRow = null;
+      }
     });
   </script>
 </body>
