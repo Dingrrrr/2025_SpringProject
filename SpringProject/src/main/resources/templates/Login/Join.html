@@ -1,79 +1,118 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>회원가입</title>
-  <link rel="stylesheet" href="/css/Joinstyle.css">
+<meta charset="UTF-8">
+<title>회원가입</title>
+<link rel="stylesheet" href="/css/Joinstyle.css">
 </head>
 <body>
-  <div class="container">
-    <h2>회원가입</h2>
-    <form class="register-form" action="/Login/Join" method="post">
-      <label>사용자 직군</label>
-      <select name="grade" required>
-        <option disabled selected>사용자 유형 선택해주세요</option>
-        <option value="의사">의사</option>
-        <option value="간호사">간호사</option>
-        <option value="수납">수납</option>
-      </select>
+	<div class="container">
+		<h2>회원가입</h2>
+		<form id="joinForm" class="register-form" action="/Login/Join" method="post">
+			<label>사용자 직군</label> 
+			<select name="grade" required>
+				<option disabled selected>사용자 유형 선택해주세요</option>
+				<option value="의사">의사</option>
+				<option value="간호사">간호사</option>
+				<option value="수납">수납</option>
+			</select> 
+			<label>이름</label> 
+			<input type="text" name="usersName" placeholder="이름을 입력해주세요" required>
+			 
+			<label>생년월일</label> 
+			<input type="date" name="usersBirth" required> 
+			
+			<input type="hidden" name="usersIdcard" id="usersIdcard">
+			
+			<label>주민등록번호</label>
+			<div class="inline jumin-wrapper">
+				<input type="text" id="juminFront" name="usersIdcardFront"
+					maxlength="6" placeholder="앞 6자리" required> <span>-</span>
+				<input type="text" id="juminBack" name="usersIdcardBack"
+					maxlength="1" placeholder="1~4" required>
+				<div class="mask">●●●●●●</div>
+			</div>
 
-      <label>이름</label>
-      <input type="text" name="usersName" placeholder="이름을 입력해주세요" required>
+			<label>성별</label> <select name="usersGender" required>
+				<option disabled selected>성별을 선택해주세요</option>
+				<option value="남">남</option>
+				<option value="여">여</option>
+				
+			</select> <label>아이디</label>
+			<div class="inline">
+				<input type="text" id="usersId" name="usersId"
+					placeholder="영문 소문자 또는 영문+숫자 조합" required>
+				<button type="button" id="checkIdBtn">중복확인</button>
+			</div>
 
-      <label>생년월일</label>
-      <input type="date" name="usersBirth" required>
+			<div id="idCheckResult" class="id-result"></div>
 
-      <label>주민등록번호</label>
-		<div class="inline jumin-wrapper">
-		  <input type="text" id="juminFront" maxlength="6" placeholder="앞 6자리">
-		  <span>-</span>
-		  <input type="text" id="juminBack" maxlength="1" placeholder="1~4">
-		  <div class="mask">●●●●●●</div>
-		</div>
+			<label>비밀번호</label> 
+			<input type="password" id="pwd" name="usersPwd" placeholder="영문 소문자 또는 영문+숫자+특수조합" required> 
+			<label>비밀번호 확인</label> 
+			<input type="password" id="pwdConfirm" name="pwdConfirm" placeholder="비밀번호 확인" required> 
+			<div id="pwdMatchResult" class="pwd-result"></div>
+			
+			<label>휴대전화번호</label>
+			<input type="tel" id="phone" name="usersPhone"
+				placeholder="010-xxxx-xxxx" maxlength="13" required> <label>이메일</label>
+			<div class="inline">
+				<input type="email" name="usersEmail" placeholder="이메일을 입력하세요"
+					required>
+				<button type="button">이메일인증</button>
+			</div>
 
-      <label>성별</label>
-      <select>
-        <option disabled selected>성별을 선택해주세요</option>
-        <option>남</option>
-        <option>여</option>
-      </select>
+			<label>주소</label> <input type="text" name="usersAddress"
+				placeholder="주소를 입력해주세요">
 
-      <label>아이디</label>
-      <div class="inline">
-        <input type="text" name="usersId" placeholder="영문 소문자 또는 영문+숫자 조합" required>
-        <button type="button">중복확인</button>
-      </div>
+			<fieldset class="terms">
+				<legend>약관 전체 동의</legend>
+				<label><input type="checkbox"> 개인정보 처리방침 (필수)</label> <label><input
+					type="checkbox"> 스팸정보 이용약관 동의 (필수)</label> <label><input
+					type="checkbox"> 마케팅 수신 동의 (선택)</label>
+			</fieldset>
 
-      <label>비밀번호</label>
-      <input type="password" name="usersPwd" placeholder="영문 소문자 또는 영문+숫자+특수조합" required>
+			<button class="submit-btn" type="submit" id="submitBtn" disabled>가입하기</button>
+		</form>
 
-      <label>비밀번호 확인</label>
-      <input type="password" placeholder="비밀번호 확인">
+<!-- ✅ 기능 JavaScript -->
+	<script>
+	
+	//아이디 중복확인
+    document.addEventListener('DOMContentLoaded', () => {
+    	  const checkBtn   = document.getElementById('checkIdBtn');
+    	  const idInput    = document.getElementById('usersId');
+    	  const resultDiv  = document.getElementById('idCheckResult');
+    	  const submitBtn  = document.getElementById('submitBtn'); // 있으면
 
-      <label>휴대전화번호</label>
-      <input type="tel" id="phone" name="usersPhone" placeholder="010-xxxx-xxxx" maxlength="13" required>
+    	  checkBtn.addEventListener('click', () => {
+    	    const id = idInput.value.trim();
+    	    if (!id) {
+    	      alert('먼저 아이디를 입력해주세요.');
+    	      idInput.focus();
+    	      return;
+    	    }
 
-      <label>이메일</label>
-      <div class="inline">
-        <input type="email" name="usersEmail" placeholder="이메일을 입력하세요" required>
-        <button type="button">이메일인증</button>
-      </div>
-
-      <label>주소</label>
-      <input type="text" name="usersAddress" placeholder="주소를 입력해주세요">
-
-      <fieldset class="terms">
-        <legend>약관 전체 동의</legend>
-        <label><input type="checkbox"> 개인정보 처리방침 (필수)</label>
-        <label><input type="checkbox"> 스팸정보 이용약관 동의 (필수)</label>
-        <label><input type="checkbox"> 마케팅 수신 동의 (선택)</label>
-      </fieldset>
-
-      <button class="submit-btn" type="submit">가입하기</button>
-    </form>
-
-    <!-- ✅ 기능 JavaScript -->
-    <script>
+    	    fetch(`/Login/checkId?usersId=${encodeURIComponent(id)}`)
+    	      .then(res => res.json())
+    	      .then(available => {
+    	        resultDiv.classList.remove('success');
+    	        if (available) {
+    	          resultDiv.textContent = '✔ 사용 가능한 아이디입니다.';
+    	          resultDiv.classList.add('success');
+    	          submitBtn.disabled = false;
+    	        } else {
+    	          resultDiv.textContent = '✖ 이미 사용 중인 아이디입니다.';
+    	          submitBtn.disabled = true;
+    	        }
+    	      })
+    	      .catch(err => {
+    	        console.error(err);
+    	        resultDiv.textContent = '아이디 확인 중 오류가 발생했습니다.';
+    	      });
+    	  });
+    	});
+    
       // 주민등록번호 뒷자리 첫 숫자 제한 (1~4)
       document.getElementById('juminBack').addEventListener('input', function () {
         const val = this.value;
@@ -120,7 +159,65 @@
           this.value = ''; // 입력 없이 벗어나면 placeholder 보이게
         }
       });
+   	  
+   	 //주민등록번호 합쳐서 입력
+   	 document.addEventListener('DOMContentLoaded', () => {
+	  const form       = document.getElementById('joinForm');
+	  const frontInput = document.getElementById('juminFront');
+	  const backInput  = document.getElementById('juminBack');
+	  const hidden     = document.getElementById('usersIdcard');
+	
+	  form.addEventListener('submit', e => {
+	    const front = frontInput.value.trim();
+	    const back  = backInput.value.trim();
+	
+	    if (!front || !back) {
+	      alert('주민등록번호 앞뒤를 모두 입력해주세요.');
+	      e.preventDefault();  // 제출 막기
+	      return;
+	    }
+	
+	    // "123456-1" 형태로 합쳐서 hidden에 넣기
+	    hidden.value = `${front}-${back}`;
+	    // 이후 폼은 정상 제출됩니다.
+	  });
+	});
+   	
+   	//비밀번호 확인
+   	document.addEventListener('DOMContentLoaded', () => {
+   	  const form         = document.getElementById('joinForm');
+   	  const pwdInput     = document.getElementById('pwd');
+   	  const confirmInput = document.getElementById('pwdConfirm');
+   	  const pwdResult    = document.getElementById('pwdMatchResult');
+
+   	  // 1) 입력할 때마다 실시간 검사
+   	  confirmInput.addEventListener('input', () => {
+   	    if (confirmInput.value === '') {
+   	      pwdResult.textContent = '';
+   	      return;
+   	    }
+   	    if (pwdInput.value === confirmInput.value) {
+   	      pwdResult.textContent = '✔ 비밀번호가 일치합니다.';
+   	      pwdResult.classList.add('success');
+   	      pwdResult.classList.remove('error');
+   	    } else {
+   	      pwdResult.textContent = '✖ 비밀번호가 일치하지 않습니다.';
+   	      pwdResult.classList.add('error');
+   	      pwdResult.classList.remove('success');
+   	    }
+   	  });
+
+   	  // 2) 폼 제출 전 최종 검사
+   	  form.addEventListener('submit', e => {
+   	    if (pwdInput.value !== confirmInput.value) {
+   	      alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요.');
+   	      e.preventDefault();  // 제출 막기
+   	    }
+   	  });
+
+   	});
+   	 
     </script>
-  </div>
+	</div>
 </body>
 </html>
