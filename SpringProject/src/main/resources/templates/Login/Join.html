@@ -54,12 +54,19 @@
 			<div id="pwdMatchResult" class="pwd-result"></div>
 			
 			<label>휴대전화번호</label>
-			<input type="tel" id="phone" name="usersPhone"
-				placeholder="010-xxxx-xxxx" maxlength="13" required> <label>이메일</label>
+			<input type="tel" id="phone" name="usersPhone" placeholder="010-xxxx-xxxx" maxlength="13" required> 
+			
+			<label>이메일</label>
 			<div class="inline">
-				<input type="email" name="usersEmail" placeholder="이메일을 입력하세요"
-					required>
-				<button type="button">이메일인증</button>
+				<input type="email" id="emailInput" name="usersEmail" placeholder="이메일을 입력하세요" required>
+				<button type="button" id="sendEmailBtn">이메일인증</button>
+			</div>
+			
+			<!-- 인증번호 입력 -->
+			<div id="emailVerifySection" style="display:none; margin-top:4px;">
+			  <input type="text" id="emailCodeInput" placeholder="인증번호 입력">
+			  <button type="button" id="verifyEmailBtn">확인</button>
+			  <span id="emailVerifyResult"></span>
 			</div>
 
 			<label>주소</label> <input type="text" name="usersAddress"
@@ -67,9 +74,9 @@
 
 			<fieldset class="terms">
 				<legend>약관 전체 동의</legend>
-				<label><input type="checkbox"> 개인정보 처리방침 (필수)</label> <label><input
-					type="checkbox"> 스팸정보 이용약관 동의 (필수)</label> <label><input
-					type="checkbox"> 마케팅 수신 동의 (선택)</label>
+				<label><input type="checkbox" id="agree1"> 개인정보 처리방침 (필수)</label> 
+				<label><input type="checkbox" id="agree2"> 스팸정보 이용약관 동의 (필수)</label>
+				<label><input type="checkbox"> 마케팅 수신 동의 (선택)</label>
 			</fieldset>
 
 			<button class="submit-btn" type="submit" id="submitBtn" disabled>가입하기</button>
@@ -77,6 +84,24 @@
 
 <!-- ✅ 기능 JavaScript -->
 	<script>
+	
+	// 조건을 완료하면 가입하기 버튼 활성화
+	let isIdValid = false;
+	let isEmailvalid = false;
+	
+	function updateSubmitState() {
+		  const submitBtn = document.getElementById('submitBtn');
+		  const agree1    = document.getElementById('agree1');
+		  const agree2    = document.getElementById('agree2');
+
+		  // 약관1, 약관2, 아이디, 이메일 인증 네 가지 모두 true여야 true
+		  submitBtn.disabled = !(
+		    agree1.checked &&
+		    agree2.checked &&
+		    isIdValid &&
+		    isEmailValid
+		  );
+		}
 	
 	//아이디 중복확인
     document.addEventListener('DOMContentLoaded', () => {
@@ -98,9 +123,10 @@
     	      .then(available => {
     	        resultDiv.classList.remove('success');
     	        if (available) {
-    	          resultDiv.textContent = '✔ 사용 가능한 아이디입니다.';
-    	          resultDiv.classList.add('success');
-    	          submitBtn.disabled = false;
+    	        	resultDiv.textContent = available ? '✔ 사용 가능한 아이디입니다.' : '✖ 이미 사용 중인 아이디입니다.';
+    	        	resultDiv.style.color = available ? 'green' : 'red';
+    	        	isIdValid = available; // ← 플래그 세팅
+    	        	updateSubmitState();   // ← 공통 상태 업데이트
     	        } else {
     	          resultDiv.textContent = '✖ 이미 사용 중인 아이디입니다.';
     	          submitBtn.disabled = true;
@@ -214,10 +240,83 @@
    	      e.preventDefault();  // 제출 막기
    	    }
    	  });
-
    	});
    	 
-    </script>
+   	//이메일 인증 번호
+   	document.addEventListener('DOMContentLoaded', () => {
+	  const sendBtn    = document.getElementById('sendEmailBtn');
+	  const emailInput = document.getElementById('emailInput');
+	  const section    = document.getElementById('emailVerifySection');
+	  const codeInput  = document.getElementById('emailCodeInput');
+	  const verifyBtn  = document.getElementById('verifyEmailBtn');
+	  const resultSpan = document.getElementById('emailVerifyResult');
+	
+	  // ➊ 인증번호 발송
+	  sendBtn.addEventListener('click', () => {
+	    const email = emailInput.value.trim();
+	    if (!email) { alert('이메일을 입력해주세요.'); return; }
+	
+	    fetch('/Login/sendEmailCode', {
+	      method: 'POST',
+	      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+	      body: `usersEmail=${encodeURIComponent(email)}`
+	    })
+	    .then(res => res.text())
+	    .then(msg => {
+	      if (msg === 'sent') {
+	        alert('인증번호를 발송했습니다.');
+	        section.style.display = 'block';
+	      } else {
+	        alert('이메일 발송에 실패했습니다.');
+	      }
+	    });
+	  });
+	
+	  // ➋ 인증번호 검증
+	  verifyBtn.addEventListener('click', () => {
+		    const code = codeInput.value.trim();
+		    if (!code) { alert('인증번호를 입력해주세요.'); return; }
+		
+		    fetch('/Login/verifyEmailCode', {
+		      method: 'POST',
+		      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		      body: `code=${encodeURIComponent(code)}`
+		    })
+		    .then(res => res.json())
+		    .then(ok => {
+		    	if (ok) {
+		    		resultSpan.textContent = '✔ 인증 완료';
+		    		resultSpan.style.color    = 'green';
+		    		isEmailValid = true;       // ← 플래그 세팅
+		    	} else {
+		    		resultSpan.textContent = '✖ 인증번호가 맞지 않습니다.';
+		    		resultSpan.style.color    = 'red';
+		    		isEmailValid = false;
+		    	}
+		    	updateSubmitState();        // ← 공통 상태 업데이트
+		    });
+		  });
+		});
+   	
+   	//약관동의
+   	document.addEventListener('DOMContentLoaded', () => {
+	  const submitBtn = document.getElementById('submitBtn');
+	  const agree1 = document.getElementById('agree1');
+	  const agree2 = document.getElementById('agree2');
+	
+	  function updateTermsState() {
+	    // 두 필수 약관이 모두 체크되어야만 활성화
+	    submitBtn.disabled = !(agree1.checked && agree2.checked);
+	  }
+	
+	  // 체크박스 상태가 변할 때마다 버튼 상태 업데이트
+	  agree1.addEventListener('change', updateSubmitState);
+	  agree2.addEventListener('change', updateSubmitState);
+	
+	  // 페이지 로드 시 기본 상태 반영
+	  updateSubmitState();
+	});
+</script>
 	</div>
 </body>
 </html>
