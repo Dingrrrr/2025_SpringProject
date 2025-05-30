@@ -31,6 +31,10 @@ public class Patient {
 	@Column(name = "patient_name", length = 50, nullable = false)
 	private String patientName;// 환자 이름
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "patient_gender", nullable = false)
+	private Gender patientGender;// 성별
+	
 	@Column(name = "patient_birth", length = 50, nullable = false)
 	private String patientBirth;// 환자 생년월일
 	
