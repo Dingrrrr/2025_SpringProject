@@ -1,6 +1,10 @@
 package com.dita.domain;
 
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,4 +51,16 @@ public class Patient {
 	@Enumerated(EnumType.STRING) 
 	@Column(name = "patient_type")
 	private PatientType patientType;// 입원여부 판단, 환자 상태: 외래, 입원대기, 입원중, 퇴원
+	
+	public int getAge() {
+	    if (this.patientBirth == null || this.patientBirth.isEmpty()) return 0;
+
+	    try {
+	        LocalDate birthDate = LocalDate.parse(this.patientBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+	        return Period.between(birthDate, LocalDate.now()).getYears(); // <- 이게 만 나이
+	    } catch (Exception e) {
+	        return 0;
+	    }
+	}
+
 }

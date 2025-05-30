@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dita.domain.PatientType;
 import com.dita.service.AdmissionService;
 import com.dita.vo.PatientDto;
 
@@ -46,10 +48,11 @@ public class InpatientController {
    ////////////////////// 
     
    //입원 대기 환자 리스트
-  @GetMapping("/waiting")
-   public List<PatientDto> getWaitngPatients(){
-	   return admissionSe.getWaitingPatients();
-    
-  }
+    @GetMapping("/waiting-patients")
+    @ResponseBody
+    public List<PatientDto> getWaitingPatients() {
+        return admissionSe.getPatientsByType(PatientType.입원대기); // ✅ Patient 기준
+    }
+
 }
 

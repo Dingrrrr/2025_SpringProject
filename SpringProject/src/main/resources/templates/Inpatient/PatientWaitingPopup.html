@@ -14,7 +14,6 @@
         <th>성별</th>
         <th>나이</th>
         <th>진단명</th>
-        <th>입원일</th>
         <th>진료과</th>
         <th>담당의</th>
         <th>병실</th>
@@ -25,42 +24,43 @@
   </table>
 
   <script>
-    // 더미 데이터 (입원대기 상태)
-    const waitingPatients = [
-      { name: "강감찬", gender: "남", age: 60, diagnosis: "폐렴", date: "2025-05-28", dept: "호흡기내과", doctor: "이의사", ward: "1병동 A", room: "102" },
-      { name: "유관순", gender: "여", age: 28, diagnosis: "복통", date: "2025-05-28", dept: "소화기내과", doctor: "박의사", ward: "2병동", room: "202" }
-    ];
+  fetch("/Inpatient/waiting-patients") // PatientDto 리스트 반환
+    .then(res => {
+      if (!res.ok) throw new Error("서버 응답 실패");
+      return res.json();
+    })
+    .then(waitingPatients => {
+      const tbody = document.getElementById("waiting-table-body");
+      tbody.innerHTML = "";
 
-    const tbody = document.getElementById("waiting-table-body");
+      waitingPatients.forEach(patient => {
+        const tr = document.createElement("tr");
 
-    waitingPatients.forEach(patient => {
-      const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${patient.name}</td>
+          <td>${patient.gender}</td>
+          <td>${patient.age}</td>
+          <td>${patient.symptom ?? "미정"}</td> <!-- 진단명 = symptom -->
+          <td>미정</td> <!-- 진료과 -->
+          <td>미정</td> <!-- 담당의 -->
+          <td>미정</td> <!-- 병실 -->
+          <td><button class="admit">입원</button></td>
+        `;
 
-      tr.innerHTML = `
-        <td>${patient.name}</td>
-        <td>${patient.gender}</td>
-        <td>${patient.age}</td>
-        <td>${patient.diagnosis}</td>
-        <td>${patient.date}</td>
-        <td>${patient.dept}</td>
-        <td>${patient.doctor}</td>
-        <td>${patient.ward}</td>
-        <td><button class="admit">입원</button></td>
-      `;
+        tr.querySelector(".admit").addEventListener("click", () => {
+          const newPatient = { ...patient, status: "입원중" };
+          window.opener.bedData.push(newPatient);
+          window.opener.location.reload();
+          window.close();
+        });
 
-      tr.querySelector(".admit").addEventListener("click", () => {
-        // 메인 페이지에 환자 추가
-        const newPatient = {
-          ...patient,
-          status: "입원중"
-        };
-        window.opener.bedData.push(newPatient);
-        window.opener.location.reload();
-        window.close();
+        tbody.appendChild(tr);
       });
-
-      tbody.appendChild(tr);
+    })
+    .catch(err => {
+      alert("대기 환자 불러오기 실패: " + err.message);
     });
-  </script>
+</script>
+
 </body>
 </html>
