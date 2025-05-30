@@ -111,10 +111,62 @@ public class LoginPageController {
 	public String showFindpwdpage(Model model) {
 		return "Login/Findpwd";
 	}
+	
+	@PostMapping("/Findpwd")
+    public String processFindPwd(
+            @RequestParam String usersId,
+            @RequestParam String usersEmail,
+            @RequestParam String code,
+            HttpSession session,
+            Model model
+    ) {
+        // 1) 세션에 저장된 인증번호 검증
+        String savedCode = (String) session.getAttribute("emailCode");
+        if (savedCode == null || !savedCode.equals(code)) {
+            model.addAttribute("error", "인증번호가 일치하지 않습니다.");
+            return "Login/Findpwd";
+        }
+
+        // 2) 아이디+이메일로 사용자 조회
+        Optional<User> opt = repo.findByUsersIdAndUsersEmail(usersId, usersEmail);
+        if (opt.isEmpty()) {
+            model.addAttribute("error", "일치하는 회원 정보가 없습니다.");
+            return "Login/Findpwd";
+        }
+
+        // 3) 조회된 아이디를 모델에 담고 Resultpwd 뷰로 이동
+        model.addAttribute("usersId", usersId);
+        return "Login/Resultpwd";
+    }
 
 	@GetMapping("/Resultpwd")
 	public String showResultpwd(Model model) {
 		return "Login/Resultpwd";
+	}
+	
+	//비밀번호 재설정
+	@PostMapping("Resultpwd")
+	public String processResultPwd(
+		@RequestParam String usersId,
+	    @RequestParam String newPwd,
+	    @RequestParam String confirmPwd,
+	    Model model
+		) {
+		// (1) 새 비밀번호/확인 일치 체크 (서버측 이중검증)
+	    if (!newPwd.equals(confirmPwd)) {
+	        model.addAttribute("usersId", usersId);
+	        model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+	        return "Login/Resetpwd";
+	    }
+
+	    // (2) 사용자 로드 및 비밀번호 업데이트
+	    User u = repo.findById(usersId)
+	                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
+	    u.setUsersPwd(newPwd);
+	    repo.save(u);
+
+	    // (3) 완료 후 로그인 페이지로
+	    return "redirect:/Login/Login";
 	}
 
 	@GetMapping("/checkId")

@@ -1,0 +1,152 @@
+@charset "UTF-8";
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f6f9fc;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f6f9fc;
+}
+
+.login-box {
+  display: flex;
+  width: 1000px;
+  height: 600px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.left-panel {
+  flex: 4;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 80px;
+  transition: background-image 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-panel h2 {
+  font-size: 32px;
+  line-height: 1.5;
+}
+
+.left-panel p {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.right-panel {
+  flex: 6;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.links {
+  margin-top: 15px;
+  font-size: 15px;
+  color: gray;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+  color: gray;
+}
+
+.small-btn {
+  padding: 10px;
+  font-size: 12px;
+  border: none;
+  background-color: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 공통 레이아웃: 아이디 찾기 & 비밀번호 재설정 폼 */
+.find-id-result,
+.reset-pwd-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* 레이블 스타일 */
+.reset-pwd-form label {
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+/* 입력창 스타일 */
+.reset-pwd-form input[type="password"],
+.reset-pwd-form input[type="text"],
+.reset-pwd-form input[type="hidden"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* 버튼 스타일 */
+.reset-pwd-form button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #6574cd;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* 비밀번호 일치/불일치 메시지 */
+.pwd-result {
+  font-size: 0.9em;
+}
+.pwd-result.success {
+  color: green;
+}
+.pwd-result.error {
+  color: red;
+}
+
+/* 서버측 에러 메시지 */
+.error-msg {
+  color: red;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
