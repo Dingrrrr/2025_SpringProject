@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>입원 통계</title>
+  <link rel="stylesheet" href="/css/statistics.css">
+  <style>
+  </style>
+</head>
+<body>
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <h3>내 프로필</h3>
+    <ul>
+      <li>홈</li>
+      <li>진료</li>
+      <li>예약</li>
+      <li>수납</li>
+      <li>재고</li>
+      <li class="active">입원
+        <ul>
+          <li>입원 관리</li>
+          <li class="active">입원 통계</li>
+        </ul>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- 메인 -->
+  <main class="main">
+    <div class="stat-header">
+      <h1>입원 통계</h1>
+      <div>
+        <input type="date" id="startDate">
+        ~
+        <input type="date" id="endDate">
+        <button onclick="fetchStats()">조회</button>
+      </div>
+    </div>
+
+    <!-- 대시보드 그리드 -->
+    <div class="dashboard-grid">
+      <div class="card">
+        <h3>매출 현황</h3>
+        <img id="salesChart" src="/images/sales.png">
+      </div>
+      <div class="card">
+        <h3>진료 현황</h3>
+        <img id="treatmentChart" src="/images/treatment.png">
+      </div>
+      <div class="card">
+        <h3>방문 목적별 현황</h3>
+        <img id="purposeChart" src="/images/purpose.png">
+      </div>
+      <div class="card">
+        <h3>담당의 별 매출</h3>
+        <img id="doctorSalesChart" src="/images/doctor_sales.png">
+      </div>
+      <div class="card">
+        <h3>보험정보 별 매출</h3>
+        <img id="insuranceChart" src="/images/insurance.png">
+      </div>
+      <div class="card">
+        <h3>지역별 환자 수</h3>
+        <img id="mapChart" src="/images/map.png">
+      </div>
+      <div class="card">
+        <h3>수납 현황</h3>
+        <img id="paymentChart" src="/images/payment.png">
+      </div>
+      <div class="card">
+        <h3>진료횟수 대비 매출</h3>
+        <img id="ratioChart" src="/images/ratio.png">
+      </div>
+      <div class="card">
+        <h3>상병코드별 환자 수</h3>
+        <img id="diagnosisChart" src="/images/diagnosis.png">
+      </div>
+    </div>
+  </main>
+
+  <script>
+  function fetchStats() {
+    const startInput = document.getElementById("startDate").value;
+    const endInput = document.getElementById("endDate").value;
+
+    // 날짜 없으면 기본: 최근 7일
+    const today = new Date();
+    const defaultEnd = today.toISOString().split("T")[0];
+    const defaultStart = new Date(today.setDate(today.getDate() - 6)).toISOString().split("T")[0];
+
+    const start = startInput || defaultStart;
+    const end = endInput || defaultEnd;
+
+    fetch('/stats/admission', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ start_date: start, end_date: end })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("salesChart").src = data.sales;
+      document.getElementById("treatmentChart").src = data.treatment;
+      document.getElementById("purposeChart").src = data.purpose;
+      document.getElementById("doctorSalesChart").src = data.doctor_sales;
+      document.getElementById("insuranceChart").src = data.insurance;
+      document.getElementById("mapChart").src = data.map;
+      document.getElementById("paymentChart").src = data.payment;
+      document.getElementById("ratioChart").src = data.ratio;
+      document.getElementById("diagnosisChart").src = data.diagnosis;
+    })
+    .catch(err => alert("통계 불러오기 실패: " + err));
+  }
+
+  //페이지 로드 시 자동 실행
+  window.onload = () => {
+    fetchStats();
+  };
+</script>
+
+</body>
+</html>
