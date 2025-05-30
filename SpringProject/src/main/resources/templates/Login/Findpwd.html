@@ -10,20 +10,25 @@
 		<div class="login-box">
 			<div class="left-panel"></div>
 			<div class="right-panel">
-				<form class="find-id-form" method="post" action="/Login/Findid">
+				<form class="find-id-form" method="post" action="/Login/Findpwd">
 					<h2>비밀번호 찾기</h2>
 
-					<label for="name">아이디</label> <input type="text" id="name"
-						name="name" placeholder="아이디 입력" required> <label
-						for="email">이메일주소</label>
+					<label for="id">아이디</label> 
+					<input type="text" id="id" name="usersId" placeholder="아이디 입력" required>
+					<label for="email">이메일주소</label>
 					<div class="inline">
-						<input type="email" id="email" placeholder="이메일 주소 입력" required>
+						<input type="email" id="email" name="usersEmail" placeholder="이메일 주소 입력" required>
 						<button type="button" id="sendCodeBtn" class="small-btn">인증번호받기</button>
 					</div>
 
-					<input type="text" id="code" name="code" placeholder="인증번호 입력" disabled>
+					<div id="emailVerifySection" style="display:none; margin-top:8px;">
+					  <input type="text" id="code" name="code" placeholder="인증번호 입력">
+					  <button type="button" id="verifyCodeBtn" class="small-btn">확인</button>
+					</div>
 
-					<button type="submit" id="nextBtn" onclick="location.href='Resultpwd'" disabled>다음</button>
+					<div id="verifyResult" style="margin-left:8px;"></div>
+
+					<button type="submit" id="nextBtn" onclick="location.href='Resultpwd'" disabled>비밀번호 찾기</button>
 
 					<div class="links">
 						<a href="Findid">아이디찾기</a> | <a href="Findpwd">비밀번호 찾기</a>
@@ -68,6 +73,63 @@
 
 		changeBackground();
 		setInterval(changeBackground, 3000);
+		
+		//이메일 인증
+		window.addEventListener('DOMContentLoaded', () => {
+		  const sendBtn    = document.getElementById('sendCodeBtn');
+		  const emailInput = document.getElementById('email');
+		  const section    = document.getElementById('emailVerifySection');
+		  const codeInput  = document.getElementById('code');
+		  const verifyBtn  = document.getElementById('verifyCodeBtn');
+		  const resultSpan = document.getElementById('verifyResult');
+		  const nextBtn    = document.getElementById('nextBtn');
+		
+		  // ➊ 인증번호 발송
+		  sendBtn.addEventListener('click', () => {
+		    const email = emailInput.value.trim();
+		    if (!email) { alert('이메일을 입력해주세요.'); return; }
+		    fetch('/Login/sendEmailCode', {
+		      method: 'POST',
+		      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		      body: `usersEmail=${encodeURIComponent(email)}`
+		    })
+		    .then(res => res.text())
+		    .then(msg => {
+		      if (msg === 'sent') {
+		        alert('인증번호를 발송했습니다.');
+		        section.style.display = 'block';
+		        codeInput.focus();
+		      } else {
+		        alert('메일 발송에 실패했습니다.');
+		      }
+		    })
+		    .catch(() => alert('오류가 발생했습니다.'));
+		  });
+		
+		  // ➋ 인증번호 검증
+		  verifyBtn.addEventListener('click', () => {
+		    const code = codeInput.value.trim();
+		    if (!code) { alert('인증번호를 입력해주세요.'); return; }
+		    fetch('/Login/verifyEmailCode', {
+		      method: 'POST',
+		      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		      body: `code=${encodeURIComponent(code)}`
+		    })
+		    .then(res => res.json())
+		    .then(ok => {
+		      if (ok) {
+		        resultSpan.textContent = '✔ 인증 완료';
+		        resultSpan.style.color = 'green';
+		        nextBtn.disabled = false;
+		      } else {
+		        resultSpan.textContent = '✖ 인증번호가 올바르지 않습니다.';
+		        resultSpan.style.color = 'red';
+		        nextBtn.disabled = true;
+		      }
+		    })
+		    .catch(() => alert('오류가 발생했습니다.'));
+		  });
+		});
 	</script>
 </body>
 </html>
