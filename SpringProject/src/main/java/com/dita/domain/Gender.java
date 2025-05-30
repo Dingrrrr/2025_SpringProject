@@ -1,5 +1,6 @@
 package com.dita.domain;
 
 public enum Gender {
-	남, 여
+    남, 여
 }
+
