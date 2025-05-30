@@ -4,144 +4,6 @@
   <meta charset="UTF-8">
   <title>관리자 병상 관리</title>
   <link rel="stylesheet" href="/css/adminstyle.css">
-</head>
-<body>
-  <div class="sidebar">
-    <div class="profile-section">
-      <div class="profile-header">
-        <img src="/icons/profile.png" alt="프로필 아이콘">
-        <span class="profile-text">내 프로필</span>
-      </div>
-    </div>
-    <ul class="nav-menu">
-      <li>회원 관리</li>
-      <li>일정 관리</li>
-      <li class="active">병실 관리</li>
-      <li>통계</li>
-    </ul>
-    <div class="logout-section">
-      <li class="logout-item">로그아웃</li>
-    </div>
-  </div>
-
-  <div class="main">
-    <!-- 병동: 301호 -->
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 301호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-          <button class="btn-action">수정</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">
-          침대 번호: 1A<br>
-          상태: 사용 중<br>
-          입원 환자: 김철수
-        </div>
-        <div class="room-box">
-          침대 번호: 1B<br>
-          상태: 사용 중<br>
-          입원 환자: 이영희
-        </div>
-      </div>
-    </div>
-
-    <!-- 병동: 302호 -->
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 302호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-          <button class="btn-action">수정</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">
-          침대 번호: 2A<br>
-          상태: 사용 중<br>
-          입원 환자: 박민준
-        </div>
-        <div class="room-box">
-          침대 번호: 2B<br>
-          상태: 사용 가능<br>
-          입원 환자: 없음
-        </div>
-      </div>
-    </div>
-
-    <!-- 병동: 303호 -->
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 303호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-          <button class="btn-action">수정</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">
-          침대 번호: 3A<br>
-          상태: 사용 중<br>
-          입원 환자: 정수빈
-        </div>
-        <div class="room-box">
-          침대 번호: 3B<br>
-          상태: 사용 가능<br>
-          입원 환자: 없음
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- ✅ 수정/삭제 모달 -->
-	<div id="editModal" class="modal">
-	  <div class="modal-content">
-	    <h3>침대 정보 수정</h3>
-	    <span class="close-edit">&times;</span>
-	    <form id="editForm">
-	      <label>침대 번호</label><br>
-	      <input type="text" id="editBedNumber" required><br><br>
-	
-	      <label>상태</label><br>
-	      <select id="editBedStatus" required>
-	        <option value="사용 중">사용 중</option>
-	        <option value="사용 가능">사용 가능</option>
-	      </select><br><br>
-	
-	      <label>입원 환자</label><br>
-	      <input type="text" id="editPatientName"><br><br>
-	
-	      <button type="submit" class="btn-action">수정</button>
-	      <button type="button" class="btn-action" id="deleteBtn" style="background-color: #e74c3c; color: white;">삭제</button>
-	    </form>
-	  </div>
-	</div>
-  
-  <!-- ✅ 추가 모달 -->
-<div id="addModal" class="modal">
-  <div class="modal-content">
-    <h3>침대 추가</h3>
-    <span class="close-add">&times;</span>
-    <form id="addForm">
-      <label>침대 번호</label><br>
-      <input type="text" id="bedNumber" required><br><br>
-
-      <label>상태</label><br>
-      <select id="bedStatus" required>
-        <option value="사용 중">사용 중</option>
-        <option value="사용 가능">사용 가능</option>
-      </select><br><br>
-
-      <label>입원 환자</label><br>
-      <input type="text" id="patientName"><br><br>
-
-      <button type="submit" class="btn-action">등록</button>
-    </form>
-  </div>
-</div>
-
   <style>
     .modal {
       display: none;
@@ -168,8 +30,8 @@
     .close {
       color: #aaa;
       position: absolute;
-      top: 8px;
-      right: 12px;
+      top: 10px;
+      right: 15px;
       font-size: 20px;
       font-weight: bold;
       cursor: pointer;
@@ -178,113 +40,192 @@
     .close:hover {
       color: #333;
     }
-    
-    /* 기존 .modal, .modal-content, .close 스타일 재사용 가능 */
-  #addModal input, #addModal select {
-    width: 100%;
-    padding: 6px;
-    margin-top: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
 
-  #addModal h3 {
-    margin-top: 0;
-    font-size: 18px;
-  }
-  
-  #addModal .close-add {
-	  color: #aaa;
-	  position: absolute;
-	  top: 10px;
-	  right: 15px;
-	  font-size: 20px;
-	  font-weight: bold;
-	  cursor: pointer;
-	}
-	
-	#addModal .close-add:hover {
-	  color: #333;
-	}
-	
-	#editModal input, #editModal select {
-	  width: 100%;
-	  padding: 6px;
-	  margin-top: 4px;
-	  border: 1px solid #ccc;
-	  border-radius: 4px;
-	}
-	#editModal h3 {
-	  margin-top: 0;
-	  font-size: 18px;
-	}
-	#editModal .close-edit {
-	  color: #aaa;
-	  position: absolute;
-	  top: 10px;
-	  right: 15px;
-	  font-size: 20px;
-	  font-weight: bold;
-	  cursor: pointer;
-	}
-	#editModal .close-edit:hover {
-	  color: #333;
-	}
+    #addModal input, #addModal select,
+    #editModal input, #editModal select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
+    .btn-action {
+      padding: 6px 12px;
+      margin-right: 5px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-action:hover {
+      background-color: #2980b9;
+    }
   </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="profile-section">
+      <div class="profile-header">
+        <img src="/icons/profile.png" alt="프로필 아이콘">
+        <span class="profile-text">내 프로필</span>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li>회원 관리</li>
+      <li>일정 관리</li>
+      <li class="active">병실 관리</li>
+      <li>통계</li>
+    </ul>
+    <div class="logout-section">
+      <li class="logout-item">로그아웃</li>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- 병동 반복 예시 -->
+    <div class="room-type">
+      <div class="room-header">
+        <span>병동 301호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+        </div>
+      </div>
+      <div class="room-list">
+        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
+        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
+      </div>
+    </div>
+    <!-- 추가 병동은 동일 구조로 복제 -->
+    <div class="room-type">
+      <div class="room-header">
+        <span>병동 302호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+        </div>
+      </div>
+      <div class="room-list">
+        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
+        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
+      </div>
+    </div>
+    <div class="room-type">
+      <div class="room-header">
+        <span>병동 303호</span>
+        <div class="btn-group">
+          <button class="btn-action">추가</button>
+        </div>
+      </div>
+      <div class="room-list">
+        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
+        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 추가 모달 -->
+  <div id="addModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeAdd">&times;</span>
+      <h3>침대 추가</h3>
+      <form id="addForm">
+        <label>침대 번호</label>
+        <input type="text" id="bedNumber" required><br><br>
+
+        <label>상태</label>
+        <select id="bedStatus" required>
+          <option value="사용 중">사용 중</option>
+          <option value="사용 가능">사용 가능</option>
+        </select><br><br>
+
+        <label>입원 환자</label>
+        <input type="text" id="patientName"><br><br>
+
+        <button type="submit" class="btn-action">등록</button>
+      </form>
+    </div>
+  </div>
   
+  <!-- 수정 모달 -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeEdit">&times;</span>
+      <h3>침대 정보 수정</h3>
+      <form id="editForm">
+        <label>침대 번호</label>
+        <input type="text" id="editBedNumber" required><br><br>
+
+        <label>상태</label>
+        <select id="editBedStatus" required>
+          <option value="사용 중">사용 중</option>
+          <option value="사용 가능">사용 가능</option>
+        </select><br><br>
+
+        <label>입원 환자</label>
+        <input type="text" id="editPatientName"><br><br>
+
+        <button type="submit" class="btn-action">수정</button>
+        <button type="button" class="btn-action" id="deleteBtn" style="background-color: #e74c3c;">삭제</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 수정 모달 생략 가능 (위와 동일 구조로 추가 가능) -->
+
   <script>
     const addModal = document.getElementById('addModal');
-    const addClose = document.querySelector('.close-add');
     const addForm = document.getElementById('addForm');
+    const closeAdd = document.getElementById('closeAdd');
+    let currentRoomList = null;
 
-    // ✅ 각 병동의 추가 버튼에 이벤트 연결
-    document.querySelectorAll('.room-type .btn-action:nth-child(1)').forEach(btn => {
+    document.querySelectorAll('.room-type .btn-action').forEach(btn => {
       btn.addEventListener('click', () => {
+        currentRoomList = btn.closest('.room-type').querySelector('.room-list');
         addModal.style.display = 'block';
       });
     });
 
-    // 닫기
-    addClose.addEventListener('click', () => {
+    closeAdd.addEventListener('click', () => {
       addModal.style.display = 'none';
     });
 
-    window.addEventListener('click', (e) => {
+    window.addEventListener('click', e => {
       if (e.target === addModal) {
         addModal.style.display = 'none';
       }
     });
 
-    // 등록 처리
-    addForm.addEventListener('submit', (e) => {
+    addForm.addEventListener('submit', e => {
       e.preventDefault();
       const bedNumber = document.getElementById('bedNumber').value.trim();
       const bedStatus = document.getElementById('bedStatus').value;
       const patientName = document.getElementById('patientName').value.trim() || '없음';
 
-      // 콘솔 확인 (이후 서버 전송 or DOM 추가)
-      console.log(`침대 번호: ${bedNumber}`);
-      console.log(`상태: ${bedStatus}`);
-      console.log(`입원 환자: ${patientName}`);
+      if (!currentRoomList) return;
 
-      // 모달 닫기 + 폼 초기화
+      const newBox = document.createElement('div');
+      newBox.className = 'room-box';
+      newBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>입원 환자: ${patientName}`;
+
+      currentRoomList.appendChild(newBox);
+
       addModal.style.display = 'none';
       addForm.reset();
+      currentRoomList = null;
     });
     
- // 수정 모달 관련
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
-    const editClose = document.querySelector('.close-edit');
+    const closeEdit = document.getElementById('closeEdit');
     const deleteBtn = document.getElementById('deleteBtn');
-
     let currentRoomBox = null;
 
-    // 각 room-box 클릭 시 수정용 모달 열기
-    document.querySelectorAll('.room-box').forEach(box => {
-      box.addEventListener('click', () => {
-        const lines = box.innerText.split('\n');
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('room-box')) {
+        currentRoomBox = e.target;
+        const lines = currentRoomBox.innerHTML.split('<br>');
         const bedNumber = lines[0].replace('침대 번호: ', '');
         const bedStatus = lines[1].replace('상태: ', '');
         const patientName = lines[2].replace('입원 환자: ', '');
@@ -293,13 +234,11 @@
         document.getElementById('editBedStatus').value = bedStatus;
         document.getElementById('editPatientName').value = patientName === '없음' ? '' : patientName;
 
-        currentRoomBox = box; // 현재 수정할 room-box 저장
         editModal.style.display = 'block';
-      });
+      }
     });
 
-    // 수정
-    editForm.addEventListener('submit', (e) => {
+    editForm.addEventListener('submit', e => {
       e.preventDefault();
       if (!currentRoomBox) return;
 
@@ -307,14 +246,12 @@
       const bedStatus = document.getElementById('editBedStatus').value;
       const patientName = document.getElementById('editPatientName').value.trim() || '없음';
 
-      currentRoomBox.innerHTML =
-        `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>입원 환자: ${patientName}`;
+      currentRoomBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>입원 환자: ${patientName}`;
 
       editModal.style.display = 'none';
       currentRoomBox = null;
     });
 
-    // 삭제
     deleteBtn.addEventListener('click', () => {
       if (!currentRoomBox) return;
       currentRoomBox.remove();
@@ -322,18 +259,16 @@
       currentRoomBox = null;
     });
 
-    // 닫기
-    editClose.addEventListener('click', () => {
+    closeEdit.addEventListener('click', () => {
       editModal.style.display = 'none';
     });
-    window.addEventListener('click', (e) => {
+
+    window.addEventListener('click', e => {
       if (e.target === editModal) {
         editModal.style.display = 'none';
       }
     });
-
+    
   </script>
-  
-  
 </body>
 </html>
