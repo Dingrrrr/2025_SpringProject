@@ -1,55 +1,381 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>홈페이지</title>
-  <link rel="stylesheet" href="/css/hospital_style.css">
-  <link rel="stylesheet" href="/css/notification.css"> <!-- 알림창 CSS 추가 -->
+  <title>관리자 회원 관리</title>
+  <link rel="stylesheet" href="/css/adminstyle.css">
 </head>
 <body>
-  <div class="container">
-    <div class="sidebar">
-      <h2 class="profile-title">
-        <img src="/icons/profile.jpg" alt="프로필">
-        <span>내 프로필</span>
-      </h2>
-      <ul>
-        <li onclick="loadAndToggleNotification()"><img src="/icons/alert.png" alt=""> 알림</li>
-        <li class="active"><img src="/icons/home.png" alt=""> 홈</li>
-        <li><img src="/icons/doctor.png" alt=""> 진료</li>
-        <li><img src="/icons/calendar.png" alt=""> 예약</li>
-        <li><img src="/icons/chart.png" alt=""> 차트</li>
-        <li><img src="/icons/statistics.png" alt=""> 통계</li>
-        <li><img src="/icons/bed.png" alt=""> 입원</li>
-      </ul>
+  <div class="sidebar">
+    <div class="profile-section">
+      <div class="profile-header">
+        <img src="/icons/profile.png" alt="프로필 아이콘">
+        <span class="profile-text">내 프로필</span>
+      </div>
     </div>
 
-    <div class="main">
-      <h1>매디링크내과</h1>
-      <p>반갑습니다 xxx 선생님</p>
-      <img src="/images/hospital.png" alt="병원 이미지" width="1000">
+    <ul class="nav-menu">
+      <li>회원 관리</li>
+      <li>일정 관리</li>
+      <li>병실 관리</li>
+      <li>통계</li>
+    </ul>
+
+    <div class="logout-section">
+      <li class="logout-item">로그아웃</li>
     </div>
   </div>
 
-  <script>
-    function loadAndToggleNotification() {
-      const existing = document.getElementById('notificationPanel');
+  <div class="main">
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="doctor">의사</button>
+        <button class="tab-btn" data-tab="nurse">간호사</button>
+        <button class="tab-btn" data-tab="billing">수납원</button>
+        <button class="tab-btn" data-tab="staff">환자</button>
+      </div>
 
-      if (existing) {
-        existing.classList.toggle('open');
-      } else {
-        fetch('/hospital/notification.html')
-          .then(response => response.text())
-          .then(html => {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const panel = tempDiv.querySelector('.notification-panel');
-            document.body.appendChild(panel);
-            panel.classList.add('open');
-          })
-          .catch(err => console.error('알림 로딩 실패:', err));
+      <!-- 탭 반복 구조 -->
+      <div class="tab-content active" id="doctor">
+        <div class="table-controls">
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+			  <tr th:each="sched : ${doctorScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="nurse">
+        <div class="table-controls">
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+			  <tr th:each="sched : ${nurseScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			   	<td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="billing">
+        <div class="table-controls">
+		  <div class="left-controls">
+		    <select class="filter-select">
+		      <option value="0">ID</option>
+		      <option value="1">이름</option>
+		    </select>
+		    <input type="text" class="search-input" placeholder="검색어 입력">
+		  </div>
+		  <select class="sort-select">
+		    <option value="0">ID순</option>
+		    <option value="1">이름순</option>
+		  </select>
+		</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+          	<tr th:each="sched : ${billingScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="staff">
+		  <div class="table-controls">
+		    <div class="left-controls">
+		      <select class="filter-select">
+		        <option value="0">ID</option>
+		        <option value="1">이름</option>
+		      </select>
+		      <input type="text" class="search-input" placeholder="검색어 입력">
+		    </div>
+		    <select class="sort-select">
+		      <option value="0">ID순</option>
+		      <option value="1">이름순</option>
+		    </select>
+		  </div>
+		  <table>
+		    <thead>
+		      <tr>
+		        <th>ID</th>
+		        <th>이름</th>
+		        <th>생년월일</th>
+		        <th>전화번호</th>
+		        <th>입원 여부</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td>sta001</td>
+		        <td>홍인원</td>
+		        <td>1990-02-15</td>
+		        <td>010-3333-4444</td>
+		        <td>O</td>
+		      </tr>
+		      <tr>
+		        <td>sta002</td>
+		        <td>강인원</td>
+		        <td>1985-10-08</td>
+		        <td>010-5555-6666</td>
+		        <td>X</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</div>
+    </div>
+  </div>
+	  
+<!-- ✅ 정보 확인 및 수정 모달 -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <form id="editForm">
+      <div id="formFields"></div>
+      <div style="margin-top: 20px;">
+        <button type="button" id="saveBtn" class="btn-action">저장</button>
+        <button type="button" id="deleteBtn" class="btn-action" style="background-color: #e74c3c;">삭제</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+ 
+.btn-action {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background-color: #2980b9;
+}
+
+  
+  </style>
+
+  <script>
+    // 탭 전환
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tabContents.forEach(c => {
+          c.classList.remove('active');
+          if (c.id === target) c.classList.add('active');
+        });
+      });
+    });
+
+    // 검색
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      const searchInput = tab.querySelector('.search-input');
+      const filterSelect = tab.querySelector('.filter-select');
+      const rows = tab.querySelectorAll('tbody tr');
+
+      if (searchInput && filterSelect) {
+        searchInput.addEventListener('input', () => {
+          const keyword = searchInput.value.toLowerCase();
+          const colIndex = parseInt(filterSelect.value);
+
+          rows.forEach(row => {
+            const cellText = row.cells[colIndex].textContent.toLowerCase();
+            row.style.display = cellText.includes(keyword) ? '' : 'none';
+          });
+        });
       }
-    }
+    });
+
+    // 정렬
+    document.querySelectorAll('.sort-select').forEach(select => {
+      select.addEventListener('change', () => {
+        const table = select.closest('.tab-content').querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const index = parseInt(select.value);
+
+        rows.sort((a, b) => {
+          const aText = a.cells[index].textContent;
+          const bText = b.cells[index].textContent;
+          return aText.localeCompare(bText);
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+    
+    let selectedRow = null;
+
+ // 테이블 행 클릭 시 모달 표시 및 input 생성
+    document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        selectedRow = row;
+
+        const cells = Array.from(row.cells);
+        const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+
+        const formFields = headers.map((th, idx) => {
+          return `
+            <label>${th.textContent}</label><br>
+            <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+          `;
+        }).join('');
+        document.getElementById('formFields').innerHTML = formFields;
+
+        infoModal.style.display = 'block';
+      });
+    });
+ 
+ // 저장 시 Ajax 요청
+    saveBtn.addEventListener("click", () => {
+      const inputs = document.querySelectorAll("#formFields input");
+      const data = {};
+
+      inputs.forEach((input) => {
+        const idx = input.getAttribute("data-idx");
+        const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
+        data[header] = input.value;
+      });
+
+      fetch("/api/admin/member/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleId: selectedRow.getAttribute("data-id"),
+          userId: data["ID"],
+          startTime: data["근무 시작 시간"],
+          endTime: data["근무 종료 시간"],
+          type: data["스케줄 유형"],
+          workDays: data["근무 요일"].split(",").map(day => day.trim().toUpperCase())
+        })
+      })
+        .then((res) => res.text())
+        .then((msg) => alert(msg));
+    });
+
+
+    // 삭제 시 Ajax 요청
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      
+      fetch(`/api/admin/member/delete/${selectedRow.getAttribute('data-id')}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.text())
+      .then(msg => {
+        alert(msg);
+        selectedRow.remove();
+        infoModal.style.display = 'none';
+      });
+    });
+    
+    const infoModal = document.getElementById('infoModal');
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      infoModal.style.display = 'none';
+      selectedRow = null;
+    });
+
   </script>
 </body>
 </html>

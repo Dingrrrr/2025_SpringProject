@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang = "ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>의사 스케줄</title>
+<link rel="stylesheet" href="/css/AcceptanceDoctorstyle.css">
+
+<style>
+
+</style>
+</head>
+<body>
+<!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span>내 프로필</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	
+	<a href="acceptanceHome" class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	<ul class="submenu">
+   	 	<li class="submenu-item active">의사 스케줄</li>
+   	 <a href = "acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+	</ul>
+	
+	<a href="acceptanceReception" class="menu-item">
+	  <div class="menu-icon">👥</div>
+	  <span>예약</span>
+	</a>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">👥</div>
+		<span>입원</span>
+	</div>
+</div>
+<div class="content">
+<div class="schedule-header">
+    <h2>의사 스케줄</h2>
+   <div class="header-right">
+    <button id="resetSearch" title="초기화">🔄</button>
+    <input type="text" id="doctorSearch" placeholder="의사 이름 검색">
+    <button onclick="searchDoctor()">검색</button>
+    <div class="month-navigator">
+        <button onclick="changeMonth(-1)">◀</button>
+        <span id="month-title">2025년 6월</span>
+        <button onclick="changeMonth(1)">▶</button>
+    </div>
+</div>
+
+</div>
+    <div class="calendar">
+        <div class="calendar-row calendar-header">
+            <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+        </div>
+        <!-- JS가 생성할 달력 -->
+        <div id="calendar-body"></div>
+    </div>
+</div>
+
+<script>
+
+function toggleSubMenu(menuItem) {
+    const allMenuItems = document.querySelectorAll('.menu-item');
+    const allSubmenus = document.querySelectorAll('.submenu');
+
+    const isActive = menuItem.classList.contains('active');
+    allMenuItems.forEach(item => item.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.style.display = 'none');
+
+    if (!isActive) {
+        menuItem.classList.add('active');
+        const submenu = menuItem.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'block';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            submenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
+
+// 전역 변수
+let currentYear = 2025;
+let currentMonth = 6;
+let searchName = '';
+
+// 월 텍스트 업데이트
+function updateMonthTitle(year, month) {
+    document.getElementById('month-title').textContent = `${year}년 ${month}월`;
+}
+
+// 달 변경
+function changeMonth(offset) {
+    currentMonth += offset;
+    if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
+    } else if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+    }
+    updateMonthTitle(currentYear, currentMonth);
+    generateCalendar(currentYear, currentMonth);
+}
+
+// 검색 버튼 클릭
+function searchDoctor() {
+    const input = document.getElementById('doctorSearch').value.trim();
+    searchName = input;
+    generateCalendar(currentYear, currentMonth);
+}
+
+// 달력 생성
+function generateCalendar(year, month) {
+    const calendarBody = document.getElementById('calendar-body');
+    calendarBody.innerHTML = '';
+
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDate = new Date(year, month, 0).getDate();
+    const startDayOfWeek = firstDay.getDay();
+    const totalCells = Math.ceil((startDayOfWeek + lastDate) / 7) * 7;
+
+    let day = 1;
+
+    for (let i = 0; i < totalCells / 7; i++) {
+        const row = document.createElement('div');
+        row.className = 'calendar-row';
+
+        for (let j = 0; j < 7; j++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            const cellIndex = i * 7 + j;
+
+            if (cellIndex >= startDayOfWeek && day <= lastDate) {
+                const dateSpan = document.createElement('span');
+                dateSpan.className = 'date';
+                dateSpan.textContent = day;
+                cell.appendChild(dateSpan);
+
+                const doctors = [];
+                if ([3, 5, 10, 12, 17].includes(day)) doctors.push({ name: '이준수', class: 'blue' });
+                if ([5, 12, 19, 30].includes(day)) doctors.push({ name: '김승환', class: 'yellow' });
+                if ([3, 4, 17, 30].includes(day)) doctors.push({ name: '이화진', class: 'red' });
+
+                for (let doc of doctors) {
+                    if (!searchName || doc.name.includes(searchName)) {
+                        const docDiv = document.createElement('div');
+                        docDiv.className = `doctor ${doc.class}`;
+                        docDiv.textContent = doc.name;
+                        cell.appendChild(docDiv);
+                    }
+                }
+
+                day++;
+            }
+
+            row.appendChild(cell);
+        }
+
+        calendarBody.appendChild(row);
+    }
+}
+
+// 최초 실행
+updateMonthTitle(currentYear, currentMonth);
+generateCalendar(currentYear, currentMonth);
+
+//새로고침
+document.getElementById('resetSearch').addEventListener('click', function () {
+    document.getElementById('doctorSearch').value = '';
+    searchName = '';
+    generateCalendar(currentYear, currentMonth);
+});
+
+</script>
+</body>
+</html>
+

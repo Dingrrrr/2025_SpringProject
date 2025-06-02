@@ -1,0 +1,140 @@
+@charset "UTF-8";
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f3f5fb;
+}
+
+.container {
+  max-width: 450px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.register-form label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+.register-form input,
+.register-form select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.inline {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.inline input {
+  flex: 1;
+}
+
+.inline button {
+  padding: 10px 12px;
+  background-color: #6078ea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+verifyEmailBtn {
+	padding: 10px 12px;
+  	background-color: #6078ea;
+  	color: white;
+}
+
+.terms {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.terms legend {
+  font-weight: bold;
+}
+
+.terms label {
+  display: block;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.submit-btn {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #4357f5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.jumin-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 20px;
+}
+
+/* 주민등록번호 앞자리 */
+#juminFront {
+  width: 300px;         /* ⬅️ 넉넉하게 넓힘 */
+  padding: 10px;
+  
+}
+
+/* 주민등록번호 뒷자리 */
+#juminBack {
+  width: 40px;          /* ⬅️ 1글자만 입력되는 좁은 입력칸 */
+  text-align: center;
+  padding: 10px;
+}
+
+/* 마스킹 점 위치 조정 */
+.mask {
+  font-size: 18px;
+  color: black;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+.id-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+  color: red;  /* 실패 시 */
+}
+
+.id-result.success {
+  color: green;
+}
+
+.pwd-result {
+  margin-top: 4px;
+  font-size: 0.9em;
+}
+.pwd-result.success {
+  color: green;
+}
+.pwd-result.error {
+  color: red;
+}

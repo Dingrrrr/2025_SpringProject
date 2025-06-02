@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang = "ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수납 홈</title>
+<link rel="stylesheet" href="/css/AcceptanceHomestyle.css">
+
+<style>
+
+</style>
+</head>
+<body>
+<!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span>내 프로필</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</div>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	<ul class="submenu">
+	<a href="acceptanceDoctor">
+   	 	<li class="submenu-item active">의사 스케줄</li></a>
+   	 <a href ="acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+
+	</ul>
+	
+	<a href="acceptanceReception" class="menu-item">
+	  <div class="menu-icon">👥</div>
+	  <span>예약</span>
+	</a>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">👥</div>
+		<span>입원</span>
+	</div>
+</div>
+
+<!-- 메인 -->
+<div class="top-menu-bar">
+    <!-- 왼쪽 영역: 예약 -->
+    <div class="menu-section">
+        <span class="menu-title">|예약</span>
+        <button class="icon-btn btn-reset">🔄 초기화</button>
+        <select class="dropdown">
+            <option>11</option>
+            <option>12</option>
+        </select>
+        <label class="label-text">내원접수</label>
+    </div>
+
+    <!-- 가운데 영역: 접수 -->
+    <div class="menu-section reception-menu">
+        <span class="menu-title">|접수</span>
+        <button class="action-btn">+ 상담등록</button>
+        <button class="action-btn">+ 하이패스 수납</button>
+        <button class="alert-btn">🔴 내원취소</button>
+    </div>
+
+    <!-- 오른쪽 영역: 진료 -->
+    <div class="menu-section treatment-menu">
+        <span class="menu-title">|진료</span>
+        <button class="icon-btn">👤 수납</button>
+        <button class="icon-btn">📝 진료등록</button>
+        <button class="icon-btn">✔️ 귀가처리</button>
+        <button class="icon-btn">🔍 인쇄</button>
+    </div>
+</div>
+<!-- 하단 영역 -->
+<div class="content-wrapper">
+    <!-- 예약 영역 -->
+    <div class="column reservation-column">
+        <div class ="header">
+        	<div class = "search-bar">
+        		<input type = "text" class="search-input" placeholder="환자 검색">
+        		<button class="search-btn">검색</button>
+        	</div>
+        </div>
+        
+   <!-- 예약현황  -->
+    <div class="reservation-topbar">
+        <span class="reservation-title">예약현황(14명)</span>
+        <div class="reservation-actions">
+            <button class="action-btn">+ 고객등록</button>
+        </div>
+    </div>
+    
+    <!-- 고객등록 모달 -->
+<div id="customerModal" class="modal" style="display:none;">
+  <div class="modal-content" style="width: 400px;">
+    <span class="close-btn" onclick="closeCustomerModal()">×</span>
+    <h3 style="margin-bottom: 15px;">고객 등록</h3>
+    
+    <form id="customerForm" method="post" action="/acceptance/acceptanceHome">
+      <div style="margin-bottom: 10px;">
+        <input type="text" placeholder="이름" name="patientName" required style="width: 100%; padding: 8px;">
+      </div>
+      <div style="margin-bottom: 10px;">
+        <select name="patientGender" required style="width: 100%; padding: 8px;">
+          <option value="">성별 선택</option>
+          <option value="남">남</option>
+          <option value="여">여</option>
+        </select>
+      </div>
+		<div style="margin-bottom: 10px;">
+		  <input type="text" name="patientBirth" placeholder="주민등록번호 (예: 900101-1234567)" required style="width: 100%; padding: 8px;">
+		</div>
+      <div style="margin-bottom: 10px;">
+        <input type="tel" placeholder="전화번호 (예: 010-1234-5678)" name="patientPhone" required style="width: 100%; padding: 8px;">
+      </div>
+     <div style="margin-bottom: 10px;">
+        <input type="tel" placeholder="증상" name="patientSymptom" required style="width: 100%; padding: 8px;">
+      </div>    
+      <div style="margin-bottom: 10px;">
+        <select name="patientType" required style="width: 100%; padding: 8px;">
+          <option value="진료대기">진료대기</option>
+          <option value="입원대기">입원대기</option>
+          <option value="입원중">입원중</option>
+          <option value="진료중">진료중</option>
+          <option value="퇴원">퇴원</option>
+          <option value="예약">예약</option>
+        </select>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <input type="text" placeholder="주소" name="patientAddress" required style="width: 100%; padding: 8px;">
+      </div>
+      <button type="submit" style="padding: 8px 12px; background-color: #3f78c5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        등록
+      </button>
+    </form>
+  </div>
+</div>
+    
+    
+	<!-- 예약 리스트 -->
+		 <ul class="reservation-list">
+        	<li class="reservation-item">
+            	<span class="time">13:00 전</span>
+            	<div class="info">
+               	 <div class="name">기묘진 (남) 010-7191-8111</div>
+                	<div class="details">예약: 성애네트웍스 / 재진 / 예약관리3</div>
+            	</div>
+        	</li>
+        </ul>
+    </div>
+
+    <!-- 접수 영역 -->
+    <div class="column reception-column">
+          <!-- 날짜 영역 -->
+<div class="date-header">
+  <button class="nav-btn" onclick="openCalendar()">📅 날짜이동</button>
+  <button class="nav-arrow" onclick="changeDate(-1)">◀</button>
+  <span class="date-text" id="currentDate">날짜</span>
+  <button class="nav-arrow" onclick="changeDate(1)">▶</button>
+  <button class="nav-btn" onclick="resetToday()">🔄 새로고침</button>
+</div>
+
+<!-- 날짜 선택 모달 -->
+<div id="calendarModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">×</span>
+    <h3>날짜 선택</h3>
+    <input type="date" id="modalDatePicker">
+    <button onclick="applyDate()">확인</button>
+  </div>
+</div>
+
+
+
+  <!-- 접수현황 상단 바 -->
+  <div class="reception-topbar">
+    <span class="reception-title">접수현황(3명)</span>
+    <div class="filter-options">
+      <label><input type="radio" name="filter" checked> 전체</label>
+      <label><input type="radio" name="filter"> 예약</label>
+      <label><input type="radio" name="filter"> 비예약</label>
+    </div>
+  </div>
+
+  <!-- 접수 리스트 -->
+  <ul class="reception-list">
+    <li class="reception-item">
+      <div class="times">
+        <span class="time1">15:00 전</span>
+        <span class="time2">18:36 내원</span>
+      </div>
+      <div class="info">
+        <div class="name">전향애(여) 010-7937-6626 [0002]</div>
+        <div class="details">
+          접수: 성민네트웍스 | 예약: 김치호 | 재진 | 예약관리3
+        </div>
+      </div>
+    </li>
+   </ul>
+
+    </div>
+
+    <!-- 진료 영역 -->
+    <div class="column treatment-column">
+         <!-- 상단 탭 -->
+  <div class="treatment-tabs">
+    <button class="tab-btn active">오늘통계</button>
+    <button class="tab-btn">귀가</button>
+  </div>
+  
+   <div class="treatment-tabs-option ">
+      <select class="select-all">
+      <option>전체선택</option>
+      <option>선택해제</option>
+    </select>
+  </div>
+
+  <!-- 수납/진료 현황 파란 바 -->
+  <div class="treatment-status-bar">
+    수납 [대기/완료] (0명/1명)<br>
+    진료 [대기/중/완료] (0명/0명/0명)
+  </div>
+
+  <!-- 진료 리스트 -->
+  <ul class="treatment-list">
+    <li class="treatment-item">
+      <div class="treatment-top">
+        <div class="left-time">
+          <span class="time-main">13:00 전</span>
+          <span class="time-sub">09:16 수납완료</span>
+        </div>
+        <div class="patient-name">
+          테테투스스(여) 010-1234-5678
+        </div>
+      </div>
+
+      <div class="treatment-info">
+        <div><strong>접수:</strong> 상담 성애네트웍스 / <strong>조진:</strong> 외국인상담</div>
+        <div>[카드] 234,422원 [현금] 0원 [통장] 0원</div>
+        <div>▶ 치료지시 ▶ 치료1 ///</div>
+        <div>▶ 치료지시 ▶ 치료2 ///</div>
+        <div>▶ 치료지시 ▶ 치료3, 부귀세 ///</div>
+      </div>
+    </li>
+   </ul>
+
+    </div>
+</div>
+
+<script>
+function toggleSubMenu(menuItem) {
+    const allMenuItems = document.querySelectorAll('.menu-item');
+    const allSubmenus = document.querySelectorAll('.submenu');
+
+    // 현재 이미 열려 있는 경우 닫기
+    const isActive = menuItem.classList.contains('active');
+    allMenuItems.forEach(item => item.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.style.display = 'none');
+
+    // 다시 열기 (닫기 상태였다면)
+    if (!isActive) {
+        menuItem.classList.add('active');
+        const submenu = menuItem.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'block';
+        }
+    }
+}
+
+// 하위 메뉴 클릭 시 활성화 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            submenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
+
+// 날짜 포맷 (yyyy-mm-dd → yyyy-mm-dd 요일)
+function formatDateString(date) {
+    const options = { weekday: 'long' };
+    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} ${days[date.getDay()]}`;
+}
+
+// 초기 날짜 설정
+function setDate(date) {
+    document.getElementById("currentDate").textContent = formatDateString(date);
+    document.getElementById("calendarInput").value = date.toISOString().split('T')[0];
+}
+
+// 오늘 날짜로 설정
+function resetToday() {
+    const today = new Date();
+    setDate(today);
+}
+
+// 날짜 하루 전/후로 이동
+function changeDate(diffDays) {
+    const input = document.getElementById("calendarInput");
+    const current = new Date(input.value);
+    current.setDate(current.getDate() + diffDays);
+    setDate(current);
+}
+
+
+let currentDate = new Date(); // 전역 관리
+
+function openCalendar() {
+    const modal = document.getElementById("calendarModal");
+    const picker = document.getElementById("modalDatePicker");
+    picker.value = currentDate.toISOString().split("T")[0];
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("calendarModal").style.display = "none";
+}
+
+function applyDate() {
+    const selectedDate = new Date(document.getElementById("modalDatePicker").value);
+    if (!isNaN(selectedDate)) {
+        currentDate = selectedDate;
+        updateDateDisplay();
+        closeModal();
+    }
+}
+
+function resetToday() {
+    currentDate = new Date();
+    updateDateDisplay();
+}
+
+function changeDate(diff) {
+    currentDate.setDate(currentDate.getDate() + diff);
+    updateDateDisplay();
+}
+
+function updateDateDisplay() {
+    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}-${currentDate.getDate().toString().padStart(2,'0')} ${days[currentDate.getDay()]}`;
+    document.getElementById("currentDate").textContent = dateStr;
+}
+document.addEventListener("DOMContentLoaded", () => {
+    updateDateDisplay(); // 페이지 로드 시 날짜 표시
+});
+
+//고객등록
+  document.addEventListener('DOMContentLoaded', () => {
+    const customerBtn = document.querySelector('.reservation-actions .action-btn');
+    if (customerBtn) {
+      customerBtn.addEventListener('click', openCustomerModal);
+    }
+  });
+
+  // ✅ 이 부분을 DOMContentLoaded 밖으로 옮김
+  function openCustomerModal() {
+    document.getElementById("customerModal").style.display = "flex";
+  }
+
+  function closeCustomerModal() {
+    document.getElementById("customerModal").style.display = "none";
+  }
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

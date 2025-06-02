@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>재고 관리 - 통합 패널</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+    }
+    .sidebar {
+      width: 240px;
+      background-color: white;
+      border-right: 1px solid #ddd;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      background-color: #333;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    .profile-text { flex: 1; font-weight: bold; }
+    .menu { flex: 1; display: flex; flex-direction: column; }
+    .menu-item, .submenu-item { padding: 12px 20px; cursor: pointer; }
+    .menu-item.active { background-color: #e3f2fd; border-right: 3px solid #2196f3; }
+    .main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-left input[type="text"] { padding: 6px 10px; width: 240px; border: 1px solid #ccc; }
+    .header-left select { padding: 6px; border: 1px solid #ccc; }
+    .header-left label { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; }
+    .header-right { display: flex; gap: 10px; }
+    .header-right button {
+      padding: 6px 12px; background-color: #1976d2; color: white; border: none; cursor: pointer;
+      border-radius: 8px;
+    }
+    
+    /* 상세 정보 카드형 스타일 */
+.drug-info-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-row h2 {
+  margin: 0;
+}
+
+.title-row button {
+  padding: 6px 12px;
+  background-color: #757de8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.info-item label {
+  font-weight: bold;
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.info-item div,
+.info-item input {
+  font-size: 14px;
+  color: #222;
+  padding: 6px 8px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+}
+    .content { display: flex; gap: 20px; flex: 1; }
+    .panel { flex: 1; background-color: white; border: 1px solid #ccc; padding: 16px; }
+    .product-card {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #eee; padding: 10px 0; gap: 16px; cursor: pointer;
+    }
+    .product-card:hover { background-color: #f9f9f9; }
+    .stock {
+      font-size: 26px; font-weight: bold; color: #1976d2; width: 60px; text-align: center;
+    }
+    .info-block { flex: 1; }
+    .info-block .name { font-weight: bold; font-size: 16px; }
+    .info-block .info { font-size: 13px; color: #777; }
+    .thumb {
+      width: 48px; height: 48px; object-fit: cover; border: 1px solid #ddd;
+    }
+    .right-panel h2 { margin-top: 0; }
+    .section-title { margin: 20px 0 10px; font-size: 15px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 14px; }
+    th { background-color: #f4f6f8; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="profile">
+      <div class="profile-icon">👤</div>
+      <div class="profile-text">내 프로필</div>
+    </div>
+    <div class="menu">
+      <div class="menu-item active">📦 재고</div>
+      <div class="submenu-item">입고, 출고</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header-bar">
+      <div class="header-left">
+        <input type="text" placeholder="이름, 바코드, 속성 검색">
+        <select><option>제품별</option></select>
+        <select><option>이름 오름차순</option></select>
+        <label><input type="checkbox"> 재고 보유</label>
+      </div>
+      <div class="header-right">
+	     <button onclick="window.open('/Drug/Add', 'AddDrugPopup', 'width=700,height=650')">+ 제품 추가</button>
+	     <button id="manage-btn" onclick="toggleEditMode()">⚙ 제품 관리</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- 왼쪽 패널 -->
+      <div class="panel">
+        <div class="product-card" onclick="showDetail('하트만수액')">
+          <img class="thumb" src="https://via.placeholder.com/48" alt="하트만수액">
+          <div class="info-block">
+            <div class="name">하트만수액</div>
+            <div class="info">수액제 | 500ml | 녹십자</div>
+          </div>
+          <div class="stock">17</div>
+        </div>
+      </div>
+
+      <!-- 오른쪽 패널 -->
+      <div class="panel right-panel" id="detail-panel">
+        <h2>상세 정보</h2>
+        <div class="placeholder">약품을 선택하면 이곳에 상세 정보가 표시됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  let isEditing = false;
+
+  function showDetail(name) {
+    if (name === '하트만수액') {
+      const detailPanel = document.getElementById("detail-panel");
+      const manageBtn = document.getElementById("manage-btn");
+      if (manageBtn) {
+        manageBtn.textContent = "⚙ 제품 관리";
+        isEditing = false;
+      }
+	//이미지 추가 고려해야함
+      detailPanel.innerHTML = `
+        <div class="drug-info-card">
+          <div class="title-row">
+            <h2>하트만수액</h2>
+          </div>
+			
+          <div class="info-grid" id="drug-info">
+            <div class="info-item"><label>종류</label><div>수액제</div></div>
+            <div class="info-item"><label>용량</label><div>500ml</div></div>
+            <div class="info-item"><label>제조사</label><div>녹십자</div></div>
+            <div class="info-item"><label>보관 위치</label><div>창고-A박스</div></div>
+            <div class="info-item"><label>재고</label><div>17</div></div>
+          </div>
+
+          <div class="section-title">입고 내역</div>
+          <table>
+            <tr><th>입고일</th><th>수량</th><th>비고</th></tr>
+            <tr><td>2025-05-01</td><td>10개</td><td>새 박스</td></tr>
+            <tr><td>2025-04-18</td><td>7개</td><td>반품 입고</td></tr>
+          </table>
+
+          <div class="section-title">출고 내역</div>
+          <table>
+            <tr><th>출고일</th><th>수량</th><th>사용처</th></tr>
+            <tr><td>2025-05-03</td><td>3개</td><td>입원환자 A</td></tr>
+            <tr><td>2025-05-06</td><td>2개</td><td>외래진료</td></tr>
+          </table>
+        </div>
+      `;
+    }
+  }
+
+  function toggleEditMode() {
+    const button = document.getElementById("manage-btn");
+
+    if (!isEditing) {
+      isEditing = true;
+      enterEditModeFromManagement(); // 수정모드로 전환
+      button.textContent = "💾 제품 저장";
+    } else {
+      saveDrugChanges(); // 저장 실행
+      isEditing = false;
+      button.textContent = "⚙ 제품 관리";
+    }
+  }
+
+  function enterEditModeFromManagement() {
+    const detailPanel = document.getElementById("detail-panel");
+
+    detailPanel.innerHTML = `
+      <div class="drug-info-card">
+        <div class="title-row">
+          <h2>하트만수액 수정</h2>
+        </div>
+
+        <div class="info-grid" id="drug-info-edit">
+          <div class="info-item"><label>종류</label><input type="text" value="수액제" /></div>
+          <div class="info-item"><label>용량</label><input type="text" value="500ml" /></div>
+          <div class="info-item"><label>제조사</label><input type="text" value="녹십자" /></div>
+          <div class="info-item"><label>보관 위치</label><input type="text" value="창고-A박스" /></div>
+          <div class="info-item"><label>재고</label><input type="number" value="17" /></div>
+        </div>
+
+        <div class="section-title">입고 내역</div>
+        <table>
+          <tr><th>입고일</th><th>수량</th><th>비고</th></tr>
+          <tr><td>2025-05-01</td><td>10개</td><td>새 박스</td></tr>
+          <tr><td>2025-04-18</td><td>7개</td><td>반품 입고</td></tr>
+        </table>
+
+        <div class="section-title">출고 내역</div>
+        <table>
+          <tr><th>출고일</th><th>수량</th><th>사용처</th></tr>
+          <tr><td>2025-05-03</td><td>3개</td><td>입원환자 A</td></tr>
+          <tr><td>2025-05-06</td><td>2개</td><td>외래진료</td></tr>
+        </table>
+      </div>
+    `;
+  }
+
+  function saveDrugChanges() {
+    const inputs = document.querySelectorAll("#drug-info-edit input");
+    const updated = {
+      type: inputs[0].value,
+      volume: inputs[1].value,
+      manufacturer: inputs[2].value,
+      location: inputs[3].value,
+      stock: inputs[4].value
+    };
+
+    alert("수정된 내용:\n" + JSON.stringify(updated, null, 2));
+
+    // 수정 후 다시 상세 보기 화면으로 복원
+    showDetail("하트만수액");
+  }
+
+  window.addEventListener("message", function (event) {
+    if (event.data.type === "ADD_DRUG") {
+      const drug = event.data.payload;
+
+      const panel = document.querySelector(".content .panel");
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.onclick = () => showDetail(drug.name);
+
+      card.innerHTML = `
+        <img class="thumb" src="https://via.placeholder.com/48" alt="${drug.name}">
+        <div class="info-block">
+          <div class="name">${drug.name}</div>
+          <div class="info">${drug.type} | ${drug.volume} | ${drug.manufacturer}</div>
+        </div>
+        <div class="stock">${drug.stock}</div>
+      `;
+
+      panel.appendChild(card);
+      alert(`'${drug.name}' 약품이 추가되었습니다.`);
+    }
+  });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+@charset "UTF-8";
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin: 0;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #343a40;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background-color: #e9ecef;
+}
+
+th, td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #dee2e6;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+th {
+  font-weight: bold;
+  color: #495057;
+}
+
+tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+button.admit {
+  background-color: #28a745;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.admit:hover {
+  background-color: #218838;
+}

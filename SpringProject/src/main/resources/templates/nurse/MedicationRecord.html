@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투약 및 처치 기록</title>
+    <link rel="stylesheet" href="/css/MedicationRecordstyle.css">
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span>내 프로필</span>
+        </div>
+        
+        <a href="#" class="menu-item">
+            <div class="menu-icon">🔔</div>
+            <span>알림</span>
+        </a>
+                
+        <a href="VitalRecord" class="menu-item">
+            <div class="menu-icon">💜</div>
+            <span>바이탈 기록</span>
+        </a>
+            
+        <a href="NurseChart" class="menu-item">
+            <div class="menu-icon">📋</div>
+            <span>차트</span>
+        </a>
+        
+        <a href="MedicationRecord" class="menu-item active">
+            <div class="menu-icon">👥</div>
+            <span>투약 및 처치 기록</span>
+        </a>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="환자 검색" value="민규짱 환자">
+                <button class="search-btn">🔍</button>
+            </div>
+            <div class="patient-info">민규짱 환자</div>
+            <div class="patient-details">성별:남 나이:00 신장:000 체중:00</div>
+        </div>
+
+        <!-- 필터 섹션 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">진료일자</label>
+                    <input type="date" class="filter-input date-input" value="2025-05-27">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">초진</label>
+                    <select class="filter-select">
+                        <option>초진</option>
+                        <option>재진</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">진찰수간</label>
+                    <select class="filter-select">
+                        <option>진찰수간</option>
+                        <option>1차</option>
+                        <option>2차</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">진료보험</label>
+                    <select class="filter-select">
+                        <option>진료보험</option>
+                        <option>건강보험</option>
+                        <option>의료급여</option>
+                    </select>
+                </div>
+                <div class="checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="chkPatient" checked>
+                        <label for="chkPatient">처방전자동체크</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="chkPrint">
+                        <label for="chkPrint">처방발급표출제한</label>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">처치수간</label>
+                    <select class="filter-select">
+                        <option>처치수간</option>
+                        <option>1회</option>
+                        <option>2회</option>
+                        <option>3회</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">발인빈수</label>
+                    <select class="filter-select">
+                        <option>발인빈수</option>
+                        <option>1일 1회</option>
+                        <option>1일 2회</option>
+                        <option>1일 3회</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">세금처럼빈수</label>
+                    <select class="filter-select">
+                        <option>00</option>
+                        <option>01</option>
+                        <option>02</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">PT CNT</label>
+                    <input type="text" class="filter-input" style="width: 80px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 테이블 컨테이너 -->
+        <div class="table-container">
+            <table class="medication-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">코드</th>
+                        <th style="width: 300px;">명칭</th>
+                        <th style="width: 100px;">일투여량</th>
+                        <th class="time-header">총<br>일<br>수</th>
+                        <th class="time-header">총<br>개<br>수</th>
+                        <th class="time-header">용<br>법</th>
+                        <th class="time-header">식<br>후</th>
+                        <th class="time-header">취<br>침</th>
+                        <th class="time-header">변<br>화</th>
+                        <th class="time-header">대<br>체</th>
+                        <th class="time-header">처<br>방</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="code-cell">A5154</td>
+                        <td class="medication-name">초신진활독-의과의원_모건의료원내31,000</td>
+                        <td class="dosage-cell">1,000</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                    <tr>
+                        <td class="code-cell">M4010</td>
+                        <td class="medication-name">표준형치료</td>
+                        <td class="dosage-cell">1,000</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                    <tr>
+                        <td class="code-cell">G1002</td>
+                        <td class="medication-name">비뇨288</td>
+                        <td class="dosage-cell">1,000</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                    <tr>
+                        <td class="code-cell">10</td>
+                        <td class="medication-name">박사세티오스정(모방)</td>
+                        <td class="dosage-cell">2,000</td>
+                        <td class="frequency-cell">3</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell">3</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell">✓</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                    <tr>
+                        <td class="code-cell">100</td>
+                        <td class="medication-name">디라드정(서울)</td>
+                        <td class="dosage-cell">1,000</td>
+                        <td class="frequency-cell">3</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell">3</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell">✓</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                    <tr>
+                        <td class="code-code">50010</td>
+                        <td class="medication-name">요일만남A142초까지</td>
+                        <td class="dosage-cell">1,000</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="frequency-cell">1</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell">✓</td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                        <td class="route-cell"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 액션 버튼 -->
+            <div class="action-buttons">
+                <button class="btn btn-primary">새 처방 추가</button>
+                <button class="btn btn-success">저장</button>    
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 메뉴 클릭 이벤트
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // href가 #인 경우만 기본 동작 방지
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 카테고리 탭 클릭 이벤트
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 탭 변경시 테이블 내용 업데이트 (실제 구현시 AJAX 호출)
+                console.log('탭 변경:', this.textContent.trim());
+            });
+        });
+
+        // 테이블 행 클릭 이벤트
+        document.querySelectorAll('.medication-table tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                // 기존 선택 해제
+                document.querySelectorAll('.medication-table tbody tr').forEach(r => {
+                    r.style.backgroundColor = '';
+                });
+                // 현재 행 선택
+                this.style.backgroundColor = '#e3f2fd';
+            });
+        });
+
+        // 체크박스 이벤트
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                console.log(this.id + ' 체크됨:', this.checked);
+            });
+        });
+
+        // 액션 버튼 이벤트
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                switch(action) {
+                    case '새 처방 추가':
+                        // 새 처방 추가 모달 또는 페이지 이동
+                        alert('새 처방 추가 기능');
+                        break;
+                    case '저장':
+                        alert('처방 정보가 저장되었습니다.');
+                        break;               
+                }
+            });
+        });
+
+        // 날짜 입력 변경 이벤트
+        document.querySelector('input[type="date"]').addEventListener('change', function() {
+            console.log('진료일자 변경:', this.value);
+            // 실제 구현시 해당 날짜의 처방 정보 로드
+        });
+    </script>
+</body>
+</html>

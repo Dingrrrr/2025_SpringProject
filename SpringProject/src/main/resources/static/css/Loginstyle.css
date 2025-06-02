@@ -1,0 +1,110 @@
+@charset "UTF-8";
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f6f9fc;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f6f9fc;
+}
+
+.login-box {
+  display: flex;
+  width: 1000px;
+  height: 600px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.left-panel {
+  flex: 4;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 80px;
+  transition: background-image 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-panel h2 {
+  font-size: 32px;
+  line-height: 1.5;
+}
+
+.left-panel p {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.right-panel {
+  flex: 6;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form input {
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.checkbox {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.login-form button {
+  background-color: #3B5BFE;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.links {
+  margin-top: 15px;
+  font-size: 15px;
+  margin-left: 20px;
+  color: gray;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+}
+
+a {
+	text-decoration: none;
+	color: gray;
+}

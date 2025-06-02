@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+<link rel="stylesheet" href="/css/Joinstyle.css">
+</head>
+<body>
+	<div class="container">
+		<h2>회원가입</h2>
+		<form id="joinForm" class="register-form" action="/Login/Join" method="post">
+			<label>사용자 직군</label> 
+			<select name="grade" required>
+				<option disabled selected>사용자 유형 선택해주세요</option>
+				<option value="의사">의사</option>
+				<option value="간호사">간호사</option>
+				<option value="수납">수납</option>
+			</select> 
+			<label>이름</label> 
+			<input type="text" name="usersName" placeholder="이름을 입력해주세요" required>
+			 
+			<label>생년월일</label> 
+			<input type="date" name="usersBirth" required> 
+			
+			<input type="hidden" name="usersIdcard" id="usersIdcard">
+			
+			<label>주민등록번호</label>
+			<div class="inline jumin-wrapper">
+				<input type="text" id="juminFront" name="usersIdcardFront"
+					maxlength="6" placeholder="앞 6자리" required> <span>-</span>
+				<input type="text" id="juminBack" name="usersIdcardBack"
+					maxlength="1" placeholder="1~4" required>
+				<div class="mask">●●●●●●</div>
+			</div>
+
+			<label>성별</label> <select name="usersGender" required>
+				<option disabled selected>성별을 선택해주세요</option>
+				<option value="남">남</option>
+				<option value="여">여</option>
+				
+			</select> <label>아이디</label>
+			<div class="inline">
+				<input type="text" id="usersId" name="usersId"
+					placeholder="영문 소문자 또는 영문+숫자 조합" required>
+				<button type="button" id="checkIdBtn">중복확인</button>
+			</div>
+
+			<div id="idCheckResult" class="id-result"></div>
+
+			<label>비밀번호</label> 
+			<input type="password" id="pwd" name="usersPwd" placeholder="영문 소문자 또는 영문+숫자+특수조합" required> 
+			<label>비밀번호 확인</label> 
+			<input type="password" id="pwdConfirm" name="pwdConfirm" placeholder="비밀번호 확인" required> 
+			<div id="pwdMatchResult" class="pwd-result"></div>
+			
+			<label>휴대전화번호</label>
+			<input type="tel" id="phone" name="usersPhone" placeholder="010-xxxx-xxxx" maxlength="13" required> 
+			
+			<label>이메일</label>
+			<div class="inline">
+				<input type="email" id="emailInput" name="usersEmail" placeholder="이메일을 입력하세요" required>
+				<button type="button" id="sendEmailBtn">이메일인증</button>
+			</div>
+			
+			<!-- 인증번호 입력 -->
+			<div id="emailVerifySection" style="display:none; margin-top:4px;">
+			  <input type="text" id="emailCodeInput" placeholder="인증번호 입력">
+			  <button type="button" id="verifyEmailBtn">확인</button>
+			  <span id="emailVerifyResult"></span>
+			</div>
+
+			<label>주소</label> <input type="text" name="usersAddress"
+				placeholder="주소를 입력해주세요">
+
+			<fieldset class="terms">
+				<legend>약관 전체 동의</legend>
+				<label><input type="checkbox" id="agree1"> 개인정보 처리방침 (필수)</label> 
+				<label><input type="checkbox" id="agree2"> 스팸정보 이용약관 동의 (필수)</label>
+				<label><input type="checkbox"> 마케팅 수신 동의 (선택)</label>
+			</fieldset>
+
+			<button class="submit-btn" type="submit" id="submitBtn" disabled>가입하기</button>
+		</form>
+
+<!-- ✅ 기능 JavaScript -->
+	<script>
+	
+	// 조건을 완료하면 가입하기 버튼 활성화
+	let isIdValid = false;
+	let isEmailvalid = false;
+	
+	function updateSubmitState() {
+		  const submitBtn = document.getElementById('submitBtn');
+		  const agree1    = document.getElementById('agree1');
+		  const agree2    = document.getElementById('agree2');
+
+		  // 약관1, 약관2, 아이디, 이메일 인증 네 가지 모두 true여야 true
+		  submitBtn.disabled = !(
+		    agree1.checked &&
+		    agree2.checked &&
+		    isIdValid &&
+		    isEmailValid
+		  );
+		}
+	
+	//아이디 중복확인
+    document.addEventListener('DOMContentLoaded', () => {
+    	  const checkBtn   = document.getElementById('checkIdBtn');
+    	  const idInput    = document.getElementById('usersId');
+    	  const resultDiv  = document.getElementById('idCheckResult');
+    	  const submitBtn  = document.getElementById('submitBtn'); // 있으면
+
+    	  checkBtn.addEventListener('click', () => {
+    	    const id = idInput.value.trim();
+    	    if (!id) {
+    	      alert('먼저 아이디를 입력해주세요.');
+    	      idInput.focus();
+    	      return;
+    	    }
+
+    	    fetch(`/Login/checkId?usersId=${encodeURIComponent(id)}`)
+    	      .then(res => res.json())
+    	      .then(available => {
+    	        resultDiv.classList.remove('success');
+    	        if (available) {
+    	        	resultDiv.textContent = available ? '✔ 사용 가능한 아이디입니다.' : '✖ 이미 사용 중인 아이디입니다.';
+    	        	resultDiv.style.color = available ? 'green' : 'red';
+    	        	isIdValid = available; // ← 플래그 세팅
+    	        	updateSubmitState();   // ← 공통 상태 업데이트
+    	        } else {
+    	          resultDiv.textContent = '✖ 이미 사용 중인 아이디입니다.';
+    	          submitBtn.disabled = true;
+    	        }
+    	      })
+    	      .catch(err => {
+    	        console.error(err);
+    	        resultDiv.textContent = '아이디 확인 중 오류가 발생했습니다.';
+    	      });
+    	  });
+    	});
+    
+      // 주민등록번호 뒷자리 첫 숫자 제한 (1~4)
+      document.getElementById('juminBack').addEventListener('input', function () {
+        const val = this.value;
+        
+        if (val === '') {
+        	//백스페이스나 삭제 허용
+        	return;
+        }
+        
+        if (!/^[1-4]$/.test(val)) {
+          this.value = ''; // 1~4 외 입력시 초기화
+          alert("뒷번호 첫 자리는 1~4만 입력 가능합니다.");
+        }
+      });
+
+      // 전화번호 자동 포맷 (010-xxxx-xxxx)
+      const phoneInput = document.getElementById('phone');
+
+      phoneInput.addEventListener('input', function () {
+        let input = this.value.replace(/\D/g, ''); // 숫자만
+
+        if (!input.startsWith('010')) {
+          input = '010' + input;
+        }
+
+        if (input.length <= 3) {
+          this.value = input;
+        } else if (input.length <= 7) {
+          this.value = input.slice(0, 3) + '-' + input.slice(3);
+        } else {
+          this.value = input.slice(0, 3) + '-' + input.slice(3, 7) + '-' + input.slice(7, 11);
+        }
+      });
+
+      phoneInput.addEventListener('focus', function () {
+        if (!this.value.startsWith('010')) {
+          this.value = '010-';
+        }
+      });
+      
+   	  // 포커스 아웃 시 010-만 남아있으면 제거
+      phoneInput.addEventListener('blur', function () {
+        if (this.value === '010') {
+          this.value = ''; // 입력 없이 벗어나면 placeholder 보이게
+        }
+      });
+   	  
+   	 //주민등록번호 합쳐서 입력
+   	 document.addEventListener('DOMContentLoaded', () => {
+	  const form       = document.getElementById('joinForm');
+	  const frontInput = document.getElementById('juminFront');
+	  const backInput  = document.getElementById('juminBack');
+	  const hidden     = document.getElementById('usersIdcard');
+	
+	  form.addEventListener('submit', e => {
+	    const front = frontInput.value.trim();
+	    const back  = backInput.value.trim();
+	
+	    if (!front || !back) {
+	      alert('주민등록번호 앞뒤를 모두 입력해주세요.');
+	      e.preventDefault();  // 제출 막기
+	      return;
+	    }
+	
+	    // "123456-1" 형태로 합쳐서 hidden에 넣기
+	    hidden.value = `${front}-${back}`;
+	    // 이후 폼은 정상 제출됩니다.
+	  });
+	});
+   	
+   	//비밀번호 확인
+   	document.addEventListener('DOMContentLoaded', () => {
+   	  const form         = document.getElementById('joinForm');
+   	  const pwdInput     = document.getElementById('pwd');
+   	  const confirmInput = document.getElementById('pwdConfirm');
+   	  const pwdResult    = document.getElementById('pwdMatchResult');
+
+   	  // 1) 입력할 때마다 실시간 검사
+   	  confirmInput.addEventListener('input', () => {
+   	    if (confirmInput.value === '') {
+   	      pwdResult.textContent = '';
+   	      return;
+   	    }
+   	    if (pwdInput.value === confirmInput.value) {
+   	      pwdResult.textContent = '✔ 비밀번호가 일치합니다.';
+   	      pwdResult.classList.add('success');
+   	      pwdResult.classList.remove('error');
+   	    } else {
+   	      pwdResult.textContent = '✖ 비밀번호가 일치하지 않습니다.';
+   	      pwdResult.classList.add('error');
+   	      pwdResult.classList.remove('success');
+   	    }
+   	  });
+
+   	  // 2) 폼 제출 전 최종 검사
+   	  form.addEventListener('submit', e => {
+   	    if (pwdInput.value !== confirmInput.value) {
+   	      alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요.');
+   	      e.preventDefault();  // 제출 막기
+   	    }
+   	  });
+   	});
+   	 
+   	//이메일 인증 번호
+   	document.addEventListener('DOMContentLoaded', () => {
+	  const sendBtn    = document.getElementById('sendEmailBtn');
+	  const emailInput = document.getElementById('emailInput');
+	  const section    = document.getElementById('emailVerifySection');
+	  const codeInput  = document.getElementById('emailCodeInput');
+	  const verifyBtn  = document.getElementById('verifyEmailBtn');
+	  const resultSpan = document.getElementById('emailVerifyResult');
+	
+	  // ➊ 인증번호 발송
+	  sendBtn.addEventListener('click', () => {
+	    const email = emailInput.value.trim();
+	    if (!email) { alert('이메일을 입력해주세요.'); return; }
+	
+	    fetch('/Login/sendEmailCode', {
+	      method: 'POST',
+	      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+	      body: `usersEmail=${encodeURIComponent(email)}`
+	    })
+	    .then(res => res.text())
+	    .then(msg => {
+	      if (msg === 'sent') {
+	        alert('인증번호를 발송했습니다.');
+	        section.style.display = 'block';
+	      } else {
+	        alert('이메일 발송에 실패했습니다.');
+	      }
+	    });
+	  });
+	
+	  // ➋ 인증번호 검증
+	  verifyBtn.addEventListener('click', () => {
+		    const code = codeInput.value.trim();
+		    if (!code) { alert('인증번호를 입력해주세요.'); return; }
+		
+		    fetch('/Login/verifyEmailCode', {
+		      method: 'POST',
+		      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		      body: `code=${encodeURIComponent(code)}`
+		    })
+		    .then(res => res.json())
+		    .then(ok => {
+		    	if (ok) {
+		    		resultSpan.textContent = '✔ 인증 완료';
+		    		resultSpan.style.color    = 'green';
+		    		isEmailValid = true;       // ← 플래그 세팅
+		    	} else {
+		    		resultSpan.textContent = '✖ 인증번호가 맞지 않습니다.';
+		    		resultSpan.style.color    = 'red';
+		    		isEmailValid = false;
+		    	}
+		    	updateSubmitState();        // ← 공통 상태 업데이트
+		    });
+		  });
+		});
+   	
+   	//약관동의
+   	document.addEventListener('DOMContentLoaded', () => {
+	  const submitBtn = document.getElementById('submitBtn');
+	  const agree1 = document.getElementById('agree1');
+	  const agree2 = document.getElementById('agree2');
+	
+	  function updateTermsState() {
+	    // 두 필수 약관이 모두 체크되어야만 활성화
+	    submitBtn.disabled = !(agree1.checked && agree2.checked);
+	  }
+	
+	  // 체크박스 상태가 변할 때마다 버튼 상태 업데이트
+	  agree1.addEventListener('change', updateSubmitState);
+	  agree2.addEventListener('change', updateSubmitState);
+	
+	  // 페이지 로드 시 기본 상태 반영
+	  updateSubmitState();
+	});
+</script>
+	</div>
+</body>
+</html>

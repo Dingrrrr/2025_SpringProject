@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>입원 관리</title>
+  <link rel="stylesheet" href="/css/inpatient.css">
+</head>
+<body>
+  <div class="container">
+    <!--  사이드바 -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="profile-icon">👤</div>
+        <div>
+          <div class="profile-name">홍길동</div>
+          <div class="profile-role">간호사</div>
+        </div>
+      </div>
+      <ul class="menu">
+        <li>진료</li>
+        <li>예약</li>
+        <li>수납</li>
+        <li>재고</li>
+        <li class="active">입원 ▾
+          <ul class="submenu">
+            <li class="selected">입원 관리</li>
+            <li>입원 통계</li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <!--  본문 -->
+    <main class="main-content">
+      <header class="page-header">
+        <h1>입원 관리</h1>
+          <button id="addBtn" class="add-btn">+ 환자 입원 추가</button>
+      </header>
+
+      <!-- 병동 탭 -->
+      <div class="ward-tabs">
+        <button class="tab active">대기실</button>
+        <button class="tab">1병동 A</button>
+        <button class="tab">1병동 B</button>
+        <button class="tab">2병동</button>
+        <button class="tab">3병동</button>
+      </div>
+
+      <!-- 병실/환자 카드 영역 -->
+      <div class="ward-board"></div>
+    </main>
+  </div>
+
+  <!-- ✅ JavaScript 삽입 -->
+  <script>
+    // 더미 데이터
+    const bedData = [
+      { ward: "대기실", room: "W01", name: "홍길동", gender: "남", age: 35, diagnosis: "위염", date: "2025-05-25", dept: "내과", doctor: "김의사", status: "입원중" },
+      { ward: "1병동 A", room: "101", name: "이순신", gender: "남", age: 40, diagnosis: "감기", date: "2025-05-26", dept: "내과", doctor: "박의사", status: "대기" },
+      { ward: "1병동 B", room: "201", name: "신사임당", gender: "여", age: 50, diagnosis: "골절", date: "2025-05-20", dept: "정형외과", doctor: "이의사", status: "입원중" },
+    ];
+
+    function renderCards(wardName) {
+      const board = document.querySelector(".ward-board");
+      board.innerHTML = "";
+
+      const filtered = bedData.filter(bed => bed.ward === wardName);
+
+      filtered.forEach(bed => {
+        const card = document.createElement("div");
+        card.className = "bed-card";
+        card.innerHTML = `
+          <div class="bed-header">
+            <span>${bed.room}</span>
+            <span class="status ${bed.status}">${bed.status}</span>
+          </div>
+          <div class="patient-info">
+            <p><strong>${bed.name}</strong> / ${bed.gender} / ${bed.age}세</p>
+            <p>진단명: ${bed.diagnosis}</p>
+            <p>입원일: ${bed.date}</p>
+            <p>진료과: ${bed.dept}</p>
+            <p>담당의: ${bed.doctor}</p>
+          </div>
+        `;
+           card.addEventListener("click", () => {
+	  const params = new URLSearchParams(bed).toString();
+	 window.open(`/Inpatient/Popup?${params}`, '환자상세', 'width=420,height=520');
+	});
+        board.appendChild(card);
+      });
+    }
+    
+ 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      // 초기 렌더링
+      renderCards("대기실");
+
+      // 탭 클릭 이벤트 연결
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          renderCards(tab.innerText);
+        });
+      });
+       document.getElementById("addBtn").addEventListener("click", () => {
+      window.open("/Inpatient/WaitingList", "입원대기 환자", "width=700,height=600");
+    });
+});
+  </script>
+</body>
+</html>
