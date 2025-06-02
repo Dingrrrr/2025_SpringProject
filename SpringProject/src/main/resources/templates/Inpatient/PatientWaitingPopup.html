@@ -27,6 +27,7 @@
     let doctorList = [];
 
     fetch("/api/doctors")
+
       .then(res => res.json())
       .then(doctors => {
         doctorList = doctors;

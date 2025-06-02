@@ -1,11 +1,15 @@
 package com.dita.controller;
 
+
 import java.util.List;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import com.dita.domain.Bed;
 import com.dita.domain.PatientType;
@@ -64,6 +68,8 @@ public class InpatientController {
     public List<Bed> getAllBeds() {
         return bedRepository.findAll(); // Bed 엔티티 그대로 반환
     }
+    
+ 
 
 }
 
