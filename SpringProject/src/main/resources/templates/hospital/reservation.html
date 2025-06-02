@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>예약 현황</title>
+  <!-- 공통 스타일 -->
+  <link rel="stylesheet" href="/css/hospital_style.css">
+  <!-- 이 페이지 전용 스타일 -->
+  <link rel="stylesheet" href="/css/reservation_style.css">
+  <!-- 알림창 스타일(기존) -->
+  <link rel="stylesheet" href="/css/notification.css">
+</head>
+<body>
+  <div class="hospital-container">
+
+ <!-- 1) 사이드바 -->
+    <aside class="hospital-sidebar">
+      <h2 class="hospital-profile-title">
+        <img src="/icons/profile.jpg" alt="프로필">
+        <span>내 프로필</span>
+      </h2>
+      <ul class="hospital-menu">
+	   <li onclick="loadAndToggleNotification()"><img src="/icons/alert.png" alt=""> 알림</li>
+	  <li onclick="goToHome()"><img src="/icons/home.png" alt=""> 홈</li>
+	  <li onclick="goToTreatment()"><img src="/icons/doctor.png" alt="진료"> 진료</li>
+      <li onclick="goToReservation()"><img src="/icons/calendar.png" alt="">예약</li>
+      <li onclick="goToChart()"><img src="/icons/chart.png" alt="차트"><span>차트</span></li>
+      <li onclick="goToStats()"><img src="/icons/statistics.png" alt="통계"><span>통계</span>
+      <li><img src="/icons/bed.png" alt=""> 입원</li>
+      </ul>
+       <div class="sidebar-footer">
+    <button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
+  </div>
+</aside>
+
+    <!-- 본문: 스케줄 + 캘린더 -->
+    <div class="reservation-container">
+
+      <!-- 1) 스케줄 패널 -->
+      <section class="reservation-schedule-panel">
+        <h2>예약 현황</h2>
+        <div id="scheduleList">
+          <p class="empty">해당 월에 예약된 일정이 없습니다.</p>
+        </div>
+      </section>
+
+      <!-- 2) 캘린더 패널 -->
+      <section class="reservation-calendar-panel">
+        <div class="reservation-calendar-header">
+          <h3 id="monthTitle">2025년 5월</h3>
+          <div class="reservation-calendar-nav">
+            <button type="button" id="prevBtn">&lt;</button>
+            <button type="button" id="todayBtn">오늘</button>
+            <button type="button" id="nextBtn">&gt;</button>
+          </div>
+        </div>
+        <table class="reservation-calendar-table">
+          <thead>
+            <tr>
+              <th>일</th><th>월</th><th>화</th>
+              <th>수</th><th>목</th><th>금</th><th>토</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS 로 렌더링 됩니다 -->
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+
+<script>
+  // ① 전역 변수 선언
+  let currentDate,
+      monthEvents = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 헤더 파싱
+    const mt = document.getElementById('monthTitle').textContent;
+    const [_, y, m] = mt.match(/(\d+)년\s*(\d+)월/);
+    currentDate = new Date(+y, +m - 1);
+
+    // 버튼 바인딩
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    });
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    });
+    document.getElementById('todayBtn').addEventListener('click', () => {
+      currentDate = new Date();
+      renderCalendar();
+    });
+
+    renderCalendar();
+  });
+
+  // ② 전체 업데이트 함수
+  function renderCalendar() {
+    const year  = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const ym    = String(month + 1).padStart(2, '0');
+
+    // 헤더 갱신
+    document.getElementById('monthTitle').textContent =
+      `${year}년 ${month + 1}월`;
+
+    // 이 달 예약 불러오기
+    fetch(`/api/reservations?year=${year}&month=${ym}`)
+      .then(r => r.json())
+      .then(evts => {
+        monthEvents = evts;
+        renderSchedule(evts);
+        renderTableBody(year, month);
+      })
+      .catch(console.error);
+  }
+
+  // ③ 좌측 스케줄 패널 렌더
+  function renderSchedule(events) {
+    const c = document.getElementById('scheduleList');
+    c.innerHTML = '';
+    if (!events.length) {
+      return c.innerHTML = '<p class="empty">해당 월에 예약된 일정이 없습니다.</p>';
+    }
+    const byDate = events.reduce((acc, e) => {
+      (acc[e.date] = acc[e.date] || []).push(e);
+      return acc;
+    }, {});
+    Object.keys(byDate).sort().forEach(date => {
+      const grp = document.createElement('div');
+      grp.className = 'date-group';
+      const h3 = document.createElement('h3');
+      h3.textContent = date.replace(/(\d+)-(\d+)-(\d+)/, '$1년 $2월 $3일');
+      grp.appendChild(h3);
+      const ul = document.createElement('ul');
+      byDate[date].forEach(e => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${e.name}</strong> – ${e.reason}`;
+        ul.appendChild(li);
+      });
+      grp.appendChild(ul);
+      c.appendChild(grp);
+    });
+  }
+
+  // ④ 캘린더 테이블 그리기
+  function renderTableBody(year, month) {
+    const firstDay     = new Date(year, month, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth  = new Date(year, month + 1, 0).getDate();
+    const tbody        = document.querySelector('.reservation-calendar-table tbody');
+    tbody.innerHTML    = '';
+
+    let day = 1;
+    for (let w = 0; w < 6; w++) {
+      const tr = document.createElement('tr');
+      for (let d = 0; d < 7; d++) {
+        const td = document.createElement('td');
+        if (!(w === 0 && d < startWeekday) && day <= daysInMonth) {
+          // data-date 설정
+          const dd = String(day).padStart(2, '0');
+          td.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${dd}`;
+          td.innerHTML    = `<div class="date-number">${day}</div>`;
+          day++;
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+      if (day > daysInMonth) break;
+    }
+  }
+
+  // ⑤ 날짜 클릭 시 해당 날짜 예약만 필터
+  document.querySelector('.reservation-calendar-table tbody')
+    .addEventListener('click', e => {
+      const td = e.target.closest('td[data-date]');
+      if (!td) return;
+      const date = td.dataset.date;
+      const filtered = monthEvents.filter(ev => ev.date === date);
+      renderSchedule(filtered);
+    });
+
+  // ⑥ 사이드바 네비 & 로그아웃
+  function goToHome()        { location.href = '/home'; }
+  function goToTreatment()   { location.href = '/hospital/treatment'; }
+  function goToReservation() { location.href = '/hospital/reservation'; }
+  function goToChart()       { location.href = '/hospital/chart'; }
+  function goToStats()       { location.href = '/hospital/statistics'; }
+  function goToAdmission()   { location.href = '/hospital/admission'; }
+  function goLogout()        { location.href = '/logout'; }
+
+  // (기존 알림창 토글 로직 유지)
+  function loadAndToggleNotification() { /* … */ }
+</script>
+</body>
+</html>

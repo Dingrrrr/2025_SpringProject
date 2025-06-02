@@ -20,6 +20,7 @@ public class DoctorController {
     @Autowired
     private UserRepository userRepository;
 
+
     // 모든 의사 목록 조회
     @GetMapping("/doctors")
     public List<Map<String, String>> getAllDoctors() {
