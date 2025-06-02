@@ -12,6 +12,7 @@
   <div class="button-group">
     <button class="edit" id="editBtn">수정</button>
     <button class="delete" id="deleteBtn">삭제</button>
+    <button class="assign" id="assignBedBtn">병상 배정</button>
     <button class="cancel" onclick="window.close()">닫기</button>
   </div>
 
@@ -63,7 +64,6 @@
         this.innerText = "저장";
         renderDetail();
       } else {
-        // 저장 로직 (모의 적용)
         data.diagnosis = document.getElementById("inputDiagnosis").value;
         data.date = document.getElementById("inputDate").value;
         data.doctor = document.getElementById("inputDoctor").value;
@@ -73,7 +73,7 @@
         currentMode = "view";
         this.innerText = "수정";
         renderDetail();
-        location.reload(); // 새로고침 (임시 처리)
+        location.reload();
       }
     });
 
@@ -83,6 +83,19 @@
         window.close();
       }
     });
+
+    document.getElementById("assignBedBtn").addEventListener("click", function () {
+      window.open("/Inpatient/AssignBedPopup", "병상 배정", "width=720,height=600");
+    });
+
+    function receiveBedAssignmentFromPopup(bed) {
+      alert(`병상 배정 완료: 병실 ${bed.room} / 침대 ${bed.bed}`);
+      const bedInfo = document.createElement("p");
+      bedInfo.textContent = `병실: ${bed.room}, 침대: ${bed.bed}`;
+      document.getElementById("form-area").appendChild(bedInfo);
+    }
+
+    window.receiveBedAssignmentFromPopup = receiveBedAssignmentFromPopup;
   </script>
 </body>
 </html>

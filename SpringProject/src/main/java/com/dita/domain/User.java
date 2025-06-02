@@ -45,11 +45,17 @@ public class User {
 	 @Column(name = "users_birth", length = 20, nullable = false)
 	 private String usersBirth;
 
+	 @Column(name = "users_gender", length = 10, nullable = false)
+	 private String usersGender;
+	 
+	 @Column(name = "users_idcard", length = 13, nullable = false)
+	 private String usersIdcard;
+	 
 	 @Column(name = "users_address", length = 50, nullable = false)
 	 private String usersAddress;
 	 
 	 @Enumerated(EnumType.STRING)
-	 @Column(nullable = false)
+	 @Column(length = 20,nullable = false)
 	 private Grade grade;
 	 
 	 @OneToOne
