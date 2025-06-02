@@ -1,7 +1,7 @@
 package com.dita.domain;
 
 public enum Status {
-	PENDING,//대기 	
-	CONFIRMED,// 확정
-	CANCELLED// 취소
+	대기,//대기 	
+	확정,// 확정
+	취소// 취소
 }
