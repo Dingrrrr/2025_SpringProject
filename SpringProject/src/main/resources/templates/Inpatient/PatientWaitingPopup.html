@@ -7,6 +7,7 @@
 </head>
 <body>
   <h2>입원 대기 환자</h2>
+
   <table>
     <thead>
       <tr>
@@ -24,43 +25,108 @@
   </table>
 
   <script>
-  fetch("/Inpatient/waiting-patients") // PatientDto 리스트 반환
-    .then(res => {
-      if (!res.ok) throw new Error("서버 응답 실패");
-      return res.json();
-    })
-    .then(waitingPatients => {
-      const tbody = document.getElementById("waiting-table-body");
-      tbody.innerHTML = "";
+    let departmentList = [];
 
-      waitingPatients.forEach(patient => {
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${patient.name}</td>
-          <td>${patient.gender}</td>
-          <td>${patient.age}</td>
-          <td>${patient.symptom ?? "미정"}</td> <!-- 진단명 = symptom -->
-          <td>미정</td> <!-- 진료과 -->
-          <td>미정</td> <!-- 담당의 -->
-          <td>미정</td> <!-- 병실 -->
-          <td><button class="admit">입원</button></td>
-        `;
-
-        tr.querySelector(".admit").addEventListener("click", () => {
-          const newPatient = { ...patient, status: "입원중" };
-          window.opener.bedData.push(newPatient);
-          window.opener.location.reload();
-          window.close();
-        });
-
-        tbody.appendChild(tr);
+    // 1. 진료과 리스트 먼저 로딩
+    fetch("/api/departments")
+      .then(res => res.json())
+      .then(depts => {
+        departmentList = depts;
+        loadWaitingPatients(); // 진료과 리스트 확보 후 환자 로드
       });
-    })
-    .catch(err => {
-      alert("대기 환자 불러오기 실패: " + err.message);
-    });
-</script>
 
+    // 2. 대기 환자 목록 불러오기
+    function loadWaitingPatients() {
+      fetch("/Inpatient/waiting-patients")
+        .then(res => res.json())
+        .then(waitingPatients => {
+          const tbody = document.getElementById("waiting-table-body");
+          tbody.innerHTML = "";
+
+          waitingPatients.forEach(patient => {
+            const tr = document.createElement("tr");
+
+            // 진료과 옵션 생성
+            const deptOptions = departmentList.map(dept =>
+              `<option value="${dept}">${dept}</option>`
+            ).join("");
+
+            tr.innerHTML = `
+              <td>${patient.name}</td>
+              <td>${patient.gender}</td>
+              <td>${patient.age}</td>
+              <td>${patient.symptom ?? "미정"}</td>
+              <td>
+                <select class="dept-select">
+                  <option value="">선택</option>
+                  ${deptOptions}
+                </select>
+              </td>
+              <td>
+                <select class="doctor-select" disabled>
+                  <option value="">진료과 먼저 선택</option>
+                </select>
+              </td>
+              <td>미정</td>
+              <td><button class="admit">입원</button></td>
+            `;
+
+            // 진료과 선택 시 해당 의사 목록 불러오기
+            const deptSelect = tr.querySelector(".dept-select");
+            const doctorSelect = tr.querySelector(".doctor-select");
+
+            deptSelect.addEventListener("change", () => {
+              const selectedDept = deptSelect.value;
+              doctorSelect.innerHTML = `<option value="">불러오는 중...</option>`;
+              doctorSelect.disabled = true;
+
+              if (!selectedDept) return;
+
+              fetch(`/api/doctors/by-dept?dept=${encodeURIComponent(selectedDept)}`)
+                .then(res => res.json())
+                .then(doctors => {
+                  const doctorOptions = doctors.map(doc =>
+                    `<option value="${doc.usersId}">${doc.usersName}</option>`
+                  ).join("");
+
+                  doctorSelect.innerHTML = `
+                    <option value="">담당의 선택</option>
+                    ${doctorOptions}
+                  `;
+                  doctorSelect.disabled = false;
+                });
+            });
+
+            // 입원 버튼 클릭 시
+            tr.querySelector(".admit").addEventListener("click", () => {
+              const selectedDoctorId = doctorSelect.value;
+              if (!selectedDoctorId) {
+                alert("담당의를 선택해주세요.");
+                return;
+              }
+
+              const admissionRequest = {
+                patientId: patient.id,
+                doctorId: selectedDoctorId
+              };
+
+              fetch("/Inpatient/admit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(admissionRequest)
+              })
+                .then(res => {
+                  if (!res.ok) throw new Error("입원 실패");
+                  alert("입원 처리 완료");
+                  window.location.reload();
+                })
+                .catch(err => alert(err.message));
+            });
+
+            tbody.appendChild(tr);
+          });
+        });
+    }
+  </script>
 </body>
 </html>
