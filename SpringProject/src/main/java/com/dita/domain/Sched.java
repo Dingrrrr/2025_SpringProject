@@ -1,8 +1,12 @@
 package com.dita.domain;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,4 +48,8 @@ public class Sched {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private Type type;// 스케줄 유형
+	
+    @Enumerated(EnumType.STRING)
+    @Column(name = "work_day")
+    private List<DayOfWeek> workDays; // 근무 요일 목록
 }
