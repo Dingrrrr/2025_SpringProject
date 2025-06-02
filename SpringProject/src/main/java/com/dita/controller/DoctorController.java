@@ -17,7 +17,6 @@ import com.dita.persistence.UserRepository;
 @RequestMapping("/api")
 public class DoctorController {
 
-
     @Autowired
     private UserRepository userRepository;
 
@@ -36,4 +35,3 @@ public class DoctorController {
             .collect(Collectors.toList());
     }
 }
-
