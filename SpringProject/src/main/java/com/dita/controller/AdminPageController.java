@@ -1,39 +1,52 @@
 package com.dita.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.dita.domain.Grade;
+import com.dita.domain.Sched;
+import com.dita.persistence.AdminMemberRepository;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 @Controller
 @Log
+@RequiredArgsConstructor
 @RequestMapping("/admin/")
 public class AdminPageController {
-	
-	@GetMapping("/adminMemberManage")
-    public String showAttendancePage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "admin/adminMemberManage"; // templates/admin/adminMemberManage.html 호출
+
+    private final AdminMemberRepository adminMemberRepository;
+
+    @GetMapping("/adminMemberManage")
+    public String showMemberManagePage(Model model) {
+        List<Sched> doctorScheds = adminMemberRepository.findByUserGrade(Grade.의사);
+        List<Sched> nurseScheds = adminMemberRepository.findByUserGrade(Grade.간호사);
+        List<Sched> billingScheds = adminMemberRepository.findByUserGrade(Grade.수납);
+
+        model.addAttribute("doctorScheds", doctorScheds);
+        model.addAttribute("nurseScheds", nurseScheds);
+        model.addAttribute("billingScheds", billingScheds);
+
+        return "admin/adminMemberManage";
     }
-	
-	@GetMapping("/adminCalendarManage")
+
+    @GetMapping("/adminCalendarManage")
     public String showCalendarPage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "admin/adminCalendarManage"; // templates/admin/adminCalendarManage.html 호출
+        return "admin/adminCalendarManage";
     }
-	
-	@GetMapping("/adminRoomManage")
+
+    @GetMapping("/adminRoomManage")
     public String showRoomPage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "admin/adminRoomManage"; // templates/admin/adminRoomManage.html 호출
+        return "admin/adminRoomManage";
     }
-	
-	@GetMapping("/adminTotalManage")
+
+    @GetMapping("/adminTotalManage")
     public String showTotalPage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "admin/adminTotalManage"; // templates/admin/adminTotalManage.html 호출
+        return "admin/adminTotalManage";
     }
-	
 }
