@@ -17,8 +17,10 @@ import com.dita.persistence.UserRepository;
 @RequestMapping("/api")
 public class DoctorController {
 
+
     @Autowired
     private UserRepository userRepository;
+
 
     // 모든 의사 목록 조회
     @GetMapping("/doctors")

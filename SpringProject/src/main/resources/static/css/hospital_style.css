@@ -1,0 +1,122 @@
+@charset "UTF-8";
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f7fb;
+}
+
+.hospital-container {
+  display: flex;
+}
+
+.hospital-sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #fff;
+  border-right: 1px solid #ccc;
+  padding: 20px 0;
+}
+
+.hospital-sidebar h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.hospital-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hospital-sidebar ul li {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.hospital-sidebar ul li img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.hospital-sidebar ul li:hover,
+.hospital-sidebar ul li.active {
+  background-color: #e0f7fa;
+}
+
+.hospital-main {
+  flex-grow: 1;
+  padding: 40px;
+}
+
+.hospital-main h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.hospital-main p {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.hospital-image-placeholder {
+  margin-top: 40px;
+  background-color: #dce7f3;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #555;
+  border-radius: 10px;
+}
+
+.hospital-profile-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  padding-left: 10px;
+  margin: 0;
+}
+
+.hospital-profile-title img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* 사이드바 하단 고정 영역 */
+.hospital-sidebar {
+  display: flex;
+  flex-direction: column;
+}
+.hospital-sidebar .hospital-menu {
+  flex: 1;  /* 메뉴가 위로 밀리도록 */
+}
+
+/* 로그아웃 버튼 영역 */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+  background: #fff;
+}
+.logout-btn {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.logout-btn:hover {
+  background: #e9ecef;
+}
+

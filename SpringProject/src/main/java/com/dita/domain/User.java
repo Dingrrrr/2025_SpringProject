@@ -57,4 +57,5 @@ public class User {
 	 @Enumerated(EnumType.STRING)
 	 @Column(length = 20,nullable = false)
 	 private Grade grade;
+
 }
