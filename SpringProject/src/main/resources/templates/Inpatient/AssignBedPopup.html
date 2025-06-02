@@ -16,57 +16,84 @@
   </div>
 
   <script>
-    const bedStatus = {}; // 예: {"101-1": "occupied", ...}
-    const roomCount = 3;
-    const bedsPerRoom = 6;
-
     const roomGrid = document.getElementById("roomGrid");
     const selectedInfo = document.getElementById("selectedInfo");
     const assignBtn = document.getElementById("assignBtn");
 
     let selectedBed = null;
 
-    function createGrid() {
+    // 병상 목록 불러오기
+    function loadBeds() {
+      fetch("/Inpatient/beds")
+        .then(res => res.json())
+        .then(beds => renderRooms(beds))
+        .catch(err => {
+          alert("병상 정보를 불러오지 못했습니다.");
+          console.error(err);
+        });
+    }
+
+    // 병실별로 병상 렌더링
+    function renderRooms(beds) {
       roomGrid.innerHTML = "";
       selectedBed = null;
       selectedInfo.textContent = "선택된 병실/침대: 없음";
       assignBtn.disabled = true;
 
-      for (let i = 1; i <= roomCount; i++) {
+      const roomMap = new Map();
+
+      // 병실별 그룹핑
+      beds.forEach(bed => {
+        const roomName = bed.ward.name;
+        if (!roomMap.has(roomName)) roomMap.set(roomName, []);
+        roomMap.get(roomName).push(bed);
+      });
+
+      // 병실 단위 UI 렌더링
+      [...roomMap.entries()].forEach(([roomName, bedList]) => {
         const roomEl = document.createElement("div");
         roomEl.className = "room";
-        const roomNum = `${i + 100}`;
-        roomEl.innerHTML = `<h4>병실 ${roomNum}</h4>`;
+        roomEl.innerHTML = `<h4>${roomName}</h4>`;
 
         const bedsEl = document.createElement("div");
         bedsEl.className = "beds";
 
-        for (let j = 1; j <= bedsPerRoom; j++) {
-          const bedKey = `${roomNum}-${j}`;
+        bedList.forEach(bed => {
+          const isAvailable = bed.bedstatus === "사용가능";
+
           const bedEl = document.createElement("div");
-          bedEl.className = "bed empty";
-          bedEl.textContent = `침대 ${j}`;
-          if (bedStatus[bedKey] === "occupied") {
-            bedEl.classList.remove("empty");
-            bedEl.classList.add("occupied");
+          bedEl.className = `bed ${isAvailable ? "empty" : "occupied"}`;
+          bedEl.textContent = `침대 ${bed.bedNumber}`;
+
+          if (isAvailable) {
+            bedEl.addEventListener("click", () => {
+              document.querySelectorAll(".bed").forEach(el => el.classList.remove("selected"));
+              bedEl.classList.add("selected");
+
+              // 선택된 병상 정보 저장
+              selectedBed = {
+                wardId: bed.ward.wardId,
+                bedId: bed.bedId,
+                wardName: bed.ward.name,
+                bedNumber: bed.bedNumber
+              };
+
+              selectedInfo.textContent = `선택된 병실/침대: ${bed.ward.name} / 침대 ${bed.bedNumber}`;
+              assignBtn.disabled = false;
+            });
+          } else {
+            bedEl.classList.add("disabled");
           }
-          bedEl.addEventListener("click", () => {
-            if (bedEl.classList.contains("occupied")) return;
-            document.querySelectorAll(".bed").forEach(el => el.classList.remove("selected"));
-            bedEl.classList.add("selected");
-            selectedBed = { room: roomNum, bed: j };
-            selectedInfo.textContent = `선택된 병실/침대: 병실 ${roomNum} / 침대 ${j}`;
-            assignBtn.disabled = false;
-          });
 
           bedsEl.appendChild(bedEl);
-        }
+        });
 
         roomEl.appendChild(bedsEl);
         roomGrid.appendChild(roomEl);
-      }
+      });
     }
 
+    // 배정하기 버튼 → 부모창으로 병상 정보 전달
     assignBtn.addEventListener("click", () => {
       if (!selectedBed) return;
       if (window.opener && window.opener.receiveBedAssignmentFromPopup) {
@@ -75,8 +102,8 @@
       window.close();
     });
 
-    // 초기 렌더링
-    createGrid();
+    // 초기 실행
+    loadBeds();
   </script>
 </body>
 </html>

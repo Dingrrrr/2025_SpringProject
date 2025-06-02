@@ -1,5 +1,5 @@
 package com.dita.domain;
 
 public enum PatientType {
-	외래진료, 입원대기, 입원중, 퇴원
+	진료대기, 진료중, 예약, 입원대기, 입원중 ,퇴원
 }

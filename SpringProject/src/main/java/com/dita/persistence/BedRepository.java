@@ -9,4 +9,5 @@ import com.dita.domain.StatusBed;
 public interface BedRepository extends JpaRepository<Bed, Integer> {
 	List<Bed> findByWard_WardId(int wardId);
 	List<Bed>findByBedstatus(StatusBed bedstatus);; // "empty" 병상만 조회
+
 }

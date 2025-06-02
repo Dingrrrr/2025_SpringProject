@@ -10,4 +10,7 @@ import com.dita.domain.Admission;
 public interface AdmissionRepository extends JpaRepository<Admission, Integer>{
 	  @Query("SELECT a FROM Admission a WHERE a.dischargeAt IS NULL AND a.bed IS NULL")
 	    List<Admission> findWaitingPatients();// 대기환자 조회
+	  
+	  @Query("SELECT a FROM Admission a WHERE a.bed IS NULL AND a.dischargeAt IS NULL")
+	  List<Admission>  findPendingBedAssignment();
 }

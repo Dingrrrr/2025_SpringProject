@@ -17,35 +17,22 @@ import com.dita.persistence.UserRepository;
 @RestController
 @RequestMapping("/api")
 public class DoctorController {
-	
-	@Autowired
-	  private UserRepository userRepository;
 
-	@GetMapping("/doctors/by-dept")
-	public List<Map<String, String>> getDoctorsByDept(@RequestParam String dept) {
-	    return userRepository.findAll().stream()
-	        .filter(user -> Grade.의사.equals(user.getGrade()))
-	        .filter(user -> user.getDeptId() != null)
-	        .filter(user -> dept.equals(user.getDeptId().getDeptName()))
-	        .map(user -> {
-	            Map<String, String> dto = new HashMap<>();
-	            dto.put("usersId", user.getUsersId());
-	            dto.put("usersName", user.getUsersName());
-	            return dto;
-	        })
-	        .collect(Collectors.toList());
-	}
-	
-	//진료과
-	@GetMapping("/departments")
-	public List<String> getDepartments() {
-	    return userRepository.findAll().stream()
-	        .filter(user -> Grade.의사.equals(user.getGrade()))
-	        .filter(user -> user.getDeptId() != null)
-	        .map(user -> user.getDeptId().getDeptName())
-	        .distinct()
-	        .collect(Collectors.toList());
-	}
+    @Autowired
+    private UserRepository userRepository;
 
-	
+    // 모든 의사 목록 조회
+    @GetMapping("/doctors")
+    public List<Map<String, String>> getAllDoctors() {
+        return userRepository.findAll().stream()
+            .filter(user -> Grade.의사.equals(user.getGrade()))
+            .map(user -> {
+                Map<String, String> dto = new HashMap<>();
+                dto.put("usersId", user.getUsersId());
+                dto.put("usersName", user.getUsersName());
+                return dto;
+            })
+            .collect(Collectors.toList());
+    }
 }
+

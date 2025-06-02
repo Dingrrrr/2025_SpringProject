@@ -40,10 +40,10 @@ public class Admission {
     private User doctor;// 담당 의사 아이디
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bed_id", nullable = false)
+    @JoinColumn(name = "bed_id", nullable = true)
     private Bed bed;// 병상 아이디
 
-    @Column(name = "admitted_at", nullable = false)
+    @Column(name = "admitted_at", nullable = true)
     private LocalDateTime admittedAt;// 입원 일시
 
     @Column(name = "discharge_at")

@@ -15,7 +15,6 @@
         <th>성별</th>
         <th>나이</th>
         <th>진단명</th>
-        <th>진료과</th>
         <th>담당의</th>
         <th>병실</th>
         <th>입원</th>
@@ -25,17 +24,15 @@
   </table>
 
   <script>
-    let departmentList = [];
+    let doctorList = [];
 
-    // 1. 진료과 리스트 먼저 로딩
-    fetch("/api/departments")
+    fetch("/api/doctors")
       .then(res => res.json())
-      .then(depts => {
-        departmentList = depts;
-        loadWaitingPatients(); // 진료과 리스트 확보 후 환자 로드
+      .then(doctors => {
+        doctorList = doctors;
+        loadWaitingPatients();
       });
 
-    // 2. 대기 환자 목록 불러오기
     function loadWaitingPatients() {
       fetch("/Inpatient/waiting-patients")
         .then(res => res.json())
@@ -46,9 +43,8 @@
           waitingPatients.forEach(patient => {
             const tr = document.createElement("tr");
 
-            // 진료과 옵션 생성
-            const deptOptions = departmentList.map(dept =>
-              `<option value="${dept}">${dept}</option>`
+            const doctorOptions = doctorList.map(doc =>
+              `<option value="${doc.usersId}">${doc.usersName}</option>`
             ).join("");
 
             tr.innerHTML = `
@@ -57,57 +53,48 @@
               <td>${patient.age}</td>
               <td>${patient.symptom ?? "미정"}</td>
               <td>
-                <select class="dept-select">
-                  <option value="">선택</option>
-                  ${deptOptions}
+                <select class="doctor-select">
+                  <option value="">담당의 선택</option>
+                  ${doctorOptions}
                 </select>
+              </td>
+              <td class="bed-cell">
+                <button class="assign-bed">병상 배정</button>
               </td>
               <td>
-                <select class="doctor-select" disabled>
-                  <option value="">진료과 먼저 선택</option>
-                </select>
+                <button class="admit">입원</button>
               </td>
-              <td>미정</td>
-              <td><button class="admit">입원</button></td>
             `;
 
-            // 진료과 선택 시 해당 의사 목록 불러오기
-            const deptSelect = tr.querySelector(".dept-select");
             const doctorSelect = tr.querySelector(".doctor-select");
+            const bedCell = tr.querySelector(".bed-cell");
 
-            deptSelect.addEventListener("change", () => {
-              const selectedDept = deptSelect.value;
-              doctorSelect.innerHTML = `<option value="">불러오는 중...</option>`;
-              doctorSelect.disabled = true;
+            // 병상 배정 버튼 클릭
+            tr.querySelector(".assign-bed").addEventListener("click", () => {
+              // 현재 클릭한 환자 정보 저장
+              window.lastAssignedRow = tr;
+              window.lastAssignedPatient = patient;
 
-              if (!selectedDept) return;
-
-              fetch(`/api/doctors/by-dept?dept=${encodeURIComponent(selectedDept)}`)
-                .then(res => res.json())
-                .then(doctors => {
-                  const doctorOptions = doctors.map(doc =>
-                    `<option value="${doc.usersId}">${doc.usersName}</option>`
-                  ).join("");
-
-                  doctorSelect.innerHTML = `
-                    <option value="">담당의 선택</option>
-                    ${doctorOptions}
-                  `;
-                  doctorSelect.disabled = false;
-                });
+              window.open("/Inpatient/AssignBedPopup", "병상 배정", "width=720,height=600");
             });
 
-            // 입원 버튼 클릭 시
+            // 입원 처리 버튼 클릭
             tr.querySelector(".admit").addEventListener("click", () => {
               const selectedDoctorId = doctorSelect.value;
               if (!selectedDoctorId) {
                 alert("담당의를 선택해주세요.");
                 return;
               }
+              if (!patient.bedId || !patient.wardId) {
+                alert("병상 배정이 필요합니다.");
+                return;
+              }
 
               const admissionRequest = {
-                patientId: patient.id,
-                doctorId: selectedDoctorId
+                patientId: patient.patientId,
+                doctorId: selectedDoctorId,
+                wardId: patient.wardId,
+                bedId: patient.bedId
               };
 
               fetch("/Inpatient/admit", {
@@ -127,6 +114,18 @@
           });
         });
     }
+
+    // 병상 배정 팝업 → 병상 정보 전달받음
+    window.receiveBedAssignmentFromPopup = function (bed) {
+      if (!window.lastAssignedRow || !window.lastAssignedPatient) return;
+
+      const bedCell = window.lastAssignedRow.querySelector(".bed-cell");
+      bedCell.innerHTML = `${bed.wardName} / 침대 ${bed.bedNumber}`;
+
+      // 병상 정보 환자 객체에 저장
+      window.lastAssignedPatient.wardId = bed.wardId;
+      window.lastAssignedPatient.bedId = bed.bedId;
+    };
   </script>
 </body>
 </html>

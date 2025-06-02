@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dita.domain.Bed;
 import com.dita.domain.PatientType;
+import com.dita.persistence.BedRepository;
 import com.dita.service.AdmissionService;
 import com.dita.vo.PatientDto;
 
@@ -52,6 +54,15 @@ public class InpatientController {
     @ResponseBody
     public List<PatientDto> getWaitingPatients() {
         return admissionSe.getPatientsByType(PatientType.입원대기); // ✅ Patient 기준
+    }
+    
+    private final BedRepository bedRepository;
+
+    // 병상 전체 조회
+    @GetMapping("/beds")
+    @ResponseBody
+    public List<Bed> getAllBeds() {
+        return bedRepository.findAll(); // Bed 엔티티 그대로 반환
     }
 
 }
