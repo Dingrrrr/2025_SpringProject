@@ -116,25 +116,38 @@
     <span class="close-btn" onclick="closeCustomerModal()">×</span>
     <h3 style="margin-bottom: 15px;">고객 등록</h3>
     
-    <form id="customerForm">
+    <form id="customerForm" method="post" action="/acceptance/acceptanceHome">
       <div style="margin-bottom: 10px;">
-        <input type="text" placeholder="이름" name="name" required style="width: 100%; padding: 8px;">
+        <input type="text" placeholder="이름" name="patientName" required style="width: 100%; padding: 8px;">
       </div>
       <div style="margin-bottom: 10px;">
-        <select name="gender" required style="width: 100%; padding: 8px;">
+        <select name="patientGender" required style="width: 100%; padding: 8px;">
           <option value="">성별 선택</option>
           <option value="남">남</option>
           <option value="여">여</option>
         </select>
       </div>
 		<div style="margin-bottom: 10px;">
-		  <input type="text" name="idcard" placeholder="주민등록번호 (예: 900101-1234567)" required style="width: 100%; padding: 8px;">
+		  <input type="text" name="patientBirth" placeholder="주민등록번호 (예: 900101-1234567)" required style="width: 100%; padding: 8px;">
 		</div>
       <div style="margin-bottom: 10px;">
-        <input type="tel" placeholder="전화번호 (예: 010-1234-5678)" name="phone" required style="width: 100%; padding: 8px;">
+        <input type="tel" placeholder="전화번호 (예: 010-1234-5678)" name="patientPhone" required style="width: 100%; padding: 8px;">
+      </div>
+     <div style="margin-bottom: 10px;">
+        <input type="tel" placeholder="증상" name="patientSymptom" required style="width: 100%; padding: 8px;">
+      </div>    
+      <div style="margin-bottom: 10px;">
+        <select name="patientType" required style="width: 100%; padding: 8px;">
+          <option value="진료대기">진료대기</option>
+          <option value="입원대기">입원대기</option>
+          <option value="입원중">입원중</option>
+          <option value="진료중">진료중</option>
+          <option value="퇴원">퇴원</option>
+          <option value="예약">예약</option>
+        </select>
       </div>
       <div style="margin-bottom: 15px;">
-        <input type="text" placeholder="주소" name="address" required style="width: 100%; padding: 8px;">
+        <input type="text" placeholder="주소" name="patientAddress" required style="width: 100%; padding: 8px;">
       </div>
       <button type="submit" style="padding: 8px 12px; background-color: #3f78c5; color: white; border: none; border-radius: 4px; cursor: pointer;">
         등록
@@ -355,27 +368,22 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //고객등록
-document.addEventListener('DOMContentLoaded', () => {
-  const customerBtn = document.querySelector('.reservation-actions .action-btn');
-  if (customerBtn) {
-    customerBtn.addEventListener('click', openCustomerModal);
+  document.addEventListener('DOMContentLoaded', () => {
+    const customerBtn = document.querySelector('.reservation-actions .action-btn');
+    if (customerBtn) {
+      customerBtn.addEventListener('click', openCustomerModal);
+    }
+  });
+
+  // ✅ 이 부분을 DOMContentLoaded 밖으로 옮김
+  function openCustomerModal() {
+    document.getElementById("customerModal").style.display = "flex";
   }
 
-  document.getElementById("customerForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    alert("고객이 등록되었습니다.");
-    closeCustomerModal();
-    this.reset();
-  });
-});
+  function closeCustomerModal() {
+    document.getElementById("customerModal").style.display = "none";
+  }
 
-function openCustomerModal() {
-  document.getElementById("customerModal").style.display = "flex";
-}
-
-function closeCustomerModal() {
-  document.getElementById("customerModal").style.display = "none";
-}
 </script>
 
 
