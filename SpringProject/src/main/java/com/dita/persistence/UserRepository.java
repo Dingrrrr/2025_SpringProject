@@ -1,10 +1,11 @@
 package com.dita.persistence;
 
-import com.dita.domain.User;
-import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.dita.domain.User;
+
 public interface UserRepository extends JpaRepository<User, String> {
-	
-	List<User> findByGrade(String grade);
+    List<User> findByGrade(String grade);
 }

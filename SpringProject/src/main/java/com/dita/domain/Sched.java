@@ -49,7 +49,10 @@ public class Sched {
 	@Column(name = "type", nullable = false)
 	private Type type;// 스케줄 유형
 	
-    @Enumerated(EnumType.STRING)
-    @Column(name = "work_day")
-    private List<DayOfWeek> workDays; // 근무 요일 목록
+	@ElementCollection(targetClass = DayOfWeek.class)
+	@Enumerated(EnumType.STRING)
+	@CollectionTable(name = "sched_work_days", joinColumns = @JoinColumn(name = "schedule_id"))
+	@Column(name = "day_of_week")
+	private List<DayOfWeek> workDays;
+
 }

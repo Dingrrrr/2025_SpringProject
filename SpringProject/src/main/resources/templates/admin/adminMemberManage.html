@@ -53,14 +53,20 @@
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>이름</th><th>전화번호</th><th>진료 과목</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+              <th>ID</th><th>이름</th><th>전화번호</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>doc001</td><td>김의사</td><td>010-1234-5678</td><td>내과</td><td>월, 화, 금</td><td>09:00</td><td>17:00</td><td>출근</td></tr>
-            <tr><td>doc002</td><td>이의사</td><td>010-2345-6789</td><td>외과</td><td>월, 수, 목</td><td>08:30</td><td>16:30</td><td>출근</td></tr>
-            <tr><td>doc003</td><td>박의사</td><td>010-3456-7890</td><td>소아과</td><td>화, 토</td><td>10:00</td><td>18:00</td><td>출근</td></tr>
-          </tbody>
+			  <tr th:each="sched : ${doctorScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
         </table>
       </div>
 
@@ -85,10 +91,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>nur001</td><td>박간호사</td><td>010-8888-9999</td><td>월, 화, 금</td><td>08:00</td><td>16:00</td><td>출근</td></tr>
-            <tr><td>nur002</td><td>정간호사</td><td>010-7777-2222</td><td>화, 금</td><td>09:00</td><td>17:00</td><td>출근</td></tr>
-            <tr><td>nur003</td><td>한간호사</td><td>010-9999-1111</td><td>수, 일</td><td>10:00</td><td>18:00</td><td>출근</td></tr>
-          </tbody>
+			  <tr th:each="sched : ${nurseScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			   	<td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
         </table>
       </div>
 
@@ -113,9 +125,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>bill001</td><td>정수납</td><td>010-1111-2222</td><td>화, 금</td><td>09:00</td><td>18:00</td><td>출근</td></tr>
-            <tr><td>bill002</td><td>이수납</td><td>010-4444-5555</td><td>월, 목</td><td>08:00</td><td>16:00</td><td>출근</td></tr>
-          </tbody>
+          	<tr th:each="sched : ${billingScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+				<td th:text="${sched.user.usersPhone}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
         </table>
       </div>
 
@@ -306,24 +325,48 @@
       });
     });
  
-    document.getElementById('saveBtn').addEventListener('click', () => {
-    	  const inputs = document.querySelectorAll('#formFields input');
-    	  inputs.forEach(input => {
-    	    const idx = input.getAttribute('data-idx');
-    	    selectedRow.cells[idx].textContent = input.value;
-    	  });
+ // 저장 시 Ajax 요청
+    saveBtn.addEventListener("click", () => {
+      const inputs = document.querySelectorAll("#formFields input");
+      const data = {};
 
-    	  infoModal.style.display = 'none';
-    	  selectedRow = null;
-    	});
+      inputs.forEach((input) => {
+        const idx = input.getAttribute("data-idx");
+        const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
+        data[header] = input.value;
+      });
 
+      fetch("/api/admin/member/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleId: selectedRow.getAttribute("data-id"),
+          userId: data["ID"],
+          startTime: data["근무 시작 시간"],
+          endTime: data["근무 종료 시간"],
+          type: data["스케줄 유형"],
+          workDays: data["근무 요일"].split(",").map(day => day.trim().toUpperCase())
+        })
+      })
+        .then((res) => res.text())
+        .then((msg) => alert(msg));
+    });
+
+
+    // 삭제 시 Ajax 요청
     document.getElementById('deleteBtn').addEventListener('click', () => {
-    	  if (confirm('정말 삭제하시겠습니까?')) {
-    	    selectedRow.remove();
-    	    infoModal.style.display = 'none';
-    	    selectedRow = null;
-    	  }
-    	});
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      
+      fetch(`/api/admin/member/delete/${selectedRow.getAttribute('data-id')}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.text())
+      .then(msg => {
+        alert(msg);
+        selectedRow.remove();
+        infoModal.style.display = 'none';
+      });
+    });
     
     const infoModal = document.getElementById('infoModal');
 
