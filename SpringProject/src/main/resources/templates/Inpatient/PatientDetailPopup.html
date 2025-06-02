@@ -12,7 +12,6 @@
   <div class="button-group">
     <button class="edit" id="editBtn">수정</button>
     <button class="delete" id="deleteBtn">삭제</button>
-    <button class="assign" id="assignBedBtn">병상 배정</button>
     <button class="cancel" onclick="window.close()">닫기</button>
   </div>
 
@@ -21,7 +20,7 @@
     const data = Object.fromEntries(params.entries());
 
     const $ = (id) => document.getElementById(id);
-    let currentMode = "view"; // view or edit
+    let currentMode = "view";
 
     function renderDetail() {
       const isEdit = currentMode === "edit";
@@ -43,19 +42,16 @@
         ${isEdit ? `<input id="inputDoctor" value="${data.doctor}">` : `<p>${data.doctor}</p>`}
 
         <label>상태</label>
-        ${
-          isEdit
-            ? `<select id="inputStatus">
-                <option value="입원대기" ${data.status === "입원대기" ? "selected" : ""}>입원대기</option>
-                <option value="입원중" ${data.status === "입원중" ? "selected" : ""}>입원중</option>
-                <option value="퇴원" ${data.status === "퇴원" ? "selected" : ""}>퇴원</option>
-              </select>`
-            : `<p>${data.status ?? "입원대기"}</p>`
-        }
+        ${isEdit
+          ? `<select id="inputStatus">
+              <option value="입원대기" ${data.status === "입원대기" ? "selected" : ""}>입원대기</option>
+              <option value="입원중" ${data.status === "입원중" ? "selected" : ""}>입원중</option>
+              <option value="퇴원" ${data.status === "퇴원" ? "selected" : ""}>퇴원</option>
+            </select>`
+          : `<p>${data.status ?? "입원대기"}</p>`}
       `;
     }
 
-    // 초기 렌더링
     renderDetail();
 
     document.getElementById("editBtn").addEventListener("click", function () {
@@ -83,19 +79,6 @@
         window.close();
       }
     });
-
-    document.getElementById("assignBedBtn").addEventListener("click", function () {
-      window.open("/Inpatient/AssignBedPopup", "병상 배정", "width=720,height=600");
-    });
-
-    function receiveBedAssignmentFromPopup(bed) {
-      alert(`병상 배정 완료: 병실 ${bed.room} / 침대 ${bed.bed}`);
-      const bedInfo = document.createElement("p");
-      bedInfo.textContent = `병실: ${bed.room}, 침대: ${bed.bed}`;
-      document.getElementById("form-area").appendChild(bedInfo);
-    }
-
-    window.receiveBedAssignmentFromPopup = receiveBedAssignmentFromPopup;
   </script>
 </body>
 </html>
