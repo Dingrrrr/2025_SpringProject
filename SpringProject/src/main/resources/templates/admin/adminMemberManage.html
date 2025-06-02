@@ -57,7 +57,7 @@
             </tr>
           </thead>
           <tbody>
-			  <tr th:each="sched : ${doctorScheds}">
+			  <tr th:each="sched : ${doctorScheds}" th:attr="data-id=${sched.scheduleId}">
 			    <td th:text="${sched.user.usersId}"></td>
 			    <td th:text="${sched.user.usersName}"></td>
 				<td th:text="${sched.user.usersPhone}"></td>
@@ -91,7 +91,7 @@
             </tr>
           </thead>
           <tbody>
-			  <tr th:each="sched : ${nurseScheds}">
+			  <tr th:each="sched : ${nurseScheds}" th:attr="data-id=${sched.scheduleId}">
 			    <td th:text="${sched.user.usersId}"></td>
 			   	<td th:text="${sched.user.usersName}"></td>
 				<td th:text="${sched.user.usersPhone}"></td>
@@ -125,7 +125,7 @@
             </tr>
           </thead>
           <tbody>
-			  <tr th:each="sched : ${billingScheds}">
+          	<tr th:each="sched : ${billingScheds}" th:attr="data-id=${sched.scheduleId}">
 			    <td th:text="${sched.user.usersId}"></td>
 			    <td th:text="${sched.user.usersName}"></td>
 				<td th:text="${sched.user.usersPhone}"></td>
@@ -325,24 +325,48 @@
       });
     });
  
-    document.getElementById('saveBtn').addEventListener('click', () => {
-    	  const inputs = document.querySelectorAll('#formFields input');
-    	  inputs.forEach(input => {
-    	    const idx = input.getAttribute('data-idx');
-    	    selectedRow.cells[idx].textContent = input.value;
-    	  });
+ // 저장 시 Ajax 요청
+    saveBtn.addEventListener("click", () => {
+      const inputs = document.querySelectorAll("#formFields input");
+      const data = {};
 
-    	  infoModal.style.display = 'none';
-    	  selectedRow = null;
-    	});
+      inputs.forEach((input) => {
+        const idx = input.getAttribute("data-idx");
+        const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
+        data[header] = input.value;
+      });
 
+      fetch("/api/admin/member/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleId: selectedRow.getAttribute("data-id"),
+          userId: data["ID"],
+          startTime: data["근무 시작 시간"],
+          endTime: data["근무 종료 시간"],
+          type: data["스케줄 유형"],
+          workDays: data["근무 요일"].split(",").map(day => day.trim().toUpperCase())
+        })
+      })
+        .then((res) => res.text())
+        .then((msg) => alert(msg));
+    });
+
+
+    // 삭제 시 Ajax 요청
     document.getElementById('deleteBtn').addEventListener('click', () => {
-    	  if (confirm('정말 삭제하시겠습니까?')) {
-    	    selectedRow.remove();
-    	    infoModal.style.display = 'none';
-    	    selectedRow = null;
-    	  }
-    	});
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      
+      fetch(`/api/admin/member/delete/${selectedRow.getAttribute('data-id')}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.text())
+      .then(msg => {
+        alert(msg);
+        selectedRow.remove();
+        infoModal.style.display = 'none';
+      });
+    });
     
     const infoModal = document.getElementById('infoModal');
 
