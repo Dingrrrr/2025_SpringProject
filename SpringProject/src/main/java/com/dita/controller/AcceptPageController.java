@@ -1,5 +1,7 @@
 package com.dita.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,11 +31,14 @@ public class AcceptPageController {
 
 	}
 	
+	//환자들만 검색해서 보여줌
 	@GetMapping("/acceptanceHome")
-    public String showAcceptanceHomePage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "acceptance/acceptanceHome"; 
-    }
+	public String showAcceptanceHomePage(Model model) {
+		List<Patient> allPatients = repo.findAll();
+		model.addAttribute("patients", allPatients);
+		return "acceptance/acceptanceHome";
+	}
+	
 	@GetMapping("/acceptanceDoctor")
     public String AcceptanceDoctorPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능

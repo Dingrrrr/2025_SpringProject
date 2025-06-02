@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang = "ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,28 +93,31 @@
 </div>
 <!-- 하단 영역 -->
 <div class="content-wrapper">
-    <!-- 예약 영역 -->
+    <!-- 1) 예약 영역 -->
     <div class="column reservation-column">
-        <div class ="header">
-        	<div class = "search-bar">
-        		<input type = "text" class="search-input" placeholder="환자 검색">
-        		<button class="search-btn">검색</button>
-        	</div>
+      <div class="header">
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="환자 검색" />
+          <button class="search-btn">검색</button>
         </div>
+      </div>
         
    <!-- 예약현황  -->
     <div class="reservation-topbar">
-        <span class="reservation-title">예약현황(14명)</span>
+        <!-- reservations.size() 를 이용해서 동적으로 개수 표시도 가능 -->
+        <span class="reservation-title">
+          예약현황(<span th:text="${patients.size()}">0</span>명)
+        </span>
         <div class="reservation-actions">
-            <button class="action-btn">+ 고객등록</button>
+          <button class="action-btn" onclick="openCustomerModal()">+ 환자 등록</button>
         </div>
-    </div>
+      </div>
     
     <!-- 고객등록 모달 -->
 <div id="customerModal" class="modal" style="display:none;">
   <div class="modal-content" style="width: 400px;">
     <span class="close-btn" onclick="closeCustomerModal()">×</span>
-    <h3 style="margin-bottom: 15px;">고객 등록</h3>
+    <h3 style="margin-bottom: 15px;">환자 등록</h3>
     
     <form id="customerForm" method="post" action="/acceptance/acceptanceHome">
       <div style="margin-bottom: 10px;">
@@ -159,14 +162,28 @@
     
 	<!-- 예약 리스트 -->
 		 <ul class="reservation-list">
-        	<li class="reservation-item">
-            	<span class="time">13:00 전</span>
-            	<div class="info">
-               	 <div class="name">기묘진 (남) 010-7191-8111</div>
-                	<div class="details">예약: 성애네트웍스 / 재진 / 예약관리3</div>
-            	</div>
-        	</li>
-        </ul>
+        <li class="reservation-item"
+            th:each="patient : ${patients}">
+
+          <!-- 예: patientBirth 필드를 “시간”처럼 보여주기 -->
+          <span th:text="${patient.patientBirth.substring(0,7) + '*******'}"></span>
+
+          <div class="info">
+            <!-- ① 환자 이름과 전화번호를 한꺼번에 연결하려면 ${…} 안에서 모두 처리 -->
+            <div class="name"
+                 th:text="${patient.patientName + ' (' + patient.patientGender + ') ' + patient.patientPhone}">
+              홍길동 (남) 010-1234-5678
+            </div>
+
+            <!-- ② 증상을 보여주려면 역시 ${…} 안에서 처리 -->
+            <div class="details"
+                 th:text="'증상: ' + ${patient.patientSymptom + ' (' + '상태 : ' + patient.patientType} + ') '">
+              증상: 두통, 어지러움
+            </div>
+          </div>
+
+        </li>
+      </ul>
     </div>
 
     <!-- 접수 영역 -->
@@ -389,19 +406,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
