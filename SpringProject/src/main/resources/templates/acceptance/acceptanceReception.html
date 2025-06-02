@@ -217,6 +217,15 @@
         <option>진료실4</option>
       </select>
       
+      <label>진료 과목</label>
+      <select name="object" required>
+        <option value="">선택</option>
+        <option>호흡기내과</option>
+        <option>내분비내과</option>
+        <option>순환기내과</option>
+
+      </select>
+      
       <label>병명</label>
 		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
 
@@ -327,6 +336,7 @@ document.getElementById('reservationForm').addEventListener('submit', function (
   const date = new Date(this.date.value);
   const department = this.department.value;
   const disease = this.disease.value;
+  const object = this.object.value;
 
   const hour = String(date.getHours()).padStart(2, '0');
   const minute = String(date.getMinutes()).padStart(2, '0');
@@ -361,6 +371,8 @@ if (targetCell.innerHTML.trim() !== '') {
 
     targetCell.classList.add('green');
     targetCell.innerHTML = `[${name}]<br>${disease}`;
+    targetCell.innerHTML = `[${name}]<br>${disease}<br>${object}`;
+    
 
     targetCell.dataset.name = name;
     targetCell.dataset.rrn = this.rrn.value;
@@ -369,6 +381,7 @@ if (targetCell.innerHTML.trim() !== '') {
     targetCell.dataset.department = department;
     targetCell.dataset.disease = disease;
     targetCell.dataset.doctor = this.doctor.value;
+    targetCell.dataset.object = object;
 
     targetCell.addEventListener('click', function () {
       document.querySelector('input[name="editName"]').value = this.dataset.name || '';
@@ -377,6 +390,7 @@ if (targetCell.innerHTML.trim() !== '') {
       document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
       document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
       document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
+      document.querySelector('select[name="editObject"]').value = this.dataset.object || '';
       document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
 
       selectedCell = this;
@@ -428,6 +442,7 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
   const newDepartment = this.editDepartment.value;
   const newDisease = this.editDisease.value;
   const newDoctor = this.editDoctor.value;
+  const newObject = this.editObject.value;
 
   if (!selectedCell) return;
 
@@ -487,7 +502,7 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
 
   // ✅ 새 셀에 예약 정보 등록
   newCell.classList.add('green');
-  newCell.innerHTML = `[${newName}]<br>${newDisease}`;
+  newCell.innerHTML = `[${newName}]<br>${newDisease}<br>${newObject}`;
   newCell.dataset.name = newName;
   newCell.dataset.rrn = newRRN;
   newCell.dataset.phone = newPhone;
@@ -495,6 +510,7 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
   newCell.dataset.department = newDepartment;
   newCell.dataset.disease = newDisease;
   newCell.dataset.doctor = newDoctor;
+  newCell.dataset.object = newObject;
 
   // ✅ 셀 클릭 시 다시 수정할 수 있게 이벤트 등록
   newCell.addEventListener('click', function () {
