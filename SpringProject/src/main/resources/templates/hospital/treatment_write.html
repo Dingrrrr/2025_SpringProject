@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body>
+  <div class="treatment-write-container">
+    <header class="tw-header">
+      <h2>2025-05-15 (오늘) — 이화진</h2>
+    </header>
+    <main class="tw-main">
+      <div class="tw-group">
+        <label>환자 상태</label>
+        <textarea id="patient-status"></textarea>
+      </div>
+      <div class="tw-group">
+        <label>진단 및 처방 내용</label>
+        <textarea id="treatment-details"></textarea>
+      </div>
+      <div class="tw-group">
+        <label>특이사항</label>
+        <textarea id="special-notes"></textarea>
+      </div>
+    </main>
+    <footer class="tw-footer">
+      <button id="save-record">저장</button>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('save-record').addEventListener('click', () => {
+      // TODO: 실 서버 저장 로직…
+
+      // 저장 완료 후 원래 화면으로 복원
+      if (window.originalRegionHTML) {
+        const container = document.querySelector('.treatment-write-container');
+        // outerHTML 대입으로 교체
+        container.outerHTML = window.originalRegionHTML;
+      }
+    });
+  </script>
+</body>
+</html>

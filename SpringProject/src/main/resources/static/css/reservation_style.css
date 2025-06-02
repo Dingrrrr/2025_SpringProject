@@ -1,0 +1,94 @@
+/* ── 전체 레이아웃 ── */
+.reservation-container {
+  display: flex;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── 스케줄 패널 ── */
+.reservation-schedule-panel {
+  width: 260px;
+  padding: 16px;
+  border-right: 1px solid #ddd;
+  background: #fafafa;
+  overflow-y: auto;
+}
+.reservation-schedule-panel h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+.date-group {
+  margin-bottom: 16px;
+}
+.date-group h3 {
+  margin: 8px 0 4px;
+  font-size: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 2px;
+}
+.date-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.date-group li {
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+.empty {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+/* ── 캘린더 패널 ── */
+.reservation-calendar-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #fff;
+  overflow-y: auto;
+}
+.reservation-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+#monthTitle {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+.reservation-calendar-nav button {
+  margin-left: 4px;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+.reservation-calendar-nav button:hover {
+  background: #e6e6e6;
+}
+.reservation-calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.reservation-calendar-table th,
+.reservation-calendar-table td {
+  border: 1px solid #ddd;
+  width: 14.28%;
+  height: 100px;
+  vertical-align: top;
+  padding: 4px;
+}
+.reservation-calendar-table th {
+  background: #fafafa;
+}
+.date-number {
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: block;
+}
