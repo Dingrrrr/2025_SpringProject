@@ -79,6 +79,14 @@
       <button class="register-btn-fixed">예약 등록</button>
     </div>
     
+	<div class="top-center-week" style="display: none; justify-content: center; align-items: center; gap: 8px; margin: 10px 0; font-size: 30px;">
+	  <button onclick="changeDate(-7)" class="date-nav">&lt;</button>
+	  <span class="date-icon">📅</span>
+	  <span id="weekDateRange">2025-06-02 ~ 2025-06-08</span>
+	  <button onclick="changeDate(7)" class="date-nav">&gt;</button>
+	</div>
+
+    
 <div id="calendarModal" class="modal" style="display: none;">
   <div class="modal-content" style="width: 300px; padding: 20px;">
     <h3 style="margin-bottom: 10px;">날짜 선택</h3>
@@ -159,6 +167,26 @@
   </div>
 </div>
 
+<!-- Month Picker Modal (Week용) -->
+<div id="monthPickerModal" class="modal" style="display: none;">
+  <div class="modal-content" style="width: 300px; padding: 20px;">
+    <h3>월 선택</h3>
+    <label for="yearSelect">년도</label>
+    <input type="number" id="yearSelect" min="2000" max="2100" style="width: 100%; padding: 8px; margin-bottom: 10px;" />
+
+    <label for="monthSelect">월</label>
+    <select id="monthSelect" style="width: 100%; padding: 8px;">
+      <!-- option은 아래 script에서 자동 생성 -->
+    </select>
+
+    <div style="margin-top: 20px; text-align: right;">
+      <button onclick="closeMonthPickerModal()" style="padding: 6px 12px;">취소</button>
+      <button onclick="applyMonthSelection()" style="padding: 6px 12px; background-color: #2196f3; color: white;">적용</button>
+    </div>
+  </div>
+</div>
+
+
  <!-- Week View -->
     <div id="weekView" class="schedule-view">
       <div class="schedule-table">
@@ -215,15 +243,6 @@
         <option>진료실2</option>
         <option>진료실3</option>
         <option>진료실4</option>
-      </select>
-      
-      <label>진료 과목</label>
-      <select name="object" required>
-        <option value="">선택</option>
-        <option>호흡기내과</option>
-        <option>내분비내과</option>
-        <option>순환기내과</option>
-
       </select>
       
       <label>병명</label>
@@ -336,7 +355,6 @@ document.getElementById('reservationForm').addEventListener('submit', function (
   const date = new Date(this.date.value);
   const department = this.department.value;
   const disease = this.disease.value;
-  const object = this.object.value;
 
   const hour = String(date.getHours()).padStart(2, '0');
   const minute = String(date.getMinutes()).padStart(2, '0');
@@ -371,7 +389,7 @@ if (targetCell.innerHTML.trim() !== '') {
 
     targetCell.classList.add('green');
     targetCell.innerHTML = `[${name}]<br>${disease}`;
-    targetCell.innerHTML = `[${name}]<br>${disease}<br>${object}`;
+    targetCell.innerHTML = `[${name}]<br>${disease}`;
     
 
     targetCell.dataset.name = name;
@@ -381,7 +399,6 @@ if (targetCell.innerHTML.trim() !== '') {
     targetCell.dataset.department = department;
     targetCell.dataset.disease = disease;
     targetCell.dataset.doctor = this.doctor.value;
-    targetCell.dataset.object = object;
 
     targetCell.addEventListener('click', function () {
       document.querySelector('input[name="editName"]').value = this.dataset.name || '';
@@ -390,7 +407,6 @@ if (targetCell.innerHTML.trim() !== '') {
       document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
       document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
       document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
-      document.querySelector('select[name="editObject"]').value = this.dataset.object || '';
       document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
 
       selectedCell = this;
@@ -442,7 +458,6 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
   const newDepartment = this.editDepartment.value;
   const newDisease = this.editDisease.value;
   const newDoctor = this.editDoctor.value;
-  const newObject = this.editObject.value;
 
   if (!selectedCell) return;
 
@@ -502,7 +517,7 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
 
   // ✅ 새 셀에 예약 정보 등록
   newCell.classList.add('green');
-  newCell.innerHTML = `[${newName}]<br>${newDisease}<br>${newObject}`;
+  newCell.innerHTML = `[${newName}]<br>${newDisease}`;
   newCell.dataset.name = newName;
   newCell.dataset.rrn = newRRN;
   newCell.dataset.phone = newPhone;
@@ -510,7 +525,6 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
   newCell.dataset.department = newDepartment;
   newCell.dataset.disease = newDisease;
   newCell.dataset.doctor = newDoctor;
-  newCell.dataset.object = newObject;
 
   // ✅ 셀 클릭 시 다시 수정할 수 있게 이벤트 등록
   newCell.addEventListener('click', function () {
@@ -561,6 +575,7 @@ function showTab(view) {
   const tabs = document.querySelectorAll('.tab');
   const views = document.querySelectorAll('.schedule-view');
   const dateWrapper = document.querySelector('.top-center-date');
+  const weekWrapper = document.querySelector('.top-center-week');
 
   tabs.forEach(tab => tab.classList.remove('active'));
   views.forEach(v => v.classList.remove('active'));
@@ -569,10 +584,13 @@ function showTab(view) {
     tabs[0].classList.add('active');
     document.getElementById('dayView').classList.add('active');
     dateWrapper.style.display = 'flex';
+    weekWrapper.style.display = 'none';
   } else if (view === 'week') {
     tabs[1].classList.add('active');
     document.getElementById('weekView').classList.add('active');
     dateWrapper.style.display = 'none';
+    weekWrapper.style.display = 'flex'; // ✅ 이 줄 추가!
+    updateWeekDisplay();                // ✅ 이 줄 추가!
   }
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -592,11 +610,17 @@ function updateDateDisplay() {
 function changeDate(days) {
   currentDateObj.setDate(currentDateObj.getDate() + days);
   updateDateDisplay();
+
+  const isWeekActive = document.getElementById('weekView').classList.contains('active');
+  if (isWeekActive) {
+    updateWeekDisplay();
+  }
 }
 
 // 초기 날짜 표시
 document.addEventListener('DOMContentLoaded', function () {
   updateDateDisplay();
+  updateWeekDisplay(); 
 });
 
 document.querySelector('.date-icon').addEventListener('click', function () {
@@ -618,6 +642,91 @@ function applyCalendarDate() {
   }
   closeCalendarModal();
 }
+
+function updateWeekDisplay() {
+  // 현재 currentDateObj 기준으로 그 주의 월요일 ~ 금요일 계산
+  const dayOfWeek = currentDateObj.getDay(); // 0(일)~6(토)
+  const monday = new Date(currentDateObj);
+  monday.setDate(currentDateObj.getDate() - ((dayOfWeek + 6) % 7)); // 월요일로 이동
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6); // 일요일로 이동
+
+  const formatDate = (date) => date.toISOString().split('T')[0];
+  const start = formatDate(monday);
+  const end = formatDate(sunday);
+
+  document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
+}
+
+// week에서 달력아이콘
+document.querySelectorAll('.date-icon').forEach(icon => {
+  icon.addEventListener('click', function () {
+    const isWeek = document.getElementById('weekView').classList.contains('active');
+    if (isWeek) {
+      openMonthPickerModal();  // Week 전용 달력
+    } else {
+      document.getElementById('calendarDateInput').value = currentDateObj.toISOString().split('T')[0];
+      document.getElementById('calendarModal').style.display = 'flex';
+    }
+  });
+});
+document.addEventListener('DOMContentLoaded', function () {
+  const selectMonth = document.getElementById('monthSelect');
+  if (selectMonth && selectMonth.children.length === 0) {
+    for (let m = 1; m <= 12; m++) {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = `${m}월`;
+      selectMonth.appendChild(opt);
+    }
+  }
+});
+function openMonthPickerModal() {
+  const now = currentDateObj;
+  document.getElementById('yearSelect').value = now.getFullYear();
+  document.getElementById('monthSelect').value = now.getMonth() + 1;
+  document.getElementById('monthPickerModal').style.display = 'flex';
+}
+
+function closeMonthPickerModal() {
+  document.getElementById('monthPickerModal').style.display = 'none';
+}
+
+function applyMonthSelection() {
+  const year = parseInt(document.getElementById('yearSelect').value);
+  const month = parseInt(document.getElementById('monthSelect').value) - 1;
+
+  if (isNaN(year) || isNaN(month)) {
+    alert("년/월을 올바르게 선택하세요.");
+    return;
+  }
+
+  // 선택한 월의 1일 기준
+  const firstOfMonth = new Date(year, month, 1);
+  const dayOfWeek = firstOfMonth.getDay(); // 0(일)~6(토)
+
+  // 해당 1일이 포함된 주의 월요일로 이동 (달력 기준)
+  const monday = new Date(firstOfMonth);
+  monday.setDate(firstOfMonth.getDate() - ((dayOfWeek + 6) % 7));
+
+  currentDateObj = new Date(monday);
+  updateWeekDisplay();
+  closeMonthPickerModal();
+}
+function updateWeekDisplay() {
+  const monday = new Date(currentDateObj);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const formatDate = (date) => date.toISOString().split('T')[0];
+  const start = formatDate(monday);
+  const end = formatDate(sunday);
+
+  document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
+}
+
+
 </script>
 
 
