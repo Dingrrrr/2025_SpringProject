@@ -249,7 +249,13 @@
 		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
 
       <label>담당 의사</label>
-      <input type="text" name="doctor" required>
+      <select name="Doctor" required>
+        <option value="">선택</option>
+        <option>담</option>
+        <option>당</option>
+        <option>의</option>
+        <option>사</option>
+      </select>
 
       <div class="modal-buttons">
         <button type="button" class="cancel-btn" onclick="closeModal()">취소</button>
@@ -576,6 +582,7 @@ function showTab(view) {
   const views = document.querySelectorAll('.schedule-view');
   const dateWrapper = document.querySelector('.top-center-date');
   const weekWrapper = document.querySelector('.top-center-week');
+  const registerBtn = document.querySelector('.register-btn-fixed'); // ✅ 추가
 
   tabs.forEach(tab => tab.classList.remove('active'));
   views.forEach(v => v.classList.remove('active'));
@@ -585,12 +592,14 @@ function showTab(view) {
     document.getElementById('dayView').classList.add('active');
     dateWrapper.style.display = 'flex';
     weekWrapper.style.display = 'none';
+    registerBtn.style.display = 'inline-block';
   } else if (view === 'week') {
     tabs[1].classList.add('active');
     document.getElementById('weekView').classList.add('active');
     dateWrapper.style.display = 'none';
-    weekWrapper.style.display = 'flex'; // ✅ 이 줄 추가!
-    updateWeekDisplay();                // ✅ 이 줄 추가!
+    weekWrapper.style.display = 'flex';
+    updateWeekDisplay();
+    registerBtn.style.display = 'none'; 
   }
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -641,22 +650,6 @@ function applyCalendarDate() {
     updateDateDisplay();
   }
   closeCalendarModal();
-}
-
-function updateWeekDisplay() {
-  // 현재 currentDateObj 기준으로 그 주의 월요일 ~ 금요일 계산
-  const dayOfWeek = currentDateObj.getDay(); // 0(일)~6(토)
-  const monday = new Date(currentDateObj);
-  monday.setDate(currentDateObj.getDate() - ((dayOfWeek + 6) % 7)); // 월요일로 이동
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6); // 일요일로 이동
-
-  const formatDate = (date) => date.toISOString().split('T')[0];
-  const start = formatDate(monday);
-  const end = formatDate(sunday);
-
-  document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
 }
 
 // week에서 달력아이콘
