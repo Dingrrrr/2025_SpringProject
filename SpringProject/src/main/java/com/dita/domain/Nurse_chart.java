@@ -33,17 +33,16 @@ public class Nurse_chart {
 	private int chartId;//차트 고유번호
 	
 	@ManyToOne
-	@JoinColumn(name = "admission_id", nullable = false)
-	private Admission admission;// 입원 기록
-	
-	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
 	private User nurse;// 작성 간호사 아이디
+	
+	@ManyToOne
+	@JoinColumn(name = "vital_id", nullable = false)
+	private Vital_sign vitalId; //바이탈 사인
 	
 	@CreationTimestamp
 	@Column(name = "entry_time")
 	private LocalDateTime entryTime;//작성 일시
 	
-	@Column(length = 1000)
-	private String notes;//간호 내용
+	
 }

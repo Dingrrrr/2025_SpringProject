@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>바이탈 기록 대시보드</title>
-    <link rel="stylesheet" href="/css/VitalRecordstyle.css">
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+       <link rel="stylesheet" href="/css/VitalRecordstyle.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
     <!-- 사이드바 -->
@@ -89,12 +89,11 @@
                 </div>
             </div>
 
-            <!-- 맥박수 모니터링 -->
+            <!-- 맥박수 -->
             <div class="chart-card">
                 <h3>
-                    맥박수 모니터링
+                    맥박수
                     <div class="chart-options">
-                        <span class="chart-option active" onclick="updatePulseChart('realtime')">실시간</span>
                         <span class="chart-option" onclick="updatePulseChart('hourly')">시간별</span>
                     </div>
                 </h3>
@@ -117,6 +116,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <script>
         // 전역 변수
