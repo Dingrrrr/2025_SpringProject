@@ -36,16 +36,7 @@ public class DoctorController {
 	        .collect(Collectors.toList());
 	}
 	
-	//진료과
-	@GetMapping("/departments")
-	public List<String> getDepartments() {
-	    return userRepository.findAll().stream()
-	        .filter(user -> Grade.의사.equals(user.getGrade()))
-	        .filter(user -> user.getDeptId() != null)
-	        .map(user -> user.getDeptId().getDeptName())
-	        .distinct()
-	        .collect(Collectors.toList());
-	}
+
 
 	
 }

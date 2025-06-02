@@ -58,7 +58,4 @@ public class User {
 	 @Column(length = 20,nullable = false)
 	 private Grade grade;
 	 
-	 @OneToOne
-	 @JoinColumn(name = "dept_id")
-	 private Dept deptId;
 }
