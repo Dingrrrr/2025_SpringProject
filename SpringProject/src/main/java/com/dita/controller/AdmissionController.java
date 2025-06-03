@@ -62,8 +62,6 @@ public class AdmissionController {
         return ResponseEntity.ok("입원 처리 완료");
     }
 
-
-
     /**
      * 병실별 입원 환자 리스트 (병실1, 병실2 등)
      */
@@ -105,10 +103,9 @@ public class AdmissionController {
         return ResponseEntity.ok(data);
     }
     
-    //수정 요청
     @PutMapping("/detail")
     public ResponseEntity<?> updatePatientDetail(@RequestBody Map<String, Object> dto) {
-        int patientId = Integer.parseInt(dto.get("patientId").toString());
+        int patientId = (int) dto.get("patientId");
         Optional<Admission> admissionOpt = admissionRepository.findByPatientId(patientId);
         if (admissionOpt.isEmpty()) return ResponseEntity.notFound().build();
 
@@ -116,15 +113,29 @@ public class AdmissionController {
         Patient patient = admission.getPatient();
 
         patient.setPatientSymptom((String) dto.get("diagnosis"));
-        patient.setPatientType(PatientType.valueOf((String) dto.get("status")));
-        patientRepository.save(patient);
+        String status = (String) dto.get("status");
+        patient.setPatientType(PatientType.valueOf(status));
 
-        String dateStr = (String) dto.get("date");
-        admission.setAdmittedAt(LocalDate.parse(dateStr).atStartOfDay()); // ✅ 수정된 부분
+        // 퇴원 상태인 경우 퇴원일 기록
+        if ("퇴원".equals(status)) {
+            admission.setDischargeAt(LocalDateTime.now());
+
+            // 병상 상태 비어있음으로 변경
+            Bed bed = admission.getBed();
+            if (bed != null) {
+                bed.setBedstatus(StatusBed.사용가능);
+                bedRepository.save(bed);
+            }
+        }
+
+        // 입원일 갱신
+        admission.setAdmittedAt(LocalDate.parse((String) dto.get("date")).atStartOfDay());
+        patientRepository.save(patient);
         admissionRepository.save(admission);
 
         return ResponseEntity.ok("수정 완료");
     }
+
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteAdmission(@RequestParam int patientId) {
@@ -150,7 +161,7 @@ public class AdmissionController {
 
         return ResponseEntity.ok("삭제 완료");
     }
-
+    
 
 }
 
