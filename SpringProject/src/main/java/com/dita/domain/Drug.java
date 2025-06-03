@@ -14,7 +14,7 @@ public class Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "drug_id")
-    private Integer drugId; // 약품 고유 ID (PK)
+    private int drugId; // 약품 고유 ID (PK)
 
     @Column(name = "drug_code", length = 50)
     private String drugCode; // 공공데이터 기준 약품코드
