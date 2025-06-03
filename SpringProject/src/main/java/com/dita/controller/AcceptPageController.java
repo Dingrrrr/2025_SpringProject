@@ -1,22 +1,52 @@
 package com.dita.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.dita.domain.Appt;
+import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
+import com.dita.persistence.ApptRepository;
+import com.dita.persistence.LoginPageRepository;
+import com.dita.persistence.PatientRepository;
+import com.dita.service.EmailService;
 
 import lombok.extern.java.Log;
+
+
 
 @Controller
 @Log
 @RequestMapping("/acceptance/")
 public class AcceptPageController {
 	
+	private final PatientRepository repo;
+	private final ApptRepository arepo;
+	
+	public AcceptPageController(PatientRepository repo, ApptRepository arepo) {
+		this.repo = repo;
+		this.arepo = arepo;
+	}
+	
+	//예약 환자들만 검색해서 보여줌
 	@GetMapping("/acceptanceHome")
-    public String showAcceptanceHomePage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
-        return "acceptance/acceptanceHome"; 
-    }
+	public String showAcceptanceHomePage(Model model) {
+	    List<Patient> reservations = repo.findByPatientType(PatientType.예약);
+	    model.addAttribute("reservations", reservations);
+	    
+	    //접수현황 리스트
+	    List<Appt> appts = arepo.findAll();
+	    model.addAttribute("appts", appts);
+	    
+	    return "acceptance/acceptanceHome";
+	}
+	
 	@GetMapping("/acceptanceDoctor")
     public String AcceptanceDoctorPage(Model model) {
 		// 필요 시 model에 데이터 추가 가능
@@ -42,4 +72,27 @@ public class AcceptPageController {
 
     }
 	
+	@PostMapping("/acceptanceHome")
+	public String processPatient(@RequestParam String patientName,
+								@RequestParam String patientBirth, @RequestParam String patientPhone,
+								@RequestParam String patientSymptom, @RequestParam String patientGender,
+								@RequestParam PatientType patientType, @RequestParam String patientAddress
+	) {
+		
+			Patient p = new Patient();
+			p.setPatientName(patientName);
+			p.setPatientBirth(patientBirth);
+			p.setPatientPhone(patientPhone);
+			p.setPatientSymptom(patientSymptom);
+			p.setPatientGender(patientGender);
+			p.setPatientType(patientType);
+			p.setPatientAddress(patientAddress);
+		
+			repo.save(p);
+			return "redirect:/acceptance/acceptanceHome";
+	}
+	
+	
+	
 }
+

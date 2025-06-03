@@ -133,13 +133,31 @@
 		
 		.top-center-date {
 		  position: absolute;
-		  top: 20px;
+		  top: 30px;
 		  left: 50%;
 		  transform: translateX(-50%);
 		  font-weight: bold;
 		  font-size: 25px;
 		  display: block; /* 기본적으로 보이게 */
 		}
+		
+		.top-center-week {
+	 	  position: absolute;
+		  top: 20px;
+		  left: 50%;
+		  transform: translateX(-50%);
+		  font-weight: bold;
+		  font-size: 25px;
+		  display: block;
+		}
+		.date-nav {
+		  background-color: #fff;
+		  border: 1px solid #ccc;
+		  padding: 5px 10px;
+		  cursor: pointer;
+		  border-radius: 5px;
+		}
+		
 		
 		.date-nav {
 		  background-color: transparent;

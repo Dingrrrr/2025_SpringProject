@@ -44,10 +44,6 @@ public class Appt {
 	@JoinColumn(name = "users_id", nullable = false)
 	private User doctor;// 의사 아이디
 	
-	@ManyToOne //N:1관계
-	@JoinColumn(name ="dept_id", nullable= false)
-	private Dept dept;
-	
 	@Column(name = "scheduled_at", nullable = false)
 	private LocalDateTime scheduledAt;
 	

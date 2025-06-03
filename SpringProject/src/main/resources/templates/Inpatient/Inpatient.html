@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="container">
-    <!--  사이드바 -->
+    <!-- 사이드바 -->
     <aside class="sidebar">
       <div class="profile">
         <div class="profile-icon">👤</div>
@@ -30,84 +30,104 @@
       </ul>
     </aside>
 
-    <!--  본문 -->
+    <!-- 본문 -->
     <main class="main-content">
       <header class="page-header">
         <h1>입원 관리</h1>
-          <button id="addBtn" class="add-btn">+ 환자 입원 추가</button>
+        <button id="addBtn" class="add-btn">+ 환자 입원 추가</button>
       </header>
 
       <!-- 병동 탭 -->
-      <div class="ward-tabs">
-        <button class="tab active">대기실</button>
-        <button class="tab">1병동 A</button>
-        <button class="tab">1병동 B</button>
-        <button class="tab">2병동</button>
-        <button class="tab">3병동</button>
-      </div>
+      <div class="ward-tabs" id="wardTabs"></div>
 
       <!-- 병실/환자 카드 영역 -->
       <div class="ward-board"></div>
     </main>
   </div>
 
-  <!-- ✅ JavaScript 삽입 -->
   <script>
-    // 더미 데이터
-    const bedData = [
-      { ward: "대기실", room: "W01", name: "홍길동", gender: "남", age: 35, diagnosis: "위염", date: "2025-05-25", dept: "내과", doctor: "김의사", status: "입원중" },
-      { ward: "1병동 A", room: "101", name: "이순신", gender: "남", age: 40, diagnosis: "감기", date: "2025-05-26", dept: "내과", doctor: "박의사", status: "대기" },
-      { ward: "1병동 B", room: "201", name: "신사임당", gender: "여", age: 50, diagnosis: "골절", date: "2025-05-20", dept: "정형외과", doctor: "이의사", status: "입원중" },
-    ];
+    // 병실 탭 동적 생성
+    function loadWardTabs() {
+      fetch("/api/wards") // 병실 목록 API
+        .then(res => res.json())
+        .then(wards => {
+          const tabContainer = document.getElementById("wardTabs");
+          tabContainer.innerHTML = "";
 
+          wards.forEach((wardName, index) => {
+            const tab = document.createElement("button");
+            tab.className = "tab";
+            tab.innerText = wardName;
+            if (index === 0) tab.classList.add("active");
+
+            tab.addEventListener("click", () => {
+              document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+              tab.classList.add("active");
+              renderCards(wardName);
+            });
+
+            tabContainer.appendChild(tab);
+          });
+
+          if (wards.length > 0) {
+            renderCards(wards[0]); // 첫 병실 기본 로딩
+          }
+        });
+    }
+
+    // 병실별 입원 환자 카드 렌더링
     function renderCards(wardName) {
       const board = document.querySelector(".ward-board");
       board.innerHTML = "";
 
-      const filtered = bedData.filter(bed => bed.ward === wardName);
+      fetch(`/Inpatient/admitted/${encodeURIComponent(wardName)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length === 0) {
+            board.innerHTML = "<p>등록된 환자가 없습니다.</p>";
+            return;
+          }
 
-      filtered.forEach(bed => {
-        const card = document.createElement("div");
-        card.className = "bed-card";
-        card.innerHTML = `
-          <div class="bed-header">
-            <span>${bed.room}</span>
-            <span class="status ${bed.status}">${bed.status}</span>
-          </div>
-          <div class="patient-info">
-            <p><strong>${bed.name}</strong> / ${bed.gender} / ${bed.age}세</p>
-            <p>진단명: ${bed.diagnosis}</p>
-            <p>입원일: ${bed.date}</p>
-            <p>진료과: ${bed.dept}</p>
-            <p>담당의: ${bed.doctor}</p>
-          </div>
-        `;
-           card.addEventListener("click", () => {
-	  const params = new URLSearchParams(bed).toString();
-	 window.open(`/Inpatient/Popup?${params}`, '환자상세', 'width=420,height=520');
-	});
-        board.appendChild(card);
-      });
-    }
-    
- 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-      // 초기 렌더링
-      renderCards("대기실");
+          data.forEach(bed => {
+            const card = document.createElement("div");
+            card.className = "bed-card";
 
-      // 탭 클릭 이벤트 연결
-      document.querySelectorAll(".tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-          document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          renderCards(tab.innerText);
+            const status = bed.patientType ?? "미정";
+
+            card.innerHTML = `
+              <div class="bed-header">
+                <span>${bed.room ?? "미정"}</span>
+                <span class="status ${status}">${status}</span>
+              </div>
+              <div class="patient-info">
+                <p><strong>${bed.name}</strong> / ${bed.gender} / ${bed.age}세</p>
+                <p>진단명: ${bed.diagnosis ?? "미정"}</p>
+                <p>입원일: ${bed.date ?? "미정"}</p>
+                <p>담당의: ${bed.doctor}</p>
+              </div>
+            `;
+
+            card.addEventListener("click", () => {
+			  const params = new URLSearchParams(bed);
+			  if (bed.patientId) {
+			    params.append("patientId", bed.patientId);
+			  }
+			  window.open(`/Inpatient/Popup?${params.toString()}`, '환자상세', 'width=420,height=520');
+			});
+
+
+            board.appendChild(card);
+          });
         });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadWardTabs();
+
+      document.getElementById("addBtn").addEventListener("click", () => {
+        window.open("/Inpatient/WaitingList", "입원대기 환자", "width=700,height=600");
       });
-       document.getElementById("addBtn").addEventListener("click", () => {
-      window.open("/Inpatient/WaitingList", "입원대기 환자", "width=700,height=600");
     });
-});
   </script>
 </body>
 </html>

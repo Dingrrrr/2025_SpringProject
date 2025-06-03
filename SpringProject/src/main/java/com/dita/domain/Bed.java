@@ -2,6 +2,8 @@ package com.dita.domain;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,15 +35,17 @@ public class Bed {
     @Column(name="bed_id", nullable = false)
     private int bedId;// 병상 고유번호
 
+ // Bed.java
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ward_id", nullable = false)
-    private Ward ward;// 소속병동
+    @JoinColumn(name = "ward_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Ward ward;
+// 소속병동
 
     @Column(name = "bed_number", length = 10, nullable = false)
     private String bedNumber;// 병상 번호
 
     @Enumerated(EnumType.STRING)
     @Column(name = "bed_status", nullable = false)
-    private StatusBed bedstatus = StatusBed.EMPTY;// 병상상태
+    private StatusBed bedstatus = StatusBed.사용가능;// 병상상태
 }
-

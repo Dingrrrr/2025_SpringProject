@@ -1,238 +1,238 @@
-﻿drug_code,drug_name,main_ingredient,category,form_type
-DAAP,Acetaminophen 300mg,아세트아미노펜,일반,내복약
-DABILOD10,Aripiprazole ODT 10mg,아리피프라졸,일반,내복약
-DABILOD15,Aripiprazole ODT 15mg,아리피프라졸,일반,내복약
-DACAM,Acamprosate 333mg,아캄프로세이트,일반,내복약
-DACAR2,Acarbose 100mg,아카보즈,일반,내복약
-DACTI,Triprolidine 2.5mg+Pseudoephedrine 60mg,슈도에페드린염산염,일반,내복약
-DALP,Alprazolam 0.25mg,알프라졸람,향정,내복약
-DALP125,Alprazolam 0.125mg,알프라졸람,향정,내복약
-DALP5,Alprazolam 0.5mg,알프라졸람,향정,내복약
-DAMA,Glimepiride 2mg,글리메피리드,일반,내복약
-DAMI10,Amitriptyline 10mg,아미트리프틸린염산염,일반,내복약
-DAMOX,Amoxicillin 250mg,아목시실린,일반,내복약
-DARIP1,Aripiprazole 1mg,아리피프라졸,일반,내복약
-DARIP10,Aripiprazole 10mg,아리피프라졸,일반,내복약
-DARIP15,Aripiprazole 15mg,아리피프라졸,일반,내복약
-DARIP2,Aripiprazole 2mg,아리피프라졸,일반,내복약
-DARIP30,Aripiprazole 30mg,아리피프라졸,일반,내복약
-DARIP5,Aripiprazole 5mg,아리피프라졸,일반,내복약
-DAROTI10,Arotinolol HCl 10mg,염산아로티놀올,일반,내복약
-DAROTI5,Arotinolol 5mg,염산아로티놀올,일반,내복약
-DATV,Lorazepam 1mg,로라제팜,향정,내복약
-DATV5,Lorazepam 0.5mg,로라제팜,향정,내복약
-DAUG,Amoxicillin 250mg+Clavulanate 125mg,아목시실린,일반,내복약
-DBC,Rivoflavine 등 7종,아스코르빈산,일반,내복약
-DBETHA2,Bethanechol 25mg,염화베타네콜,일반,내복약
-DBIG,Ethyl lofprazepate 2mg,에틸로플라제페이트,향정,내복약
-DBLO2,Blonanserin 2mg,블로난세린,일반,내복약
-DBLO4,Blonanserin 4mg,블로난세린,일반,내복약
-DBLO8,Blonanserin 8mg ,블로난세린,일반,내복약
-DBRIN,Vortioxetine 10mg,보티옥세틴브롬화수소산염,일반,내복약
-DBRU,Ibuprofen 200mg,이부프로펜,일반,내복약
-DBTP1,Benztropine 1mg,메실산벤즈트로핀,일반,내복약
-DBTP2,Benztropine 2mg,메실산벤즈트로핀,일반,내복약
-DBUP,Bupropion 150mg,염산부프로피온,일반,내복약
-DBUSPA,Buspiron 10mg,염산부스피론,일반,내복약
-DBUSPA15,Buspiron 15mg,염산부스피론,일반,내복약
-DC100,Chlorpromazine 100mg,염산클로로프로마진,일반,내복약
-DC200,Chlorpromazin 200mg,염산클로로프로마진,일반,내복약
-DC50,Chlorpromazine 50mg,염산클로로프로마진,일반,내복약
-DCBZ,Carbamazepine 200mg,카르바마제핀,일반,내복약
-DCBZR,Carbamazepine CR 200mg,카르바마제핀,일반,내복약
-DCET10,Cetirizine HCI 10mg,세티리진염산염,일반,내복약
-DCGIN200,Cilostazol 200mg+Ginkgo Leaf Ext. 160mg,실로스타졸,일반,내복약
-DCHOL,Choline Alfoscerate 400mg [cap],콜린알포세레이트,일반,내복약
-DCLOBA,Clobazam5mg,클로바잠,향정,내복약
-DCLOM,Clomipramine 25mg,클로미프라민염산염,일반,내복약
-DCLOR,Cefaclor 250mg,세파클러,일반,내복약
-DCOFS,Dihydrocodeine 50mg 등 4종,염화암모늄,일반,내복약
-DCZ100,Clozapin 100mg,클로자핀,일반,내복약
-DCZ25,Clozapin 25mg,클로자핀,일반,내복약
-DCZ50,Clozapin 50mg,클로자핀,일반,내복약
-DDCZ,Hydrochlorothiazide 25mg,히드로클로로티아지드(히드로클로르치아짓),일반,내복약
-DDEPA,Etizolam  1mg,에티졸람,향정,내복약
-DDEPAK,Sodium valproate 500mg,발프로산나트륨,일반,내복약
-DDEPAK3,Sodium valproate 300mg,발프로산나트륨,일반,내복약
-DDIVAR250,Divalproex sodium ER 250mg,디발프로엑스나트륨,일반,내복약
-DDIVAR500,Divalproex sodium ER 500mg,디발프로엑스나트륨,일반,내복약
-DDONE,Donepezil 5mg,도네페질염산염,일반,내복약
-DDONE2,Donepezil 10mg,도네페질염산염,일반,내복약
-DDOX,Doxepin 3mg,독세핀염산염,일반,내복약
-DDOX2,Doxepin 6mg,독세핀염산염,일반,내복약
-DDPH,Phenytoin 100mg,페니토인,일반,내복약
-DDZ2,Diazepam 2mg,디아제팜,향정,내복약
-DDZ5,Diazepam 5mg,디아제팜,향정,내복약
-DEHY,Sodium Hyaluronate 5ml(1mg/ml),히알루론산나트륨,일반,외용약
-DELE,Levofloxacin 5ml(5mg/ml),레보플록사신수화물,일반,외용약
-DENAL,Enalapril 10mg,말레인산에날라프릴,일반,내복약
-DFMT,Famotidine 20mg,파모티딘,일반,내복약
-DGABA100,Gabapentin 100mg,가바펜틴,일반,내복약
-DGIN240,Ginkgo Leaf Ext. 240mg ,은행엽건조엑스,일반,내복약
-DGINK,Ginkgo Leaf ext. 40mg,은행엽건조엑스,일반,내복약
-DGLY,Glycerin0.5g(글리세린),글리세린,일반,외용약
-DGODEX,Carnitine orotate 150mg+Biphenyl Dimethyl Dicarboxylate 25mg+etc.,염산아데닌,일반,내복약
-DHP,Haloperidol 1.5mg,할로페리돌,일반,내복약
-DHP10,Haloperidol 10mg,할로페리돌,일반,내복약
-DHP3,Haloperidol 3mg,할로페리돌,일반,내복약
-DHP5,Haloperidol 5mg,할로페리돌,일반,내복약
-DIMIP,Imipramine 25mg,염산이미프라민,일반,내복약
-DINS1000,NaCl 9g 1000ml 관류용,염화나트륨,일반,외용약
-DIX,Milnacipran 25mg,밀나시프란염산염,일반,내복약
-DIX12,Milnacipran 12.5mg,밀나시프란염산염,일반,내복약
-DIX2,Milnacipran 50mg,밀나시프란염산염,일반,내복약
-DLAM100,Lamotrigine 100mg,라모트리진,일반,내복약
-DLAM25,Lamotrigine25mg,라모트리진,일반,내복약
-DLEVE,Levetiracetam 500mg,레비티라세탐,일반,내복약
-DLITH,Lithium 300mg,탄산리튬,일반,내복약
-DLM100,Levomepromazine 100mg,말레이산레보메프로마진,일반,내복약
-DLM50,Levomepromazine 50mg,말레이산레보메프로마진,일반,내복약
-DLMEN,Salicylate 200mg+Menthol 60mg/100ml,멘톨,일반,외용약
-DLOP,Loperamide  2mg,로페라미드염산염,일반,내복약
-DLURA40,Lurasidone 40mg,루라시돈염산염,일반,내복약
-DMEDILAC,Bacillus subtilis + Enterococcus faecium,바실루스서브틸리스(활성소화균),일반,내복약
-DMEM,Memantine 10mg,메만틴염산염,일반,내복약
-DMET,Metformin 500mg,메트포르민염산염,일반,내복약
-DMGO5,Magnesium hydroxide 500mg,수산화마그네슘,일반,내복약
-DMIR15,Mirtazapine 15mg,미르타자핀,일반,내복약
-DMIR7.5,Mirtazapine 7.5mg,미르타자핀,일반,내복약
-DMIRS15,Mirtazapine ODT 15mg,미르타자핀,일반,내복약
-DMIRS30,Mirtazapine ODT 30mg,미르타자핀,일반,내복약
-DMOT30,Motilitone TAb.,현호색:견우자(5:1) 50% 에탄올 연조엑스(9.5~11.5→1),일반,내복약
-DMQQ,Bisacody 5mg+Docusate 14mg+etc.,비사코딜,일반,내복약
-DNA,Magnesium Aluminometasilicate 500mg,노이실린 A,일반,내복약
-DNTX,Naltrexone 50mg,염산날트렉손,일반,내복약
-DOACY,Acyclovir 5g(50mg/1g),아시클로버,일반,외용약
-DOCELE,Betamethasone0.61mg+Gentamycin1mg,베타메타손발레레이트,일반,외용약
-DOFUSI,Sodium fusidate 20mg,푸시딘산나트륨,일반,외용약
-DOLAMI,Terbinafine HCl 15g(10mg/g),테르비나핀염산염,일반,외용약
-DOLAN,Olanzapine 5mg,올란자핀,일반,내복약
-DOLAN15,Olanzapine 15mg,올란자핀,일반,내복약
-DOLAN2,Olanzapine 10mg,올란자핀,일반,내복약
-DOLAN2.5,Olanzapine 2.5mg,올란자핀,일반,내복약
-DOPERME,Permethrin 50mg,퍼메트린,일반,외용약
-DOURC,Crotamiton 50g(100mg/g),크로타미톤,일반,외용약
-DPAL3,Paliperidone ER 3mg,팔리페리돈,일반,내복약
-DPAL6,Paliperidone ER 6mg,팔리페리돈,일반,내복약
-DPAL9,Paliperidone ER 9mg,팔리페리돈,일반,내복약
-DPANC,Pancreatin 170mg+Simethicone 84.43mg ,판크레아틴,일반,내복약
-DPAX,Paroxetine CR 12.5mg,파록세틴염산염수화물,일반,내복약
-DPAX2,Paroxetine CR 25mg,파록세틴염산염,일반,내복약
-DPDUL,Lactulose concentrate 1.34g,락툴로오즈농축액,일반,내복약
-DPEN18,Methylphenidate OROS 18mg,메칠페니데이트염산염,향정,내복약
-DPEN2,Methylphenidate 10mg,메칠페니데이트염산염,향정,내복약
-DPEN27,Methylphenidate OROS 27mg,메칠페니데이트염산염,향정,내복약
-DPEN36,Methylphenidate OROS 36mg,메칠페니데이트염산염,향정,내복약
-DPEN54,Methylphenidate OROS 54mg,메칠페니데이트염산염,향정,내복약
-DPENC10,Methylphenidate CR 10mg,메칠페니데이트염산염,향정,내복약
-DPITA,Pitavastatin 2mg,피타바스타틴칼슘,일반,내복약
-DPMZ4,Pimozide 4mg,피모짓,일반,내복약
-DPP10,Propranolol 10mg,프로프라놀롤염산염,일반,내복약
-DPP40,Propranolol 40mg,프로프라놀롤염산염,일반,내복약
-DPR25,Desvenlafaxine SR 25mg,데스벤라팍신,일반,내복약
-DPRG100,Desvenlafaxine benzoate SR 100mg,데스벤라팍신벤조산염,일반,내복약
-DPRG50,Desvenlafaxine benzoate SR 50mg,데스벤라팍신벤조산염,일반,내복약
-DPRO,Procyclidine 5mg,염산프로시클리딘,일반,내복약
-DPZ,Fluoxetine 20mg,플루옥세틴염산염,일반,내복약
-DQT,Quetiapine 25mg,푸마르산쿠에티아핀,일반,내복약
-DQT1,Quetiapine 100mg,푸마르산쿠에티아핀,일반,내복약
-DQT12,Quetiapine 12.5mg,푸마르산쿠에티아핀,일반,내복약
-DQT2,Quetiapine 200mg,푸마르산쿠에티아핀,일반,내복약
-DQT3,Quetiapine 300mg,푸마르산쿠에티아핀,일반,내복약
-DQT50,Quetiapine XR 50mg,푸마르산쿠에티아핀,일반,내복약
-DQTIR50,Quetiapine 50mg,푸마르산쿠에티아핀,일반,내복약
-DQTR3,Quetiapine XR 300mg,푸마르산쿠에티아핀,일반,내복약
-DQTR4,Quetiapine XR 400mg,푸마르산쿠에티아핀,일반,내복약
-DRHIN,S-carboxymethlcysteine 375mg,카르보시스테인,일반,내복약
-DRIS0.5,Risperidone 0.5mg,리스페리돈,일반,내복약
-DRIS1,Risperidone 1mg,리스페리돈,일반,내복약
-DRIS2,Risperidone 2mg,리스페리돈,일반,내복약
-DRIS3,Risperidone 3mg,리스페리돈,일반,내복약
-DRISQ1,Risperidone ODT 1mg,리스페리돈,일반,내복약
-DRISQ2,Risperidone ODT 2mg,리스페리돈,일반,내복약
-DRIVO,Clonazepam 0.5mg,클로나제팜,향정,내복약
-DRO,Ropinirole 1mg,염산로피니롤,일반,내복약
-DRZP,Flunitrazepam 1mg,플루니트라제팜,향정,내복약
-DSCITAL,Escitalopram 10mg,수산에스시탈로프람,일반,내복약
-DSCITAL2,Escitalopram 20mg,에스시탈로프람옥살산염,일반,내복약
-DSCITAL5,Escitalopram  5mg,수산에스시탈로프람,일반,내복약
-DSCITALOD10,Escitalopram OD 10mg,에스시탈로프람옥살산염,일반,내복약
-DSCITALOD20,Escitalopram OD 20mg,에스시탈로프람옥살산염,일반,내복약
-DSCITALOD5,Escitalopram OD 5mg ,에스시탈로프람옥살산염,일반,내복약
-DSERO,Paroxetine 20mg,파록세틴염산염,일반,내복약
-DSOL,Amisulpride100mg,아미설프리드,일반,내복약
-DSOL200,Amisulpride 200mg,아미설프리드,일반,내복약
-DSOL400,Amisulpride 400mg,아미설프리드,일반,내복약
-DSTIL,Zolpidem tartrate 10mg,주석산졸피뎀,향정,내복약
-DSTILR,Zolpidem CR 12.5mg,주석산졸피뎀,향정,내복약
-DSTR10,Atomoxetine 10mg,염산아토목세틴,일반,내복약
-DSTR18,Atomoxetine 18mg,염산아토목세틴,일반,내복약
-DSTR4,Atomoxetine 40mg,염산아토목세틴,일반,내복약
-DSTR6,Atomoxetine 60mg,염산아토목세틴,일반,내복약
-DSULP,Sulpiride 200mg,설피리드,일반,내복약
-DSYM,Duloxetine 30mg,둘록세틴 염산염,일반,내복약
-DSYM2,Duloxetine 60mg,둘록세틴 염산염,일반,내복약
-DSZOP1,Eszopiclone 1mg,에스조피클론,향정,내복약
-DSZOP2,Eszopiclone 2mg,에스조피클론,향정,내복약
-DTELAM405,Telmisartan40mg+S-amlodipine5mg,에스암로디핀베실산염이수화물,일반,내복약
-DTHI,Thiamine 10mg,티아민염산염,일반,내복약
-DTOFI,Tofisopam 50mg,토피소팜,일반,내복약
-DTP,Topiramate 25mg,토피라메이트,일반,내복약
-DTP100,Topiramate 100mg,토피라메이트,일반,내복약
-DTRA,Trazodone 50mg,염산트라조돈,일반,내복약
-DTRA25,Trazodone 25mg,염산트라조돈,일반,내복약
-DVALS80,Valsartan 80mg,발사르탄,일반,내복약
-DVDX,Agomelatine 25mg,아고멜라틴,일반,내복약
-DVILD,Vildagliptin 50mg,빌다글립틴,일반,내복약
-DVITA22,Zinc Oxide 18.7mg 등 22개,아스코르브산과립97%,일반,내복약
-DVXR,Venlafaxine XR 37.5mg,벤라팍신,일반,내복약
-DVXR2,Venlafaxine XR 75mg,벤라팍신,일반,내복약
-DZALE10,Zaleplon 10mg,잘레플론,향정,내복약
-DZALE5,Zaleplon 5mg,잘레플론,향정,내복약
-DZAN,Lercanidipine 10mg,레르카니디핀염산염,일반,내복약
-DZEL2,Ziprasidone 20mg,염산지프라시돈일수화물,일반,내복약
-DZEL4,Ziprasidone 40mg,염산지프라시돈일수화물,일반,내복약
-DZEL6,Ziprasidone 60mg,염산지프라시돈일수화물,일반,내복약
-DZEL8,Ziprasidone 80mg,염산지프라시돈일수화물,일반,내복약
-DZOLO,Sertraline 50mg,설트랄린염산염,일반,내복약
-DZOLO100,Sertraline 100mg,설트랄린염산염,일반,내복약
-DZOLO25,Sertraline  25mg,설트랄린염산염,일반,내복약
-DZON,Zonisamide 100mg,조니사마이드,일반,내복약
-DZT,Zotepin 25mg,조테핀,일반,내복약
-DZT100,Zotepin 100mg,조테핀,일반,내복약
-DZT50,Zotepin 50mg,조테핀,일반,내복약
-DZYD,Olanzapine  ODT 10mg,올란자핀,일반,내복약
-DZYD5,Olanzapine  ODT 5mg,올란자핀,일반,내복약
-WABIL300,Aripiprazole 300mg,아리피프라졸일수화물,일반,주사약
-WABIL400,Aripiprazole 400mg,아리피프라졸일수화물,일반,주사약
-WAMIO,Amiodarone 150mg/3ml Inj.,염산아미오다론,일반,주사약
-WATV,Lorazepam 4mg/1ml Inj.,로라제팜,향정,주사약
-WATV2,Lorazepam 2mg/0.5ml Inj.,로라제팜,향정,주사약
-WAUG,Amoxicillin1g+Clavulanate 200mg Inj.,아목시실린나트륨,일반,주사약
-WAVIL2,Chlorpheniramine 4mg/2ml Inj.,클로르페니라민말레산염,일반,주사약
-WBC,Rivoflavine 등 6종/2ml Inj.,시아노코발라민,일반,주사약
-WCAN,Ascorbic acid 100mg/2ml Inj.,아스코르빈산,일반,주사약
-WDEXA,Dexamethasone 5mg/1ml Inj.,디나트륨인산덱사메타손,일반,주사약
-WDO,Dopamine 200mg/5ml Inj.,도파민염산염,일반,주사약
-WDPH,Phenytoin sodium 100mg/2ml Inj.,페니토인나트륨,일반,주사약
-WDS5,Dextrose 50g  NaCl 9g 1000ml Inj.,포도당(함수),일반,주사약
-WDW10,Dextrose 100g 1000ml Inj.,포도당(함수),일반,주사약
-WDW5,Dextrose 50g 1000ml Inj.,포도당(함수),일반,주사약
-WEPI,Epinephrine HCL 1mg/1ml Inj.,에피네프린,일반,주사약
-WHS,Sodium chloride 등 4종/500ml Inj.(하트만액),염화칼슘,일반,주사약
-WKCL,Potassium Chloride 3g/20ml Inj.,염화칼륨,일반,주사약
-WKET,Ketorolac 30mg/1ml Inj.,케토롤락트로메타민,일반,주사약
-WLIDO5,Lidocaine 100mg/5ml Inj.,염산리도카인일수화물,일반,주사약
-WNA,Sodium Chloride 2.34g/20ml Inj.,염화나트륨,일반,주사약
-WNS,NaCl 9g 1000ml Inj,염화나트륨,일반,주사약
-WNS1,NaCl 0.9g 100ml Inj.,염화나트륨,일반,주사약
-WNS20,NaCl 0.18g 20ml Inj,염화나트륨,일반,주사약
-WPAL100,Paliperidone palmitate 156mg,팔리페리돈팔미테이트,일반,주사약
-WPAL150,Paliperidone palmitate 234mg,팔리페리돈팔미테이트,일반,주사약
-WPAL50,Paliperidone palmitate 78mg,팔리페리돈팔미테이트,일반,주사약
-WPAL546,Paliperidone palmitate 546mg,팔리페리돈팔미테이트,일반,주사약
-WPAL75,Paliperidone palmitate 117mg,팔리페리돈팔미테이트,일반,주사약
-WPAL819,Paliperidone palmitate 819mg,팔리페리돈팔미테이트,일반,주사약
-WPERI,Haloperidol 5mg/1ml Inj,할로페리돌,일반,주사약
-WPPCT,Propacetamol 1g Inj.,염산프로파세타몰,일반,주사약
-WTHI,Thiamine HCL 50mg/2ml Inj.,치아민염산염,일반,주사약
+drug_code,drug_name,main_ingredient,category,form_type
+DAAP,아세트아미노펜 300mg,아세트아미노펜,일반,내복약
+DABILOD10,아리피프라졸 10mg,아리피프라졸,일반,내복약
+DABILOD15,아리피프라졸 15mg,아리피프라졸,일반,내복약
+DACAM,아캄프로세이트 333mg,아캄프로세이트,일반,내복약
+DACAR2,아카보즈 100mg,아카보즈,일반,내복약
+DACTI,슈도에페드린염산염 2.5mg,슈도에페드린염산염,일반,내복약
+DALP,알프라졸람 0.25mg,알프라졸람,향정,내복약
+DALP125,알프라졸람 0.125mg,알프라졸람,향정,내복약
+DALP5,알프라졸람 0.5mg,알프라졸람,향정,내복약
+DAMA,글리메피리드 2mg,글리메피리드,일반,내복약
+DAMI10,아미트리프틸린염산염 10mg,아미트리프틸린염산염,일반,내복약
+DAMOX,아목시실린 250mg,아목시실린,일반,내복약
+DARIP1,아리피프라졸 1mg,아리피프라졸,일반,내복약
+DARIP10,아리피프라졸 10mg,아리피프라졸,일반,내복약
+DARIP15,아리피프라졸 15mg,아리피프라졸,일반,내복약
+DARIP2,아리피프라졸 2mg,아리피프라졸,일반,내복약
+DARIP30,아리피프라졸 30mg,아리피프라졸,일반,내복약
+DARIP5,아리피프라졸 5mg,아리피프라졸,일반,내복약
+DAROTI10,염산아로티놀올 10mg,염산아로티놀올,일반,내복약
+DAROTI5,염산아로티놀올 5mg,염산아로티놀올,일반,내복약
+DATV,로라제팜 1mg,로라제팜,향정,내복약
+DATV5,로라제팜 0.5mg,로라제팜,향정,내복약
+DAUG,아목시실린 250mg,아목시실린,일반,내복약
+DBC,아스코르빈산,아스코르빈산,일반,내복약
+DBETHA2,염화베타네콜 25mg,염화베타네콜,일반,내복약
+DBIG,에틸로플라제페이트 2mg,에틸로플라제페이트,향정,내복약
+DBLO2,블로난세린 2mg,블로난세린,일반,내복약
+DBLO4,블로난세린 4mg,블로난세린,일반,내복약
+DBLO8,블로난세린 8mg,블로난세린,일반,내복약
+DBRIN,보티옥세틴브롬화수소산염 10mg,보티옥세틴브롬화수소산염,일반,내복약
+DBRU,이부프로펜 200mg,이부프로펜,일반,내복약
+DBTP1,메실산벤즈트로핀 1mg,메실산벤즈트로핀,일반,내복약
+DBTP2,메실산벤즈트로핀 2mg,메실산벤즈트로핀,일반,내복약
+DBUP,염산부프로피온 150mg,염산부프로피온,일반,내복약
+DBUSPA,염산부스피론 10mg,염산부스피론,일반,내복약
+DBUSPA15,염산부스피론 15mg,염산부스피론,일반,내복약
+DC100,염산클로로프로마진 100mg,염산클로로프로마진,일반,내복약
+DC200,염산클로로프로마진 200mg,염산클로로프로마진,일반,내복약
+DC50,염산클로로프로마진 50mg,염산클로로프로마진,일반,내복약
+DCBZ,카르바마제핀 200mg,카르바마제핀,일반,내복약
+DCBZR,카르바마제핀 200mg,카르바마제핀,일반,내복약
+DCET10,세티리진염산염 10mg,세티리진염산염,일반,내복약
+DCGIN200,실로스타졸 200mg,실로스타졸,일반,내복약
+DCHOL,콜린알포세레이트 400mg,콜린알포세레이트,일반,내복약
+DCLOBA,클로바잠 5mg,클로바잠,향정,내복약
+DCLOM,클로미프라민염산염 25mg,클로미프라민염산염,일반,내복약
+DCLOR,세파클러 250mg,세파클러,일반,내복약
+DCOFS,염화암모늄 50mg,염화암모늄,일반,내복약
+DCZ100,클로자핀 100mg,클로자핀,일반,내복약
+DCZ25,클로자핀 25mg,클로자핀,일반,내복약
+DCZ50,클로자핀 50mg,클로자핀,일반,내복약
+DDCZ,히드로클로로티아지드(히드로클로르치아짓) 25mg,히드로클로로티아지드(히드로클로르치아짓),일반,내복약
+DDEPA,에티졸람 1mg,에티졸람,향정,내복약
+DDEPAK,발프로산나트륨 500mg,발프로산나트륨,일반,내복약
+DDEPAK3,발프로산나트륨 300mg,발프로산나트륨,일반,내복약
+DDIVAR250,디발프로엑스나트륨 250mg,디발프로엑스나트륨,일반,내복약
+DDIVAR500,디발프로엑스나트륨 500mg,디발프로엑스나트륨,일반,내복약
+DDONE,도네페질염산염 5mg,도네페질염산염,일반,내복약
+DDONE2,도네페질염산염 10mg,도네페질염산염,일반,내복약
+DDOX,독세핀염산염 3mg,독세핀염산염,일반,내복약
+DDOX2,독세핀염산염 6mg,독세핀염산염,일반,내복약
+DDPH,페니토인 100mg,페니토인,일반,내복약
+DDZ2,디아제팜 2mg,디아제팜,향정,내복약
+DDZ5,디아제팜 5mg,디아제팜,향정,내복약
+DEHY,히알루론산나트륨 5ml,히알루론산나트륨,일반,외용약
+DELE,레보플록사신수화물 5ml,레보플록사신수화물,일반,외용약
+DENAL,말레인산에날라프릴 10mg,말레인산에날라프릴,일반,내복약
+DFMT,파모티딘 20mg,파모티딘,일반,내복약
+DGABA100,가바펜틴 100mg,가바펜틴,일반,내복약
+DGIN240,은행엽건조엑스 240mg,은행엽건조엑스,일반,내복약
+DGINK,은행엽건조엑스 40mg,은행엽건조엑스,일반,내복약
+DGLY,글리세린 0.5g,글리세린,일반,외용약
+DGODEX,염산아데닌 150mg,염산아데닌,일반,내복약
+DHP,할로페리돌 1.5mg,할로페리돌,일반,내복약
+DHP10,할로페리돌 10mg,할로페리돌,일반,내복약
+DHP3,할로페리돌 3mg,할로페리돌,일반,내복약
+DHP5,할로페리돌 5mg,할로페리돌,일반,내복약
+DIMIP,염산이미프라민 25mg,염산이미프라민,일반,내복약
+DINS1000,염화나트륨 9g,염화나트륨,일반,외용약
+DIX,밀나시프란염산염 25mg,밀나시프란염산염,일반,내복약
+DIX12,밀나시프란염산염 12.5mg,밀나시프란염산염,일반,내복약
+DIX2,밀나시프란염산염 50mg,밀나시프란염산염,일반,내복약
+DLAM100,라모트리진 100mg,라모트리진,일반,내복약
+DLAM25,라모트리진 25mg,라모트리진,일반,내복약
+DLEVE,레비티라세탐 500mg,레비티라세탐,일반,내복약
+DLITH,탄산리튬 300mg,탄산리튬,일반,내복약
+DLM100,말레이산레보메프로마진 100mg,말레이산레보메프로마진,일반,내복약
+DLM50,말레이산레보메프로마진 50mg,말레이산레보메프로마진,일반,내복약
+DLMEN,멘톨 200mg,멘톨,일반,외용약
+DLOP,로페라미드염산염 2mg,로페라미드염산염,일반,내복약
+DLURA40,루라시돈염산염 40mg,루라시돈염산염,일반,내복약
+DMEDILAC,바실루스서브틸리스(활성소화균),바실루스서브틸리스(활성소화균),일반,내복약
+DMEM,메만틴염산염 10mg,메만틴염산염,일반,내복약
+DMET,메트포르민염산염 500mg,메트포르민염산염,일반,내복약
+DMGO5,수산화마그네슘 500mg,수산화마그네슘,일반,내복약
+DMIR15,미르타자핀 15mg,미르타자핀,일반,내복약
+DMIR7.5,미르타자핀 7.5mg,미르타자핀,일반,내복약
+DMIRS15,미르타자핀 15mg,미르타자핀,일반,내복약
+DMIRS30,미르타자핀 30mg,미르타자핀,일반,내복약
+DMOT30,현호색:견우자(5:1) 50% 에탄올 연조엑스(9.5~11.5→1),현호색:견우자(5:1) 50% 에탄올 연조엑스(9.5~11.5→1),일반,내복약
+DMQQ,비사코딜 5mg,비사코딜,일반,내복약
+DNA,노이실린 A 500mg,노이실린 A,일반,내복약
+DNTX,염산날트렉손 50mg,염산날트렉손,일반,내복약
+DOACY,아시클로버 5g,아시클로버,일반,외용약
+DOCELE,베타메타손발레레이트 0.61mg,베타메타손발레레이트,일반,외용약
+DOFUSI,푸시딘산나트륨 20mg,푸시딘산나트륨,일반,외용약
+DOLAMI,테르비나핀염산염 15g,테르비나핀염산염,일반,외용약
+DOLAN,올란자핀 5mg,올란자핀,일반,내복약
+DOLAN15,올란자핀 15mg,올란자핀,일반,내복약
+DOLAN2,올란자핀 10mg,올란자핀,일반,내복약
+DOLAN2.5,올란자핀 2.5mg,올란자핀,일반,내복약
+DOPERME,퍼메트린 50mg,퍼메트린,일반,외용약
+DOURC,크로타미톤 50g,크로타미톤,일반,외용약
+DPAL3,팔리페리돈 3mg,팔리페리돈,일반,내복약
+DPAL6,팔리페리돈 6mg,팔리페리돈,일반,내복약
+DPAL9,팔리페리돈 9mg,팔리페리돈,일반,내복약
+DPANC,판크레아틴 170mg,판크레아틴,일반,내복약
+DPAX,파록세틴염산염수화물 12.5mg,파록세틴염산염수화물,일반,내복약
+DPAX2,파록세틴염산염 25mg,파록세틴염산염,일반,내복약
+DPDUL,락툴로오즈농축액 1.34g,락툴로오즈농축액,일반,내복약
+DPEN18,메칠페니데이트염산염 18mg,메칠페니데이트염산염,향정,내복약
+DPEN2,메칠페니데이트염산염 10mg,메칠페니데이트염산염,향정,내복약
+DPEN27,메칠페니데이트염산염 27mg,메칠페니데이트염산염,향정,내복약
+DPEN36,메칠페니데이트염산염 36mg,메칠페니데이트염산염,향정,내복약
+DPEN54,메칠페니데이트염산염 54mg,메칠페니데이트염산염,향정,내복약
+DPENC10,메칠페니데이트염산염 10mg,메칠페니데이트염산염,향정,내복약
+DPITA,피타바스타틴칼슘 2mg,피타바스타틴칼슘,일반,내복약
+DPMZ4,피모짓 4mg,피모짓,일반,내복약
+DPP10,프로프라놀롤염산염 10mg,프로프라놀롤염산염,일반,내복약
+DPP40,프로프라놀롤염산염 40mg,프로프라놀롤염산염,일반,내복약
+DPR25,데스벤라팍신 25mg,데스벤라팍신,일반,내복약
+DPRG100,데스벤라팍신벤조산염 100mg,데스벤라팍신벤조산염,일반,내복약
+DPRG50,데스벤라팍신벤조산염 50mg,데스벤라팍신벤조산염,일반,내복약
+DPRO,염산프로시클리딘 5mg,염산프로시클리딘,일반,내복약
+DPZ,플루옥세틴염산염 20mg,플루옥세틴염산염,일반,내복약
+DQT,푸마르산쿠에티아핀 25mg,푸마르산쿠에티아핀,일반,내복약
+DQT1,푸마르산쿠에티아핀 100mg,푸마르산쿠에티아핀,일반,내복약
+DQT12,푸마르산쿠에티아핀 12.5mg,푸마르산쿠에티아핀,일반,내복약
+DQT2,푸마르산쿠에티아핀 200mg,푸마르산쿠에티아핀,일반,내복약
+DQT3,푸마르산쿠에티아핀 300mg,푸마르산쿠에티아핀,일반,내복약
+DQT50,푸마르산쿠에티아핀 50mg,푸마르산쿠에티아핀,일반,내복약
+DQTIR50,푸마르산쿠에티아핀 50mg,푸마르산쿠에티아핀,일반,내복약
+DQTR3,푸마르산쿠에티아핀 300mg,푸마르산쿠에티아핀,일반,내복약
+DQTR4,푸마르산쿠에티아핀 400mg,푸마르산쿠에티아핀,일반,내복약
+DRHIN,카르보시스테인 375mg,카르보시스테인,일반,내복약
+DRIS0.5,리스페리돈 0.5mg,리스페리돈,일반,내복약
+DRIS1,리스페리돈 1mg,리스페리돈,일반,내복약
+DRIS2,리스페리돈 2mg,리스페리돈,일반,내복약
+DRIS3,리스페리돈 3mg,리스페리돈,일반,내복약
+DRISQ1,리스페리돈 1mg,리스페리돈,일반,내복약
+DRISQ2,리스페리돈 2mg,리스페리돈,일반,내복약
+DRIVO,클로나제팜 0.5mg,클로나제팜,향정,내복약
+DRO,염산로피니롤 1mg,염산로피니롤,일반,내복약
+DRZP,플루니트라제팜 1mg,플루니트라제팜,향정,내복약
+DSCITAL,수산에스시탈로프람 10mg,수산에스시탈로프람,일반,내복약
+DSCITAL2,에스시탈로프람옥살산염 20mg,에스시탈로프람옥살산염,일반,내복약
+DSCITAL5,수산에스시탈로프람 5mg,수산에스시탈로프람,일반,내복약
+DSCITALOD10,에스시탈로프람옥살산염 10mg,에스시탈로프람옥살산염,일반,내복약
+DSCITALOD20,에스시탈로프람옥살산염 20mg,에스시탈로프람옥살산염,일반,내복약
+DSCITALOD5,에스시탈로프람옥살산염 5mg,에스시탈로프람옥살산염,일반,내복약
+DSERO,파록세틴염산염 20mg,파록세틴염산염,일반,내복약
+DSOL,아미설프리드 100mg,아미설프리드,일반,내복약
+DSOL200,아미설프리드 200mg,아미설프리드,일반,내복약
+DSOL400,아미설프리드 400mg,아미설프리드,일반,내복약
+DSTIL,주석산졸피뎀 10mg,주석산졸피뎀,향정,내복약
+DSTILR,주석산졸피뎀 12.5mg,주석산졸피뎀,향정,내복약
+DSTR10,염산아토목세틴 10mg,염산아토목세틴,일반,내복약
+DSTR18,염산아토목세틴 18mg,염산아토목세틴,일반,내복약
+DSTR4,염산아토목세틴 40mg,염산아토목세틴,일반,내복약
+DSTR6,염산아토목세틴 60mg,염산아토목세틴,일반,내복약
+DSULP,설피리드 200mg,설피리드,일반,내복약
+DSYM,둘록세틴 염산염 30mg,둘록세틴 염산염,일반,내복약
+DSYM2,둘록세틴 염산염 60mg,둘록세틴 염산염,일반,내복약
+DSZOP1,에스조피클론 1mg,에스조피클론,향정,내복약
+DSZOP2,에스조피클론 2mg,에스조피클론,향정,내복약
+DTELAM405,에스암로디핀베실산염이수화물 40mg,에스암로디핀베실산염이수화물,일반,내복약
+DTHI,티아민염산염 10mg,티아민염산염,일반,내복약
+DTOFI,토피소팜 50mg,토피소팜,일반,내복약
+DTP,토피라메이트 25mg,토피라메이트,일반,내복약
+DTP100,토피라메이트 100mg,토피라메이트,일반,내복약
+DTRA,염산트라조돈 50mg,염산트라조돈,일반,내복약
+DTRA25,염산트라조돈 25mg,염산트라조돈,일반,내복약
+DVALS80,발사르탄 80mg,발사르탄,일반,내복약
+DVDX,아고멜라틴 25mg,아고멜라틴,일반,내복약
+DVILD,빌다글립틴 50mg,빌다글립틴,일반,내복약
+DVITA22,아스코르브산과립97% 18.7mg,아스코르브산과립97%,일반,내복약
+DVXR,벤라팍신 37.5mg,벤라팍신,일반,내복약
+DVXR2,벤라팍신 75mg,벤라팍신,일반,내복약
+DZALE10,잘레플론 10mg,잘레플론,향정,내복약
+DZALE5,잘레플론 5mg,잘레플론,향정,내복약
+DZAN,레르카니디핀염산염 10mg,레르카니디핀염산염,일반,내복약
+DZEL2,염산지프라시돈일수화물 20mg,염산지프라시돈일수화물,일반,내복약
+DZEL4,염산지프라시돈일수화물 40mg,염산지프라시돈일수화물,일반,내복약
+DZEL6,염산지프라시돈일수화물 60mg,염산지프라시돈일수화물,일반,내복약
+DZEL8,염산지프라시돈일수화물 80mg,염산지프라시돈일수화물,일반,내복약
+DZOLO,설트랄린염산염 50mg,설트랄린염산염,일반,내복약
+DZOLO100,설트랄린염산염 100mg,설트랄린염산염,일반,내복약
+DZOLO25,설트랄린염산염 25mg,설트랄린염산염,일반,내복약
+DZON,조니사마이드 100mg,조니사마이드,일반,내복약
+DZT,조테핀 25mg,조테핀,일반,내복약
+DZT100,조테핀 100mg,조테핀,일반,내복약
+DZT50,조테핀 50mg,조테핀,일반,내복약
+DZYD,올란자핀 10mg,올란자핀,일반,내복약
+DZYD5,올란자핀 5mg,올란자핀,일반,내복약
+WABIL300,아리피프라졸일수화물 300mg,아리피프라졸일수화물,일반,주사약
+WABIL400,아리피프라졸일수화물 400mg,아리피프라졸일수화물,일반,주사약
+WAMIO,염산아미오다론 150mg,염산아미오다론,일반,주사약
+WATV,로라제팜 4mg,로라제팜,향정,주사약
+WATV2,로라제팜 2mg,로라제팜,향정,주사약
+WAUG,아목시실린나트륨 1g,아목시실린나트륨,일반,주사약
+WAVIL2,클로르페니라민말레산염 4mg,클로르페니라민말레산염,일반,주사약
+WBC,시아노코발라민 2ml,시아노코발라민,일반,주사약
+WCAN,아스코르빈산 100mg,아스코르빈산,일반,주사약
+WDEXA,디나트륨인산덱사메타손 5mg,디나트륨인산덱사메타손,일반,주사약
+WDO,도파민염산염 200mg,도파민염산염,일반,주사약
+WDPH,페니토인나트륨 100mg,페니토인나트륨,일반,주사약
+WDS5,포도당(함수) 50g,포도당(함수),일반,주사약
+WDW10,포도당(함수) 100g,포도당(함수),일반,주사약
+WDW5,포도당(함수) 50g,포도당(함수),일반,주사약
+WEPI,에피네프린 1mg,에피네프린,일반,주사약
+WHS,염화칼슘 500ml,염화칼슘,일반,주사약
+WKCL,염화칼륨 3g,염화칼륨,일반,주사약
+WKET,케토롤락트로메타민 30mg,케토롤락트로메타민,일반,주사약
+WLIDO5,염산리도카인일수화물 100mg,염산리도카인일수화물,일반,주사약
+WNA,염화나트륨 2.34g,염화나트륨,일반,주사약
+WNS,염화나트륨 9g,염화나트륨,일반,주사약
+WNS1,염화나트륨 0.9g,염화나트륨,일반,주사약
+WNS20,염화나트륨 0.18g,염화나트륨,일반,주사약
+WPAL100,팔리페리돈팔미테이트 156mg,팔리페리돈팔미테이트,일반,주사약
+WPAL150,팔리페리돈팔미테이트 234mg,팔리페리돈팔미테이트,일반,주사약
+WPAL50,팔리페리돈팔미테이트 78mg,팔리페리돈팔미테이트,일반,주사약
+WPAL546,팔리페리돈팔미테이트 546mg,팔리페리돈팔미테이트,일반,주사약
+WPAL75,팔리페리돈팔미테이트 117mg,팔리페리돈팔미테이트,일반,주사약
+WPAL819,팔리페리돈팔미테이트 819mg,팔리페리돈팔미테이트,일반,주사약
+WPERI,할로페리돌 5mg,할로페리돌,일반,주사약
+WPPCT,염산프로파세타몰 1g,염산프로파세타몰,일반,주사약
+WTHI,치아민염산염 50mg,치아민염산염,일반,주사약

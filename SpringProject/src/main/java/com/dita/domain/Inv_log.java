@@ -33,7 +33,7 @@ public class Inv_log {
 	@Column(name = "log_id",nullable = false)
 	private int logId;//재고 아이디
 	
-	@ManyToOne(fetch = FetchType.LAZY)//N:1 관계
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)//N:1 관계
 	@JoinColumn(name = "drug_id", nullable = false)
 	private Drug drug;// 약품 아이디
 	
@@ -48,7 +48,6 @@ public class Inv_log {
 	private LocalDateTime occurredAt;// 발생일시
 	
 	@ManyToOne(fetch = FetchType.LAZY)//N:1 관계
-	@JoinColumn(name = "recorded_by", nullable = false)
+	@JoinColumn(name = "recorded_by", nullable = true)
 	private User recordedBy; //처리자 아이디 
-	
 }

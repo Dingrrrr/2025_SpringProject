@@ -1,0 +1,85 @@
+/* ── 컨테이너 ── */
+/* ── 진료기록 작성 폼 전체 컨테이너 크기 조절 ── */
+.treatment-write-container {
+  /* 가로 최대 800px, 컨테이너 너비는 부모(#treatmentRegion)의 100%가 아닌
+     화면 전체 기준 80% 로 조절하고, 가운데 정렬 */
+  max-width: 800px;
+  width: 100%;
+  margin: 16px auto;    
+
+  /* 세로도 너무 길다면 최대 높이 지정 후 내부 스크롤 */
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+
+  /* 기존 padding, 배경 등 유지 */
+  padding: 16px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* ── 헤더 ── */
+.tw-header {
+  flex: 0 0 auto;
+  margin-bottom: 16px;
+}
+.tw-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+}
+
+/* ── 본문: 3개 그룹 ── */
+.tw-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+.tw-group {
+  display: flex;
+  flex-direction: column;
+}
+.tw-group label {
+  margin-bottom: 4px;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+.tw-group textarea {
+  /* 높이 고정 */
+  height: 180px;
+  min-height: 180px;
+  max-height: 180px;
+  /* 내부 스크롤 */
+  overflow-y: auto;
+  /* 크기 조절 금지 */
+  resize: none;
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+/* ── 푸터: 저장 버튼 ── */
+.tw-footer {
+  flex: 0 0 auto;
+  text-align: right;
+  margin-top: 16px;
+}
+.tw-footer button {
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.tw-footer button:hover {
+  background: #0056b3;
+}
