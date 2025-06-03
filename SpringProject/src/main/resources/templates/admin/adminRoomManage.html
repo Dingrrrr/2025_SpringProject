@@ -85,45 +85,21 @@
   </div>
 
   <div class="main">
-    <!-- 병동 반복 예시 -->
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 301호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
-        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
+  <div th:each="ward : ${wards}" class="room-type">
+    <div class="room-header">
+      <span th:text="'병동 ' + ${ward.name}">병동 이름</span>
+      <div class="btn-group">
+        <button class="btn-action">추가</button>
       </div>
     </div>
-    <!-- 추가 병동은 동일 구조로 복제 -->
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 302호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
-        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
-      </div>
-    </div>
-    <div class="room-type">
-      <div class="room-header">
-        <span>병동 303호</span>
-        <div class="btn-group">
-          <button class="btn-action">추가</button>
-        </div>
-      </div>
-      <div class="room-list">
-        <div class="room-box">침대 번호: 1A<br>상태: 사용 중<br>입원 환자: 김철수</div>
-        <div class="room-box">침대 번호: 1B<br>상태: 사용 중<br>입원 환자: 이영희</div>
+    <div class="room-list">
+      <div th:each="bed : ${bedMap[ward.wardId]}" class="room-box"
+           th:text="'침대 번호: ' + ${bed.bedNumber} + '&#10;상태: ' + ${bed.bedstatus}">
+        침대 번호: 1A<br>상태: 사용 중<br>
       </div>
     </div>
   </div>
+</div>
 
   <!-- 추가 모달 -->
   <div id="addModal" class="modal">
@@ -136,12 +112,10 @@
 
         <label>상태</label>
         <select id="bedStatus" required>
-          <option value="사용 중">사용 중</option>
-          <option value="사용 가능">사용 가능</option>
-        </select><br><br>
-
-        <label>입원 환자</label>
-        <input type="text" id="patientName"><br><br>
+		  <option value="OCCUPIED">사용 중</option>
+		  <option value="EMPTY">사용 가능</option>
+		</select>
+		<br><br>
 
         <button type="submit" class="btn-action">등록</button>
       </form>
@@ -159,12 +133,10 @@
 
         <label>상태</label>
         <select id="editBedStatus" required>
-          <option value="사용 중">사용 중</option>
-          <option value="사용 가능">사용 가능</option>
-        </select><br><br>
-
-        <label>입원 환자</label>
-        <input type="text" id="editPatientName"><br><br>
+		  <option value="OCCUPIED">사용 중</option>
+		  <option value="EMPTY">사용 가능</option>
+		</select>
+		<br><br>
 
         <button type="submit" class="btn-action">수정</button>
         <button type="button" class="btn-action" id="deleteBtn" style="background-color: #e74c3c;">삭제</button>
@@ -201,13 +173,12 @@
       e.preventDefault();
       const bedNumber = document.getElementById('bedNumber').value.trim();
       const bedStatus = document.getElementById('bedStatus').value;
-      const patientName = document.getElementById('patientName').value.trim() || '없음';
-
+     
       if (!currentRoomList) return;
 
       const newBox = document.createElement('div');
       newBox.className = 'room-box';
-      newBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>입원 환자: ${patientName}`;
+      newBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>`;
 
       currentRoomList.appendChild(newBox);
 
@@ -228,12 +199,10 @@
         const lines = currentRoomBox.innerHTML.split('<br>');
         const bedNumber = lines[0].replace('침대 번호: ', '');
         const bedStatus = lines[1].replace('상태: ', '');
-        const patientName = lines[2].replace('입원 환자: ', '');
 
         document.getElementById('editBedNumber').value = bedNumber;
         document.getElementById('editBedStatus').value = bedStatus;
-        document.getElementById('editPatientName').value = patientName === '없음' ? '' : patientName;
-
+        
         editModal.style.display = 'block';
       }
     });
@@ -244,9 +213,8 @@
 
       const bedNumber = document.getElementById('editBedNumber').value.trim();
       const bedStatus = document.getElementById('editBedStatus').value;
-      const patientName = document.getElementById('editPatientName').value.trim() || '없음';
-
-      currentRoomBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>입원 환자: ${patientName}`;
+      
+      currentRoomBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>`;
 
       editModal.style.display = 'none';
       currentRoomBox = null;

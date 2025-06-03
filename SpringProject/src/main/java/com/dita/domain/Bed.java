@@ -42,6 +42,6 @@ public class Bed {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "bed_status", nullable = false)
-    private StatusBed bedstatus = StatusBed.사용가능;// 병상상태
+    private StatusBed bedstatus = StatusBed.EMPTY;// 병상상태
 }
 
