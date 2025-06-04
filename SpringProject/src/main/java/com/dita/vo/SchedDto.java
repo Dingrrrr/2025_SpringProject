@@ -13,4 +13,5 @@ public class SchedDto {
     private LocalDateTime endTime;
     private Type type; // 정확히 com.dita.domain.Type 임포트 사용
     private List<DayOfWeek> workDays;
+    private String usersId;
 }
