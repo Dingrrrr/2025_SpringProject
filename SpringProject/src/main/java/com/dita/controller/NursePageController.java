@@ -40,8 +40,7 @@ public class NursePageController {
     public NursePageController(LoginPageRepository repo) {
         this.repo = repo;
     }
-	
-	@GetMapping("/NurseChart")
+
     @Autowired
     private NurseChartRepository nurseChartRepository;
 
@@ -88,7 +87,7 @@ public class NursePageController {
             return ResponseEntity.status(500).build();
         }
     }
- // 차트 저장 API 추가
+    // 차트 저장 API 추가
     @PostMapping("/api/charts/save")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> saveChart(@RequestBody ChartSaveRequestDto request) {
