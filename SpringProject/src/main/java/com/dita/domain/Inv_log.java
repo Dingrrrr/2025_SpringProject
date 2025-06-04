@@ -3,6 +3,8 @@ package com.dita.domain;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +37,7 @@ public class Inv_log {
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)//N:1 관계
 	@JoinColumn(name = "drug_id", nullable = false)
+	@JsonIgnore
 	private Drug drug;// 약품 아이디
 	
 	@Enumerated(EnumType.STRING)
@@ -50,4 +53,7 @@ public class Inv_log {
 	@ManyToOne(fetch = FetchType.LAZY)//N:1 관계
 	@JoinColumn(name = "recorded_by", nullable = true)
 	private User recordedBy; //처리자 아이디 
+	
+	@Column(name = "location")// 재고 위치
+	private String location;   
 }
