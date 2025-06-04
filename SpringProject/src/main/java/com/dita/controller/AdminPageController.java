@@ -42,11 +42,6 @@ public class AdminPageController {
         return "admin/adminMemberManage";
     }
 
-    @GetMapping("/adminCalendarManage")
-    public String showCalendarPage(Model model) {
-        return "admin/adminCalendarManage";
-    }
-
     @GetMapping("/adminRoomManage")
     public String showBedPage(Model model) {
         List<Ward> wards = wardRepository.findAll();
