@@ -8,5 +8,5 @@ import com.dita.domain.Grade;
 import com.dita.domain.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
-    List<User> findByGrade(String grade);
+    List<User> findByGrade(Grade grade);
 }

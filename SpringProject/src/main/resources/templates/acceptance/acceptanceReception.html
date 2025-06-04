@@ -223,12 +223,19 @@
 <div id="reservationModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h2>예약 등록</h2>
-    <form id="reservationForm">
+ 	<form id="reservationForm" method="post" action="/acceptance/appointment">
       <label>이름</label>
       <input type="text" name="name" required>
+      
+      <label>성별</label>
+		<select name="gender" required>
+		  <option value="">선택</option>
+		  <option value="남">남</option>
+		  <option value="여">여</option>
+		</select>
 
-      <label>주민번호</label>
-      <input type="text" name="rrn" placeholder="예: 123456-1234567" required>
+		<label>주민등록번호</label>
+		<input type="text" name="rrn" placeholder="000000-0000000" required>
 
       <label>연락처</label>
       <input type="tel" name="phone" placeholder="010-0000-0000" required>
@@ -237,7 +244,7 @@
       <input type="datetime-local" name="date" required>
 
       <label>진료실</label>
-      <select name="department" required>
+      <select name="room" required>
         <option value="">선택</option>
         <option>진료실1</option>
         <option>진료실2</option>
@@ -247,15 +254,11 @@
       
       <label>병명</label>
 		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
-
-      <label>담당 의사</label>
-      <select name="Doctor" required>
-        <option value="">선택</option>
-        <option>담</option>
-        <option>당</option>
-        <option>의</option>
-        <option>사</option>
-      </select>
+	
+	<label for="doctorSelect">담당 의사</label>
+	<select id="doctorSelect" name="doctor" required>
+	  <option value="">의사 선택</option>
+	</select>
 
       <div class="modal-buttons">
         <button type="button" class="cancel-btn" onclick="closeModal()">취소</button>
@@ -356,17 +359,15 @@ function closeModal() {
 document.getElementById('reservationForm').addEventListener('submit', function (e) {
   e.preventDefault(); // 새로고침 방지
 
-  // 입력값 가져오기
   const name = this.name.value;
   const date = new Date(this.date.value);
-  const department = this.department.value;
+  const department = this.room.value;
   const disease = this.disease.value;
 
   const hour = String(date.getHours()).padStart(2, '0');
   const minute = String(date.getMinutes()).padStart(2, '0');
   const timeStr = `${hour}:${minute}`;
 
-  // 진료실 인덱스 매핑
   const roomIndex = {
     '진료실1': 1,
     '진료실2': 2,
@@ -382,58 +383,71 @@ document.getElementById('reservationForm').addEventListener('submit', function (
   const rows = document.querySelectorAll('.schedule-row');
   let inserted = false;
 
-for (const row of rows) {
-  const timeCol = row.querySelector('.time-col');
-  if (timeCol && timeCol.textContent.trim() === timeStr) {
-    const cells = row.querySelectorAll('.cell');
-    const targetCell = cells[roomIndex - 1];
+  for (const row of rows) {
+    const timeCol = row.querySelector('.time-col');
+    if (timeCol && timeCol.textContent.trim() === timeStr) {
+      const cells = row.querySelectorAll('.cell');
+      const targetCell = cells[roomIndex - 1];
 
-if (targetCell.innerHTML.trim() !== '') {
-  alert("해당 시간대에 이미 예약이 존재합니다.");
-  return;  // 중복 시 함수 종료
-}
+      if (targetCell.innerHTML.trim() !== '') {
+        alert("해당 시간대에 이미 예약이 존재합니다.");
+        return;
+      }
 
-    targetCell.classList.add('green');
-    targetCell.innerHTML = `[${name}]<br>${disease}`;
-    targetCell.innerHTML = `[${name}]<br>${disease}`;
-    
+      targetCell.classList.add('green');
+      targetCell.innerHTML = `[${name}]<br>${disease}`;
 
-    targetCell.dataset.name = name;
-    targetCell.dataset.rrn = this.rrn.value;
-    targetCell.dataset.phone = this.phone.value;
-    targetCell.dataset.date = this.date.value;
-    targetCell.dataset.department = department;
-    targetCell.dataset.disease = disease;
-    targetCell.dataset.doctor = this.doctor.value;
+      targetCell.dataset.name = name;
+      targetCell.dataset.rrn = this.rrn.value;
+      targetCell.dataset.phone = this.phone.value;
+      targetCell.dataset.date = this.date.value;
+      targetCell.dataset.department = department;
+      targetCell.dataset.disease = disease;
+      targetCell.dataset.doctor = this.doctor.value;
 
-    targetCell.addEventListener('click', function () {
-      document.querySelector('input[name="editName"]').value = this.dataset.name || '';
-      document.querySelector('input[name="editRRN"]').value = this.dataset.rrn || '';
-      document.querySelector('input[name="editPhone"]').value = this.dataset.phone || '';
-      document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
-      document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
-      document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
-      document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
-
-      selectedCell = this;
-      document.getElementById('reservationDetailModal').style.display = 'flex';
-    });
-
-    inserted = true;
-    break; // ✅ 처리 완료 후 루프 중단
+      inserted = true;
+      break;
+    }
   }
-}
 
+  if (!inserted) {
+    alert("입력한 시간에 해당하는 셀이 없습니다.");
+    return;
+  }
 
-if (!inserted) {
-  // 아무 셀에도 넣지 못했을 경우만 메시지 표시
-  alert("입력한 시간에 해당하는 셀이 없습니다.");
-} else if (!document.getElementById('reservationModal').style.display.includes('none')) {
-  // 정상 등록되었을 경우만 모달 닫기
-  alert('예약이 저장되었습니다.');
-  closeModal();
-}
+  // ✅ JSON 방식으로 fetch 전송
+  const payload = {
+    name: this.name.value,
+    rrn: this.rrn.value,
+    phone: this.phone.value,
+    gender: this.gender.value,
+    date: this.date.value,
+    room: this.room.value,
+    disease: this.disease.value,
+    doctor: this.doctor.value
+  };
+
+  fetch("/acceptance/appointment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("예약 실패");
+    return response.text();
+  })
+  .then(result => {
+    alert("예약이 DB에 저장되었습니다.");
+    closeModal(); // 모달 닫기
+  })
+  .catch(err => {
+    console.error("DB 저장 실패:", err);
+    alert("서버 저장 실패");
+  });
 });
+
 
 
 
@@ -720,6 +734,29 @@ function updateWeekDisplay() {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("doctorSelect");
+
+  fetch("/api/doctors")
+    .then(res => {
+      if (!res.ok) throw new Error("서버 오류: " + res.status);
+      return res.json();
+    })
+    .then(doctors => {
+      if (!Array.isArray(doctors)) throw new Error("데이터 형식 오류");
+
+      doctors.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.usersId;
+        option.textContent = doc.usersName;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => {
+      console.error("의사 목록 로딩 실패", err);
+      alert("의사 목록을 불러오는 데 실패했습니다.");
+    });
+});
 </script>
 
 
