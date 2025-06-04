@@ -12,6 +12,3 @@ public interface PatientRepository extends JpaRepository<Patient, Integer>{
 
 	List<Patient> findByPatientType(PatientType patientType); //입원대기 조회다음
 }
-
-	List<Patient> findByPatientType(PatientType patientType);
-}

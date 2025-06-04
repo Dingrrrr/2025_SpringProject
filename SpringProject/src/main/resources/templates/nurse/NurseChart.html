@@ -6,6 +6,14 @@
     <title>의료 기록 차트</title>
     <link rel="stylesheet" href="/css/NurseChartstyle.css">
 </head>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의료 기록 차트</title>
+    <link rel="stylesheet" href="/css/NurseChartstyle.css">
+</head>
 <body>
     <!-- 사이드바 -->
     <div class="sidebar">
@@ -51,27 +59,8 @@
 
         <!-- 환자 리스트 -->
         <div class="patient-list show" id="patient-list">
-            <div class="patient-list-header">환자 목록</div>
-            <div class="patient-item" data-patient-id="1">
-                <div class="patient-name">민규짱</div>
-                <div class="patient-detail">성별: 남 | 생년월일: 2000.08.04 | 전화번호: 010-7462-6853</div>
-            </div>
-            <div class="patient-item" data-patient-id="2">
-                <div class="patient-name">김영희</div>
-                <div class="patient-detail">성별: 여 | 생년월일: 1985.03.15 | 전화번호: 010-1234-5678</div>
-            </div>
-            <div class="patient-item" data-patient-id="3">
-                <div class="patient-name">박철수</div>
-                <div class="patient-detail">성별: 남 | 생년월일: 1992.11.28 | 전화번호: 010-9876-5432</div>
-            </div>
-            <div class="patient-item" data-patient-id="4">
-                <div class="patient-name">이미정</div>
-                <div class="patient-detail">성별: 여 | 생년월일: 1978.07.22 | 전화번호: 010-5555-7777</div>
-            </div>
-            <div class="patient-item" data-patient-id="5">
-                <div class="patient-name">최준호</div>
-                <div class="patient-detail">성별: 남 | 생년월일: 1995.12.10 | 전화번호: 010-3333-9999</div>
-            </div>
+            <div class="patient-list-header">입원 환자 목록</div>
+            <!-- 환자 목록이 데이터베이스에서 동적으로 로드됩니다 -->
         </div>
 
         <!-- 차트 리스트 -->
@@ -92,7 +81,6 @@
                 <button class="back-btn" id="back-to-list">← 차트 목록으로 돌아가기</button>
                 
                 <div class="chart-controls">
-                    <button class="chart-btn active">작성하기</button>
                     <button class="chart-btn" id="save-chart-btn">저장하기</button>
                 </div>
 
@@ -142,67 +130,11 @@
     </div>
 
     <script>
-        // 환자 데이터
-        const patients = {
-            1: {
-                name: "민규짱",
-                gender: "남",
-                birth: "2000.08.04",
-                phone: "010-7462-6853"
-            },
-            2: {
-                name: "김영희",
-                gender: "여",
-                birth: "1985.03.15",
-                phone: "010-1234-5678"
-            },
-            3: {
-                name: "박철수",
-                gender: "남",
-                birth: "1992.11.28",
-                phone: "010-9876-5432"
-            },
-            4: {
-                name: "이미정",
-                gender: "여",
-                birth: "1978.07.22",
-                phone: "010-5555-7777"
-            },
-            5: {
-                name: "최준호",
-                gender: "남",
-                birth: "1995.12.10",
-                phone: "010-3333-9999"
-            }
-        };
+        // 환자 데이터 (데이터베이스에서 로드될 예정)
+        let patients = {};
 
-        // 차트 데이터 (예시)
-        const chartData = {
-            1: [ // 민규짱의 차트들
-                { 
-                    id: 1, 
-                    date: "2025-06-01", 
-                    time: "09:30", 
-                    status: "complete",
-                    data: {
-                        "혈압": { "아침": "120/80", "점심": "118/78", "저녁": "", "야간": "" },
-                        "심박수": { "아침": "72", "점심": "68", "저녁": "", "야간": "" },
-                        "체온": { "아침": "36.5", "점심": "36.7", "저녁": "", "야간": "" },
-                        "호흡수": { "아침": "18", "점심": "16", "저녁": "", "야간": "" }
-                    }
-                },
-                { id: 2, date: "2025-05-31", time: "14:20", status: "complete" },
-                { id: 3, date: "2025-05-30", time: "11:15", status: "incomplete" }
-            ],
-            2: [ // 김영희의 차트들
-                { id: 4, date: "2025-06-01", time: "10:00", status: "complete" },
-                { id: 5, date: "2025-05-30", time: "16:30", status: "complete" }
-            ],
-            3: [ // 박철수의 차트들
-                { id: 6, date: "2025-06-02", time: "08:45", status: "incomplete" },
-                { id: 7, date: "2025-06-01", time: "13:20", status: "complete" }
-            ]
-        };
+        // 차트 데이터 (데이터베이스에서 로드될 예정)
+        let chartData = {};
 
         let currentPatientId = null;
         let currentChartId = null;
@@ -222,6 +154,121 @@
         const newChartBtn = document.getElementById('new-chart-btn');
         const backToListBtn = document.getElementById('back-to-list');
         const saveChartBtn = document.getElementById('save-chart-btn');
+
+        // 입원중인 환자 목록을 데이터베이스에서 가져오는 함수
+        async function fetchInpatients() {
+            try {
+                console.log('입원 환자 데이터 요청 시작...');
+                const response = await fetch('/nurse/api/patients/inpatients');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const patientList = await response.json();
+                console.log('받아온 환자 데이터:', patientList);
+                
+                // 배열을 객체로 변환 (기존 코드와 호환성을 위해)
+                patients = {};
+                patientList.forEach(patient => {
+                    patients[patient.patient_id] = {
+                        name: patient.patient_name,
+                        gender: patient.patient_gender,
+                        birth: patient.patient_birth,
+                        phone: patient.patient_phone
+                    };
+                });
+                
+                console.log('변환된 환자 객체:', patients);
+                
+                // 환자 목록 UI 업데이트
+                updatePatientListUI();
+                
+                console.log('입원 환자 데이터 로드 완료:', Object.keys(patients).length + '명');
+                
+            } catch (error) {
+                console.error('환자 데이터 로드 실패:', error);
+                alert('환자 정보를 불러오는 중 오류가 발생했습니다: ' + error.message);
+                
+                // 에러 발생시 빈 환자 목록 표시
+                updatePatientListUI();
+            }
+        }
+
+      // 특정 환자의 차트 목록을 데이터베이스에서 가져오는 함수
+async function fetchPatientCharts(patientId) {
+    try {
+        console.log(`환자 ${patientId}의 차트 데이터 요청 시작...`);
+        const response = await fetch(`/nurse/api/charts/patient/${patientId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const charts = await response.json();
+        console.log(`받아온 차트 데이터:`, charts);
+        
+        // 백엔드 응답 구조에 맞게 수정
+        chartData[patientId] = charts.map(chart => ({
+            id: chart.recorded_date,
+            date: chart.recorded_date,
+            time: chart.latest_time || '00:00', // latest_time 사용
+            status: 'complete',
+            recordCount: chart.record_count
+        }));
+        
+        console.log(`환자 ${patientId}의 차트 ${chartData[patientId].length}개 로드 완료`);
+        
+    } catch (error) {
+        console.error('차트 데이터 로드 실패:', error);
+        chartData[patientId] = [];
+        alert('차트 정보를 불러오는 중 오류가 발생했습니다: ' + error.message);
+    }
+}
+
+        // 환자 목록 UI 업데이트 함수
+        function updatePatientListUI() {
+            const patientListContainer = document.getElementById('patient-list');
+            
+            // 기존 환자 아이템들 제거 (헤더는 유지)
+            const existingItems = patientListContainer.querySelectorAll('.patient-item');
+            existingItems.forEach(item => item.remove());
+            
+            // 환자가 없을 경우 메시지 표시
+            if (Object.keys(patients).length === 0) {
+                const noPatientMsg = document.createElement('div');
+                noPatientMsg.style.padding = '20px';
+                noPatientMsg.style.textAlign = 'center';
+                noPatientMsg.style.color = '#666';
+                noPatientMsg.textContent = '입원 환자가 없습니다.';
+                patientListContainer.appendChild(noPatientMsg);
+                return;
+            }
+            
+            // 새로운 환자 아이템들 추가
+            Object.entries(patients).forEach(([patientId, patient]) => {
+                const patientItem = document.createElement('div');
+                patientItem.className = 'patient-item';
+                patientItem.setAttribute('data-patient-id', patientId);
+                
+                patientItem.innerHTML = `
+                    <div class="patient-name">${patient.name}</div>
+                    <div class="patient-detail">성별: ${patient.gender} | 생년월일: ${patient.birth} | 전화번호: ${patient.phone}</div>
+                `;
+                
+                // 환자 클릭 이벤트 추가
+                patientItem.addEventListener('click', function() {
+                    const clickedPatientId = this.getAttribute('data-patient-id');
+                    const clickedPatient = patients[clickedPatientId];
+                    
+                    if (clickedPatient) {
+                        selectPatientFromSearch(clickedPatientId, clickedPatient);
+                    }
+                });
+                
+                patientListContainer.appendChild(patientItem);
+            });
+        }
 
         // 차트 셀 편집 기능 초기화
         function initializeChartCells() {
@@ -338,7 +385,7 @@
         }
 
         // 차트 리스트 표시 함수
-        function showChartList(patientId, patientName) {
+        async function showChartList(patientId, patientName) {
             selectedPatientName.textContent = patientName;
             
             // UI 전환
@@ -347,6 +394,9 @@
             chartContent.classList.remove('show');
             patientInfo.style.display = 'block';
             patientDetails.style.display = 'block';
+            
+            // 해당 환자의 차트 데이터 로드
+            await fetchPatientCharts(patientId);
             
             // 차트 리스트 내용 생성
             displayChartList(patientId);
@@ -412,29 +462,37 @@
         });
 
         // 기존 차트 데이터 로드 함수
-        function loadChartData(chartId) {
-            const patientCharts = chartData[currentPatientId];
-            if (!patientCharts) return;
-
-            const chart = patientCharts.find(c => c.id === chartId);
-            if (!chart || !chart.data) return;
-
-            // 테이블 데이터 로드
-            const rows = ['혈압', '심박수', '체온', '호흡수'];
-            const times = ['아침', '점심', '저녁', '야간'];
-            
-            rows.forEach((row) => {
-                times.forEach((time) => {
-                    const cell = document.querySelector(`[data-row="${row}"][data-time="${time}"]`);
-                    if (cell && chart.data[row] && chart.data[row][time]) {
-                        cell.textContent = chart.data[row][time];
-                    }
-                });
-            });
+       async function loadChartData(chartId) {
+    try {
+        const response = await fetch(`/nurse/api/charts/detail/${currentPatientId}/${chartId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        const chartData = result.data;
+        
+        // 테이블에 데이터 로드
+        const rows = ['혈압', '심박수', '체온', '호흡수'];
+        const times = ['아침', '점심', '저녁', '야간'];
+        
+        rows.forEach((row) => {
+            times.forEach((time) => {
+                const cell = document.querySelector(`[data-row="${row}"][data-time="${time}"]`);
+                if (cell && chartData[row] && chartData[row][time]) {
+                    cell.textContent = chartData[row][time];
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('차트 데이터 로드 실패:', error);
+    }
+}
 
-        // 차트 저장 함수
-        function saveChart() {
+        // 차트 저장 함수 (DB 연동)
+        async function saveChart() {
             if (!currentPatientId) {
                 alert('환자가 선택되지 않았습니다.');
                 return;
@@ -453,47 +511,60 @@
                 });
             });
 
-            if (isNewChart) {
-                // 새 차트 저장
-                const newChartId = Date.now(); // 간단한 ID 생성
-                const currentDate = new Date();
-                const dateStr = currentDate.toISOString().split('T')[0];
-                const timeStr = currentDate.toTimeString().split(' ')[0].substring(0, 5);
+            // 데이터가 입력되었는지 확인
+            const hasData = rows.some(row => 
+                times.some(time => chartTableData[row][time] !== '')
+            );
 
-                const newChart = {
-                    id: newChartId,
-                    date: dateStr,
-                    time: timeStr,
-                    status: 'complete',
-                    data: chartTableData
-                };
-
-                // 차트 데이터에 추가
-                if (!chartData[currentPatientId]) {
-                    chartData[currentPatientId] = [];
-                }
-                chartData[currentPatientId].unshift(newChart); // 최신 차트를 맨 위에 추가
-
-                alert('새 차트가 저장되었습니다.');
-            } else {
-                // 기존 차트 업데이트
-                const patientCharts = chartData[currentPatientId];
-                if (patientCharts) {
-                    const chartIndex = patientCharts.findIndex(chart => chart.id === currentChartId);
-                    if (chartIndex !== -1) {
-                        patientCharts[chartIndex].data = chartTableData;
-                        patientCharts[chartIndex].status = 'complete';
-                    }
-                }
-                alert('차트가 업데이트되었습니다.');
+            if (!hasData) {
+                alert('입력된 데이터가 없습니다. 최소 하나의 값을 입력해주세요.');
+                return;
             }
 
-            // 차트 리스트로 돌아가기
-            chartContent.classList.remove('show');
-            chartList.classList.add('show');
-            
-            // 차트 리스트 새로고침
-            displayChartList(currentPatientId);
+            // 백엔드로 전송할 데이터 구성
+            const requestData = {
+                patientId: parseInt(currentPatientId),
+                nurseId: 'nurse01', // 실제로는 로그인한 간호사 ID 사용
+                recordedDate: new Date().toISOString().split('T')[0], // 오늘 날짜
+                data: chartTableData
+            };
+
+            try {
+                console.log('차트 저장 요청:', requestData);
+                
+                const response = await fetch('/nurse/api/charts/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('차트 저장 응답:', result);
+
+                if (result.success) {
+                    alert(`차트가 성공적으로 저장되었습니다. (${result.savedRecords}개 레코드)`);
+                    
+                    // 차트 리스트로 돌아가기
+                    chartContent.classList.remove('show');
+                    chartList.classList.add('show');
+                    
+                    // 차트 리스트 새로고침
+                    await fetchPatientCharts(currentPatientId);
+                    displayChartList(currentPatientId);
+                } else {
+                    alert('저장 실패: ' + result.message);
+                }
+
+            } catch (error) {
+                console.error('차트 저장 실패:', error);
+                alert('차트 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
 
         // 차트 테이블 초기화
@@ -509,17 +580,8 @@
             chartList.classList.add('show');
         });
 
-        // 환자 아이템 클릭 이벤트
-        document.querySelectorAll('.patient-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const patientId = this.getAttribute('data-patient-id');
-                const patient = patients[patientId];
-                
-                if (patient) {
-                    selectPatientFromSearch(patientId, patient);
-                }
-            });
-        });
+        // 환자 아이템 클릭 이벤트는 updatePatientListUI 함수에서 동적으로 추가됨
+        // (기존 하드코딩된 환자 아이템들은 더 이상 존재하지 않음)
 
         // 차트 메뉴 클릭 이벤트
         document.getElementById('chart-menu').addEventListener('click', function(e) {
@@ -566,15 +628,13 @@
             });
         });
 
-        // 차트 버튼 클릭 이벤트
+        // 차트 버튼 클릭 이벤트 (저장 기능 제거)
         document.querySelectorAll('.chart-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
-                if (this.textContent === '저장하기') {
-                    saveChart();
-                }
+                // 저장 기능은 별도의 saveChartBtn 이벤트에서만 처리
             });
         });
 
@@ -585,7 +645,9 @@
 
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('페이지 로드 완료, 초기화 시작...');
             initializeChartCells();
+            fetchInpatients(); // 입원 환자 데이터 로드
         });
 
     </script>
