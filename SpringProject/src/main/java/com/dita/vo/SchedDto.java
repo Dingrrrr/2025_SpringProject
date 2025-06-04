@@ -11,6 +11,8 @@ public class SchedDto {
     private int scheduleId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Type type; // 정확히 com.dita.domain.Type 임포트 사용
-    private List<DayOfWeek> workDays;
+    private Type type;
+    private List<String> workDays; // 이제 "월", "화", ... 형태의 문자열 리스트
+    private String usersId;
 }
+

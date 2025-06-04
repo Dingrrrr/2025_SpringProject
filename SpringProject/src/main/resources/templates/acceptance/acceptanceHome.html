@@ -193,11 +193,29 @@
     <div class="column reception-column">
           <!-- 날짜 영역 -->
 <div class="date-header">
-  <button class="nav-btn" onclick="openCalendar()">📅 날짜이동</button>
-  <button class="nav-arrow" onclick="changeDate(-1)">◀</button>
-  <span class="date-text" id="currentDate">날짜</span>
-  <button class="nav-arrow" onclick="changeDate(1)">▶</button>
-  <button class="nav-btn" onclick="resetToday()">🔄 새로고침</button>
+    <!-- 1일 전으로 이동 -->
+    <button class="nav-btn"
+            th:onclick="|window.location='@{/acceptance/acceptanceHome(date=${targetDate.minusDays(1)})}'|">
+      ◀
+    </button>
+
+    <!-- 현재 선택된 날짜(2025-06-02 월요일 등) 표시 -->
+    <span class="date-text"
+          th:text="${#temporals.format(targetDate, 'yyyy-MM-dd EEEE')}">
+      2025-06-02 월요일
+    </span>
+
+    <!-- 1일 후로 이동 -->
+    <button class="nav-btn"
+            th:onclick="|window.location='@{/acceptance/acceptanceHome(date=${targetDate.plusDays(1)})}'|">
+      ▶
+    </button>
+
+    <!-- 새로고침 (동일한 targetDate 다시 호출) -->
+    <button class="nav-btn"
+            th:onclick="|window.location='@{/acceptance/acceptanceHome(date=${targetDate})}'|">
+      🔄 새로고침
+    </button>
 </div>
 
 <!-- 날짜 선택 모달 -->
@@ -329,6 +347,16 @@ function toggleSubMenu(menuItem) {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.submenu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.submenu-item')
+              .forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+});
+
 // ───────────────────────────────────────────────────────
 // 2) 날짜 표시 및 모달 제어
 //    - currentDate: 전역에서 관리하는 “현재 선택된 날짜”
@@ -355,49 +383,6 @@ function updateDateDisplay() {
   }
 }
 
-// ‘오늘로 리셋’ 버튼
-function resetToday() {
-  currentDate = new Date();
-  updateDateDisplay();
-}
-
-// ‘◀’ , ‘▶’ 버튼 (diff가 -1이면 전날, +1이면 다음날)
-function changeDate(diff) {
-  currentDate.setDate(currentDate.getDate() + diff);
-  updateDateDisplay();
-}
-
-// 달력 모달 열기
-function openCalendar() {
-  const modal = document.getElementById('calendarModal');
-  const picker = document.getElementById('modalDatePicker');
-  if (modal && picker) {
-    // 모달이 열릴 때 기본값을 currentDate로 설정
-    picker.value = currentDate.toISOString().split('T')[0];
-    modal.style.display = 'flex';
-  }
-}
-
-// 달력 모달 닫기
-function closeModal() {
-  const modal = document.getElementById('calendarModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-}
-
-// 선택한 날짜를 currentDate에 적용하고 닫기
-function applyDate() {
-  const picker = document.getElementById('modalDatePicker');
-  if (picker) {
-    const selDate = new Date(picker.value);
-    if (!isNaN(selDate)) {
-      currentDate = selDate;
-      updateDateDisplay();
-    }
-  }
-  closeModal();
-}
 
 // ───────────────────────────────────────────────────────
 // 3) 환자 등록(고객등록) 모달 열기/닫기

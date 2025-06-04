@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>관리자 근무 스케줄 관리</title>
+  <title>관리자 스케줄 관리</title>
   <link rel="stylesheet" href="/css/adminstyle.css">
 </head>
 <body>
@@ -27,15 +28,16 @@
   </div>
 
   <div class="main">
-    <div class="tab-buttons">
-      <button class="tab-btn active" data-tab="doctor">의사</button>
-      <button class="tab-btn" data-tab="nurse">간호사</button>
-      <button class="tab-btn" data-tab="billing">수납원</button>
-    </div>
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="doctor">의사</button>
+        <button class="tab-btn" data-tab="nurse">간호사</button>
+        <button class="tab-btn" data-tab="billing">수납원</button>
+      </div>
 
-    <!-- 의사 스케줄 -->
-    <div class="tab-content active" id="doctor">
-      <div class="table-controls">
+      <!-- 탭 반복 구조 -->
+      <div class="tab-content active" id="doctor">
+        <div class="table-controls">
 		  <div class="left-controls">
 		    <select class="filter-select">
 		      <option value="0">ID</option>
@@ -47,39 +49,29 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+			<button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
-      <table>
-        <thead>
-          <tr>
-            <th>직원 ID</th>
-            <th>이름</th>
-            <th>근무 시작 시각</th>
-            <th>근무 종료 시각</th>
-            <th>스케줄 유형</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>doc001</td>
-            <td>김의사</td>
-            <td>2024-06-01 09:00</td>
-            <td>2024-06-01 17:00</td>
-            <td>출근</td>
-          </tr>
-          <tr>
-            <td>doc002</td>
-            <td>이의사</td>
-            <td>2024-06-02 09:00</td>
-            <td>2024-06-02 17:00</td>
-            <td>퇴근</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+			  <tr th:each="sched : ${doctorScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
 
-    <!-- 간호사 스케줄 -->
-    <div class="tab-content" id="nurse">
-      <div class="table-controls">
+      <div class="tab-content" id="nurse">
+        <div class="table-controls">
 		  <div class="left-controls">
 		    <select class="filter-select">
 		      <option value="0">ID</option>
@@ -91,32 +83,29 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+		  	<button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
-      <table>
-        <thead>
-          <tr>
-            <th>직원 ID</th>
-            <th>이름</th>
-            <th>근무 시작 시각</th>
-            <th>근무 종료 시각</th>
-            <th>스케줄 유형</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>nur001</td>
-            <td>박간호사</td>
-            <td>2024-06-01 08:00</td>
-            <td>2024-06-01 16:00</td>
-            <td>출근</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+			  <tr th:each="sched : ${nurseScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			   	<td th:text="${sched.user.usersName}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
 
-    <!-- 수납원 스케줄 -->
-    <div class="tab-content" id="billing">
-      <div class="table-controls">
+      <div class="tab-content" id="billing">
+        <div class="table-controls">
 		  <div class="left-controls">
 		    <select class="filter-select">
 		      <option value="0">ID</option>
@@ -128,87 +117,94 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+		  <button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
-      <table>
-        <thead>
-          <tr>
-            <th>직원 ID</th>
-            <th>이름</th>
-            <th>근무 시작 시각</th>
-            <th>근무 종료 시각</th>
-            <th>스케줄 유형</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>bill001</td>
-            <td>정수납</td>
-            <td>2024-06-03 09:00</td>
-            <td>2024-06-03 18:00</td>
-            <td>출근</td>
-          </tr>
-        </tbody>
-      </table>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>이름</th><th>근무 요일</th><th>근무 시작 시간</th><th>근무 종료 시간</th><th>스케줄 유형</th>
+            </tr>
+          </thead>
+          <tbody>
+          	<tr th:each="sched : ${billingScheds}" th:attr="data-id=${sched.scheduleId}">
+			    <td th:text="${sched.user.usersId}"></td>
+			    <td th:text="${sched.user.usersName}"></td>
+			    <td th:text="${#strings.arrayJoin(sched.workDays.toArray(), ', ')}"></td>
+			    <td th:text="${sched.startTime}"></td>
+			    <td th:text="${sched.endTime}"></td>
+			    <td th:text="${sched.type}"></td>
+			  </tr>
+		</tbody>
+        </table>
+      </div>
     </div>
   </div>
-  
-  <!-- ✅ 모달 구성 -->
-  <div id="scheduleModal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <form id="scheduleForm">
-        <div id="formFields"></div>
+	  
+<!-- ✅ 정보 확인 및 수정 모달 -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <form id="editForm">
+      <div id="formFields"></div>
+      <div style="margin-top: 20px;">
         <button type="button" id="saveBtn" class="btn-action">저장</button>
         <button type="button" id="deleteBtn" class="btn-action" style="background-color: #e74c3c;">삭제</button>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
+</div>
 
-	<style>
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 8px;
-      width: 350px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      position: relative;
-    }
-    .close-modal {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #aaa;
-      cursor: pointer;
-    }
-    .close-modal:hover {
-      color: #333;
-    }
-    .btn-action {
-      padding: 6px 12px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .btn-action:hover {
-      background-color: #2980b9;
-    }
+  <style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+ 
+.btn-action {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background-color: #2980b9;
+}
+
+  
   </style>
 
   <script>
@@ -227,7 +223,7 @@
       });
     });
 
- 	// 검색
+    // 검색
     document.querySelectorAll('.tab-content').forEach(tab => {
       const searchInput = tab.querySelector('.search-input');
       const filterSelect = tab.querySelector('.filter-select');
@@ -253,22 +249,27 @@
         const tbody = table.querySelector('tbody');
         const rows = Array.from(tbody.querySelectorAll('tr'));
         const index = parseInt(select.value);
+
         rows.sort((a, b) => {
           const aText = a.cells[index].textContent;
           const bText = b.cells[index].textContent;
           return aText.localeCompare(bText);
         });
+
         rows.forEach(row => tbody.appendChild(row));
       });
     });
     
     let selectedRow = null;
 
-    document.querySelectorAll('tbody tr').forEach(row => {
+ // 테이블 행 클릭 시 모달 표시 및 input 생성
+    document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
       row.addEventListener('click', () => {
         selectedRow = row;
+
         const cells = Array.from(row.cells);
         const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+
         const formFields = headers.map((th, idx) => {
           return `
             <label>${th.textContent}</label><br>
@@ -276,39 +277,123 @@
           `;
         }).join('');
         document.getElementById('formFields').innerHTML = formFields;
-        document.getElementById('scheduleModal').style.display = 'block';
+
+        infoModal.style.display = 'block';
       });
     });
+ 
+ 	// 저장 시 Ajax 요청
+    saveBtn.addEventListener("click", () => {
+  	const inputs = document.querySelectorAll("#formFields input");
+  	const data = {};
+
+	  inputs.forEach((input) => {
+	    const idx = input.getAttribute("data-idx");
+	    const header = document.querySelector(".tab-content.active thead").querySelectorAll("th")[idx].textContent.trim();
+	    data[header] = input.value;
+	  });
+	
+	  const payload = {
+	    userId: data["ID"],
+	    startTime: data["근무 시작 시간"],
+	    endTime: data["근무 종료 시간"],
+	    type: data["스케줄 유형"],
+	    workDays: data["근무 요일"].split(",").map(day => day.trim())
+	  };
+	
+	  const url = selectedRow
+	    ? `/admin/adminCalendarManage/update`
+	    : `/admin/adminCalendarManage/create`;
+	
+	  fetch(url, {
+	    method: "POST",
+	    headers: { "Content-Type": "application/json" },
+	    body: JSON.stringify(
+	      selectedRow ? { scheduleId: selectedRow.getAttribute("data-id"), ...payload } : payload
+	    )
+	  })
+	    .then((res) => res.text())
+	    .then((msg) => {
+	      alert(msg);
+	      location.reload(); // 새로고침으로 반영
+	    });
+	});
+
+    // 삭제 시 Ajax 요청
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      
+      fetch(`/admin/adminCalendarManage/delete/${selectedRow.getAttribute('data-id')}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.text())
+      .then(msg => {
+        alert(msg);
+        selectedRow.remove();
+        infoModal.style.display = 'none';
+      });
+    });
+    
+    const infoModal = document.getElementById('infoModal');
 
     document.querySelector('.close-modal').addEventListener('click', () => {
-      document.getElementById('scheduleModal').style.display = 'none';
+      infoModal.style.display = 'none';
       selectedRow = null;
     });
 
-    window.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('scheduleModal')) {
-        document.getElementById('scheduleModal').style.display = 'none';
-        selectedRow = null;
-      }
-    });
+    document.querySelectorAll('.add-schedule-btn').forEach(btn => {
+    	  btn.addEventListener('click', () => {
+    	    const tab = btn.closest('.tab-content');
+    	    const tabId = tab.id; // doctor, nurse, billing
+    	    selectedRow = null;
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      const inputs = document.querySelectorAll('#formFields input');
-      inputs.forEach(input => {
-        const idx = input.getAttribute('data-idx');
-        selectedRow.cells[idx].textContent = input.value;
-      });
-      document.getElementById('scheduleModal').style.display = 'none';
-      selectedRow = null;
-    });
+    	    const gradeMap = {
+    	      doctor: '의사',
+    	      nurse: '간호사',
+    	      billing: '수납'
+    	    };
 
-    document.getElementById('deleteBtn').addEventListener('click', () => {
-      if (confirm('정말 삭제하시겠습니까?')) {
-        selectedRow.remove();
-        document.getElementById('scheduleModal').style.display = 'none';
-        selectedRow = null;
-      }
-    });
+    	    fetch(`/admin/adminCalendarManage/users?grade=${gradeMap[tabId]}`)
+    	      .then(response => response.json())
+    	      .then(userList => {
+    	        const idSelectHTML = `
+    	          <label>ID</label><br>
+    	          <select id="idSelect" style="width: 100%; margin-bottom: 10px;">
+    	            <option value="">선택하세요</option>
+    	            ${userList.map(user => `<option value="${user.usersId}">${user.usersId}</option>`).join('')}
+    	          </select>
+    	        `;
+
+    	        const nameInputHTML = `
+    	          <label>이름</label><br>
+    	          <input type="text" id="nameInput" disabled style="width: 100%; margin-bottom: 10px;">
+    	        `;
+
+    	        const otherFields = [
+    	          { label: '근무 요일', placeholder: '예: 월,화,수' },
+    	          { label: '근무 시작 시간', placeholder: '예: 09:00' },
+    	          { label: '근무 종료 시간', placeholder: '예: 18:00' },
+    	          { label: '스케줄 유형', placeholder: '예: MORNING' }
+    	        ];
+
+    	        const otherInputsHTML = otherFields.map((field, idx) => `
+    	          <label>${field.label}</label><br>
+    	          <input type="text" placeholder="${field.placeholder}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+    	        `).join('');
+
+    	        document.getElementById('formFields').innerHTML = idSelectHTML + nameInputHTML + otherInputsHTML;
+
+    	        document.getElementById('idSelect').addEventListener('change', e => {
+    	          const selectedId = e.target.value;
+    	          const selectedUser = userList.find(u => u.usersId === selectedId);
+    	          document.getElementById('nameInput').value = selectedUser ? selectedUser.usersName : '';
+    	        });
+
+    	        infoModal.style.display = 'block';
+    	      });
+    	  });
+    	});
+
   </script>
 </body>
 </html>
