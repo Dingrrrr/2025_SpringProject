@@ -23,10 +23,25 @@
   <div class="inventory-main">
     <div class="header-bar">
       <div class="header-left">
-        <input type="text" placeholder="이름, 바코드, 속성 검색">
-        <select><option>제품별</option></select>
-        <select><option>이름 오름차순</option></select>
-        <label><input type="checkbox"> 재고 보유</label>
+        <input type="text" id="search-input" placeholder="검색">
+        <select id="type-filter">
+		  <option value="">전체</option>
+		  <option value="INTERNAL">내복약</option>
+		  <option value="EXTERNAL">외용약</option>
+		  <option value="INJECTION">주사</option>
+		  <option value="LIQUID">수액제</option>
+		  <option value="ETC">기타</option>
+		</select>
+
+
+        <select id="sort-filter">
+		  <option value="name_asc">이름 오름차순</option>
+		  <option value="name_desc">이름 내림차순</option>
+		  <option value="stock_desc">재고 많은 순</option>
+		  <option value="stock_asc">재고 적은 순</option>
+		</select>
+
+        <label><input type="checkbox" id="stock-only"> 재고 보유</label>
       </div>
       <div class="header-right">
         <button onclick="window.open('/Drug/Add', 'AddDrugPopup', 'width=700,height=650')">+ 제품 추가</button>
@@ -36,149 +51,378 @@
 
     <div class="content">
       <!-- 왼쪽 패널 -->
-      <div class="panel">
-        <div class="product-card" onclick="showDetail('하트만수액')">
-          <img class="thumb" src="https://via.placeholder.com/48" alt="하트만수액">
-          <div class="info-block">
-            <div class="name">하트만수액</div>
-            <div class="info">수액제 | DDONE2</div>
-          </div>
-          <div class="stock">17</div>
-        </div>
+      <div class="panel" id="product-panel">
+        <!-- JS로 약품 카드 동적 삽입 -->
       </div>
 
-      <!-- 오른쪽 패널 -->
+      <!-- 오른쪽 상세정보 패널 -->
       <div class="panel right-panel" id="detail-panel">
         <h2>상세 정보</h2>
         <div class="placeholder">약품을 선택하면 이곳에 상세 정보가 표시됩니다.</div>
       </div>
     </div>
   </div>
+  
+  <!-- 출고 모달 -->
+<div id="withdraw-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <h3>약품 출고</h3>
+    <p id="withdraw-drug-name"></p>
+    <p>현재 재고: <span id="withdraw-current-stock"></span></p>
 
-  <script>
-    let isEditing = false;
+    <label for="withdraw-amount">출고 수량</label>
+    <input type="number" id="withdraw-amount" min="1" />
 
-    function showDetail(name) {
-      if (name === '하트만수액') {
-        const detailPanel = document.getElementById("detail-panel");
-        const manageBtn = document.getElementById("manage-btn");
-        if (manageBtn) {
-          manageBtn.textContent = "⚙ 제품 관리";
-          isEditing = false;
-        }
+    <div class="modal-buttons">
+      <button onclick="closeWithdrawModal()">취소</button>
+      <button onclick="submitWithdraw()">출고</button>
+    </div>
+  </div>
+</div>
+ <!-- 입고 모달 -->
+<div id="add-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <h3>약품 입고</h3>
+    <p id="add-drug-name"></p>
+    <p>현재 재고: <span id="add-current-stock"></span></p>
 
-        detailPanel.innerHTML = `
-          <div class="drug-info-card">
-            <div class="title-row">
-              <h2>하트만수액</h2>
-            </div>
-            <div class="info-grid" id="drug-info">
-              <div class="info-item"><label>종류</label><div>수액제</div></div>
-              <div class="info-item"><label>약품 코드</label><div>DDONE2</div></div>
-              <div class="info-item"><label>보관 위치</label><div>창고-A박스</div></div>
-              <div class="info-item"><label>재고</label><div>17</div></div>
-            </div>
+    <label for="add-amount">입고 수량</label>
+    <input type="number" id="add-amount" min="1" />
 
-            <div class="section-title">입고 내역</div>
-            <table>
-              <tr><th>입고일</th><th>수량</th><th>비고</th></tr>
-              <tr><td>2025-05-01</td><td>10개</td><td>새 박스</td></tr>
-              <tr><td>2025-04-18</td><td>7개</td><td>반품 입고</td></tr>
-            </table>
+    <div class="modal-buttons">
+      <button onclick="closeAddModal()">취소</button>
+      <button onclick="submitAdd()">입고</button>
+    </div>
+  </div>
+</div>
 
-            <div class="section-title">출고 내역</div>
-            <table>
-              <tr><th>출고일</th><th>수량</th><th>사용처</th></tr>
-              <tr><td>2025-05-03</td><td>3개</td><td>입원환자 A</td></tr>
-              <tr><td>2025-05-06</td><td>2개</td><td>외래진료</td></tr>
-            </table>
-          </div>
-        `;
-      }
+
+<script>
+  let currentDrug = null;
+  let isEditing = false;
+  let loadedDrugs = [];
+
+  const FORM_TYPE_LABELS = {
+    INTERNAL: "내복약",
+    EXTERNAL: "외용약",
+    INJECTION: "주사",
+    LIQUID: "수액제",
+    ETC: "기타"
+  };
+
+  async function loadInventoryCards() {
+    try {
+      const res = await fetch("/api/inventory/summary");
+      if (!res.ok) throw new Error("서버 오류: 재고 목록을 불러올 수 없습니다.");
+
+      loadedDrugs = await res.json();  // 전체 약품 저장
+      renderInventoryCards(loadedDrugs);  // 렌더링
+    } catch (err) {
+      alert("재고 데이터를 불러오는 중 오류가 발생했습니다.");
+      console.error("불러오기 실패:", err);
     }
+  }
 
-    function toggleEditMode() {
-      const button = document.getElementById("manage-btn");
+  function renderInventoryCards(drugs) {
+    const panel = document.getElementById("product-panel");
+    panel.innerHTML = "";
 
-      if (!isEditing) {
-        isEditing = true;
-        enterEditModeFromManagement();
-        button.textContent = "💾 제품 저장";
-      } else {
-        saveDrugChanges();
-        isEditing = false;
-        button.textContent = "⚙ 제품 관리";
-      }
-    }
+    drugs.forEach(drug => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.onclick = () => showDetail(drug);
+		 console.log("drug.type:", drug.type);//콘솔 로그
+      const typeLabel = FORM_TYPE_LABELS[drug.type] || drug.type;
 
-    function enterEditModeFromManagement() {
-      const detailPanel = document.getElementById("detail-panel");
-
-      detailPanel.innerHTML = `
-        <div class="drug-info-card">
-          <div class="title-row">
-            <h2>하트만수액 수정</h2>
-          </div>
-          <div class="info-grid" id="drug-info-edit">
-            <div class="info-item"><label>종류</label><input type="text" value="수액제" /></div>
-            <div class="info-item"><label>약품 코드</label><input type="text" value="DDONE2" /></div>
-            <div class="info-item"><label>보관 위치</label><input type="text" value="창고-A박스" /></div>
-            <div class="info-item"><label>재고</label><input type="number" value="17" /></div>
-          </div>
-
-          <div class="section-title">입고 내역</div>
-          <table>
-            <tr><th>입고일</th><th>수량</th><th>비고</th></tr>
-            <tr><td>2025-05-01</td><td>10개</td><td>새 박스</td></tr>
-            <tr><td>2025-04-18</td><td>7개</td><td>반품 입고</td></tr>
-          </table>
-
-          <div class="section-title">출고 내역</div>
-          <table>
-            <tr><th>출고일</th><th>수량</th><th>사용처</th></tr>
-            <tr><td>2025-05-03</td><td>3개</td><td>입원환자 A</td></tr>
-            <tr><td>2025-05-06</td><td>2개</td><td>외래진료</td></tr>
-          </table>
+      card.innerHTML = `
+        <div class="info-block">
+          <div class="name">${drug.name}</div>
+          <div class="info">${typeLabel} | ${drug.code}</div>
         </div>
+        <div class="stock">${drug.stock}</div>
       `;
-    }
-
-    function saveDrugChanges() {
-      const inputs = document.querySelectorAll("#drug-info-edit input");
-      const updated = {
-        type: inputs[0].value,
-        manufacturer: inputs[1].value,
-        location: inputs[2].value,
-        stock: inputs[3].value
-      };
-
-      alert("수정된 내용:\n" + JSON.stringify(updated, null, 2));
-      showDetail("하트만수액");
-    }
-
-    window.addEventListener("message", function (event) {
-      if (event.data.type === "ADD_DRUG") {
-        const drug = event.data.payload;
-
-        const panel = document.querySelector(".content .panel");
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.onclick = () => showDetail(drug.name);
-
-        card.innerHTML = `
-          <img class="thumb" src="https://via.placeholder.com/48" alt="${drug.name}">
-          <div class="info-block">
-            <div class="name">${drug.name}</div>
-            <div class="info">${drug.type} | ${drug.manufacturer}</div>
-          </div>
-          <div class="stock">${drug.stock}</div>
-        `;
-
-        panel.appendChild(card);
-        alert(`'${drug.name}' 약품이 추가되었습니다.`);
-      }
+      panel.appendChild(card);
     });
-  </script>
+  }
 
+  document.getElementById("search-input").addEventListener("input", function () {
+    const keyword = this.value.trim().toLowerCase();
+
+    const filtered = loadedDrugs.filter(drug =>
+      drug.name.toLowerCase().includes(keyword) ||
+      drug.code.toLowerCase().includes(keyword) ||
+      (FORM_TYPE_LABELS[drug.type] || drug.type).toLowerCase().includes(keyword)
+    );
+
+    renderInventoryCards(filtered);
+  });
+
+  async function loadInventoryLogs(drugId) {
+    try {
+      const res = await fetch(`/api/inventory/logs?drugId=${drugId}`);
+      if (!res.ok) throw new Error("로그 불러오기 실패");
+      return await res.json();
+    } catch (err) {
+      console.error("입출고 로그 오류:", err);
+      return [];
+    }
+  }
+
+  async function showDetail(drug) {
+    currentDrug = drug;
+    isEditing = false;
+    document.getElementById("manage-btn").textContent = "⚙ 제품 관리";
+
+    const detailPanel = document.getElementById("detail-panel");
+    const typeLabel = FORM_TYPE_LABELS[drug.type] || drug.type;
+
+    const logs = await loadInventoryLogs(drug.drugId);
+    if (logs.length > 0) {
+      drug.lastLogId = logs[0].logId;
+    }
+
+    const logRows = logs.length > 0 ? logs.map(log => `
+      <tr>
+        <td>${log.occurredAt?.slice(0, 10) || "-"}</td>
+        <td>${log.changeType === 'IN' ? '입고' : '출고'}</td>
+        <td>${log.quantity}</td>
+        <td>${log.location || '-'}</td>
+      </tr>
+    `).join("") : `<tr><td colspan='4'>입출고 기록이 없습니다</td></tr>`;
+
+    detailPanel.innerHTML = `
+      <div class="drug-info-card">
+        <div class="title-row"><h2>${drug.name}</h2></div>
+        <div class="info-grid" id="drug-info">
+          <div class="info-item"><label>종류</label><div>${typeLabel}</div></div>
+          <div class="info-item"><label>약품 코드</label><div>${drug.code}</div></div>
+          <div class="info-item"><label>보관 위치</label><div>${drug.location}</div></div>
+          <div class="info-item"><label>재고</label><div>${drug.stock}</div></div>
+        </div>
+
+        <div class="section-title">입출고 내역</div>
+        <table class="log-table">
+          <thead><tr><th>날짜</th><th>구분</th><th>수량</th><th>위치</th></tr></thead>
+          <tbody>${logRows}</tbody>
+        </table>
+
+        <div class="button-group">
+          <button onclick="openWithdrawModal()" class="withdraw-button">출고</button>
+          <button onclick="openAddModal()" class="add-button">입고</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function toggleEditMode() {
+    const button = document.getElementById("manage-btn");
+    if (!currentDrug) return alert("먼저 약품을 선택하세요.");
+
+    if (!isEditing) {
+      isEditing = true;
+      button.textContent = "💾 제품 저장";
+      enterEditMode(currentDrug);
+    } else {
+      saveDrugChanges();
+      isEditing = false;
+      button.textContent = "⚙ 제품 관리";
+    }
+  }
+
+  function enterEditMode(drug) {
+    const detailPanel = document.getElementById("detail-panel");
+
+    detailPanel.innerHTML = `
+      <div class="drug-info-card">
+        <div class="title-row"><h2>${drug.name} 수정</h2></div>
+        <div class="info-grid" id="drug-info-edit">
+          <div class="info-item"><label>종류</label><input type="text" value="${drug.type}" /></div>
+          <div class="info-item"><label>약품 코드</label><input type="text" value="${drug.code}" /></div>
+          <div class="info-item"><label>보관 위치</label><input type="text" value="${drug.location}" /></div>
+          <div class="info-item"><label>재고</label><input type="number" value="${drug.stock}" /></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function saveDrugChanges() {
+    const inputs = document.querySelectorAll("#drug-info-edit input");
+    const updated = {
+      location: inputs[2].value,
+      stock: parseInt(inputs[3].value)
+    };
+    submitDrugEdit(updated);
+  }
+
+  async function submitDrugEdit(updated) {
+    const logId = currentDrug.lastLogId;
+    const { location, stock } = updated;
+
+    if (!logId || isNaN(stock)) {
+      alert("올바른 입력값이 아닙니다.");
+      return;
+    }
+
+    const body = { logId, location, quantity: stock };
+
+    try {
+      const res = await fetch("/api/inventory/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert("제품 정보가 수정되었습니다.");
+        loadInventoryCards();
+      } else {
+        alert("수정 실패");
+      }
+    } catch (e) {
+      console.error("수정 요청 실패", e);
+    }
+  }
+
+  function openWithdrawModal() {
+    if (!currentDrug) return;
+    document.getElementById("withdraw-drug-name").innerText = currentDrug.name;
+    document.getElementById("withdraw-current-stock").innerText = currentDrug.stock;
+    document.getElementById("withdraw-amount").value = "";
+    document.getElementById("withdraw-modal").style.display = "flex";
+  }
+
+  function closeWithdrawModal() {
+    document.getElementById("withdraw-modal").style.display = "none";
+    document.getElementById("withdraw-amount").value = "";
+  }
+
+  async function submitWithdraw() {
+    const amount = parseInt(document.getElementById("withdraw-amount").value);
+    const btn = event.target;
+
+    if (isNaN(amount) || amount <= 0 || amount > currentDrug.stock) {
+      alert("출고 수량을 올바르게 입력해주세요.");
+      return;
+    }
+
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("/api/inventory/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drugId: currentDrug.drugId, quantity: amount })
+      });
+
+      if (!res.ok) throw new Error("출고 요청 실패");
+
+      alert("출고가 완료되었습니다.");
+      closeWithdrawModal();
+      loadInventoryCards();
+    } catch (e) {
+      console.error(e);
+      alert("출고 중 오류 발생");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function openAddModal() {
+    if (!currentDrug) return;
+    document.getElementById("add-drug-name").innerText = currentDrug.name;
+    document.getElementById("add-current-stock").innerText = currentDrug.stock;
+    document.getElementById("add-amount").value = "";
+    document.getElementById("add-modal").style.display = "flex";
+  }
+
+  function closeAddModal() {
+    document.getElementById("add-modal").style.display = "none";
+    document.getElementById("add-amount").value = "";
+  }
+
+  async function submitAdd() {
+    const amount = parseInt(document.getElementById("add-amount").value);
+    const btn = event.target;
+
+    if (isNaN(amount) || amount <= 0) {
+      alert("입고 수량을 올바르게 입력해주세요.");
+      return;
+    }
+
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("/api/inventory/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          drug: { drugId: currentDrug.drugId },
+          changeType: "IN",
+          quantity: amount
+        })
+      });
+
+      if (!res.ok) throw new Error("입고 요청 실패");
+
+      alert("입고가 완료되었습니다.");
+      closeAddModal();
+      loadInventoryCards();
+    } catch (e) {
+      console.error(e);
+      alert("입고 중 오류 발생");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  
+  function applyFilters() {
+ 
+  const keyword = document.getElementById("search-input").value.trim().toLowerCase();
+  const selectedLabel = document.getElementById("type-filter").options[
+    document.getElementById("type-filter").selectedIndex
+  ].text;
+  const sortOption = document.getElementById("sort-filter")?.value || "name_asc"; // 정렬 기본값
+  const stockOnly = document.getElementById("stock-only").checked;
+	
+  let filtered = loadedDrugs.filter(drug =>
+    (selectedLabel === "전체" || (FORM_TYPE_LABELS[drug.type] || drug.type) === selectedLabel) &&
+    (
+      drug.name.toLowerCase().includes(keyword) ||
+      drug.code.toLowerCase().includes(keyword) ||
+      (FORM_TYPE_LABELS[drug.type] || drug.type).toLowerCase().includes(keyword)
+    ) &&
+     (!stockOnly || drug.stock > 0) 
+  );
+
+  switch (sortOption) {
+    case "name_asc":
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "name_desc":
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+      break;
+    case "stock_desc":
+      filtered.sort((a, b) => b.stock - a.stock);
+      break;
+    case "stock_asc":
+      filtered.sort((a, b) => a.stock - b.stock);
+      break;
+  }
+
+  renderInventoryCards(filtered);
+}
+  
+
+  window.onload = function () {
+  loadInventoryCards();
+
+  document.getElementById("search-input").addEventListener("input", applyFilters);
+  document.getElementById("type-filter").addEventListener("change", applyFilters);
+  document.getElementById("sort-filter").addEventListener("change", applyFilters);
+  document.getElementById("stock-only").addEventListener("change", applyFilters);
+};
+
+
+</script>
 </body>
 </html>

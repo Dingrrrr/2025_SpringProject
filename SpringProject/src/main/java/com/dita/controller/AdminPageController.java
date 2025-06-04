@@ -29,19 +29,6 @@ public class AdminPageController {
 
     private final AdminMemberRepository adminMemberRepository;
 
-    @GetMapping("/adminMemberManage")
-    public String showMemberManagePage(Model model) {
-        List<Sched> doctorScheds = adminMemberRepository.findByUserGrade(Grade.의사);
-        List<Sched> nurseScheds = adminMemberRepository.findByUserGrade(Grade.간호사);
-        List<Sched> billingScheds = adminMemberRepository.findByUserGrade(Grade.수납);
-
-        model.addAttribute("doctorScheds", doctorScheds);
-        model.addAttribute("nurseScheds", nurseScheds);
-        model.addAttribute("billingScheds", billingScheds);
-
-        return "admin/adminMemberManage";
-    }
-
     @GetMapping("/adminRoomManage")
     public String showBedPage(Model model) {
         List<Ward> wards = wardRepository.findAll();
