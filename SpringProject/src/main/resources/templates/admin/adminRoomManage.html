@@ -85,21 +85,31 @@
   </div>
 
   <div class="main">
-  <div th:each="ward : ${wards}" class="room-type">
-    <div class="room-header">
-      <span th:text="'병동 ' + ${ward.name}">병동 이름</span>
-      <div class="btn-group">
-        <button class="btn-action">추가</button>
+    <div th:each="ward : ${wards}" class="room-type" th:data-ward-id="${ward.wardId}">
+      <div class="room-header">
+        <span th:text="'병동 ' + ${ward.name}">병동 이름</span>
+        <div class="btn-group">
+          <button class="btn-action add-btn">추가</button>
+          <div class="btn-group">
+          	<button class="btn-action edit-ward-btn" th:data-ward-id="${ward.wardId}" th:data-ward-name="${ward.name}">수정</button>
+		  	<button class="btn-action delete-ward-btn" th:data-ward-id="${ward.wardId}" style="background-color: #e74c3c;">삭제</button>
+          </div>
+        </div>
+      </div>
+      <div class="room-list">
+        <div th:each="bed : ${bedMap[ward.wardId]}" class="room-box" 
+			     th:data-bed-id="${bed.bedId}"
+			     th:data-bed-number="${bed.bedNumber}"
+			     th:data-bed-status="${bed.bedstatus}"
+			     th:utext="'침대 번호: ' + ${bed.bedNumber} + '<br>상태: ' + ${bed.bedstatus}">
+			</div>
       </div>
     </div>
-    <div class="room-list">
-      <div th:each="bed : ${bedMap[ward.wardId]}" class="room-box"
-           th:text="'침대 번호: ' + ${bed.bedNumber} + '&#10;상태: ' + ${bed.bedstatus}">
-        침대 번호: 1A<br>상태: 사용 중<br>
-      </div>
-    </div>
+    <!-- 병동 추가 버튼 -->
+	<div style="margin: 20px 0 0 20px;">
+	  <button class="btn-action" id="openWardModal">병동 추가</button>
+	</div>
   </div>
-</div>
 
   <!-- 추가 모달 -->
   <div id="addModal" class="modal">
@@ -112,16 +122,16 @@
 
         <label>상태</label>
         <select id="bedStatus" required>
-		  <option value="OCCUPIED">사용 중</option>
-		  <option value="EMPTY">사용 가능</option>
-		</select>
-		<br><br>
+          <option value="사용중">사용 중</option>
+          <option value="사용가능">사용 가능</option>
+        </select><br><br>
 
+        <input type="hidden" id="wardId">
         <button type="submit" class="btn-action">등록</button>
       </form>
     </div>
   </div>
-  
+
   <!-- 수정 모달 -->
   <div id="editModal" class="modal">
     <div class="modal-content">
@@ -133,108 +143,178 @@
 
         <label>상태</label>
         <select id="editBedStatus" required>
-		  <option value="OCCUPIED">사용 중</option>
-		  <option value="EMPTY">사용 가능</option>
-		</select>
-		<br><br>
+          <option value="사용중">사용 중</option>
+          <option value="사용가능">사용 가능</option>
+        </select><br><br>
 
+        <input type="hidden" id="editBedId">
         <button type="submit" class="btn-action">수정</button>
         <button type="button" class="btn-action" id="deleteBtn" style="background-color: #e74c3c;">삭제</button>
       </form>
     </div>
   </div>
-
-  <!-- 수정 모달 생략 가능 (위와 동일 구조로 추가 가능) -->
+  
+  <!-- 병동 추가 모달 -->
+<div id="wardModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeWardModal">&times;</span>
+    <h3>병동 추가</h3>
+    <form id="wardForm">
+      <label>병동 이름</label>
+      <input type="text" id="wardName" required><br><br>
+      <input type="hidden" id="wardIdForEdit"> <!-- 수정 시 사용 -->
+      <button type="submit" class="btn-action">저장</button>
+    </form>
+  </div>
+</div>
 
   <script>
-    const addModal = document.getElementById('addModal');
-    const addForm = document.getElementById('addForm');
-    const closeAdd = document.getElementById('closeAdd');
-    let currentRoomList = null;
+    let currentWardId = null;
+    let currentRoomBox = null;
 
-    document.querySelectorAll('.room-type .btn-action').forEach(btn => {
+    document.querySelectorAll('.add-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        currentRoomList = btn.closest('.room-type').querySelector('.room-list');
-        addModal.style.display = 'block';
+        const roomType = btn.closest('.room-type');
+        currentWardId = roomType.getAttribute('data-ward-id');
+        document.getElementById('wardId').value = currentWardId;
+        document.getElementById('addModal').style.display = 'block';
       });
     });
 
-    closeAdd.addEventListener('click', () => {
-      addModal.style.display = 'none';
-    });
+    document.getElementById('addForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const bedNumber = document.getElementById('bedNumber').value;
+      const bedStatus = document.getElementById('bedStatus').value;
+      const wardId = document.getElementById('wardId').value;
 
-    window.addEventListener('click', e => {
-      if (e.target === addModal) {
-        addModal.style.display = 'none';
+      const response = await fetch('/admin/adminRoomManage/roomadd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bedNumber, bedStatus, wardId })
+      });
+
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("등록 실패");
       }
     });
 
-    addForm.addEventListener('submit', e => {
+    document.querySelectorAll('.room-box').forEach(box => {
+      box.addEventListener('click', () => {
+        currentRoomBox = box;
+        document.getElementById('editBedId').value = box.getAttribute('data-bed-id');
+        document.getElementById('editBedNumber').value = box.getAttribute('data-bed-number');
+        document.getElementById('editBedStatus').value = box.getAttribute('data-bed-status');
+        document.getElementById('editModal').style.display = 'block';
+      });
+    });
+
+    document.getElementById('editForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const bedNumber = document.getElementById('bedNumber').value.trim();
-      const bedStatus = document.getElementById('bedStatus').value;
-     
-      if (!currentRoomList) return;
+      const bedId = document.getElementById('editBedId').value;
+      const bedNumber = document.getElementById('editBedNumber').value;
+      const bedStatus = document.getElementById('editBedStatus').value;
 
-      const newBox = document.createElement('div');
-      newBox.className = 'room-box';
-      newBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>`;
+      const response = await fetch(`/admin/adminRoomManage/room${bedId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bedNumber, bedStatus })
+      });
 
-      currentRoomList.appendChild(newBox);
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("수정 실패");
+      }
+    });
 
-      addModal.style.display = 'none';
-      addForm.reset();
-      currentRoomList = null;
+    document.getElementById('deleteBtn').addEventListener('click', async () => {
+      const bedId = document.getElementById('editBedId').value;
+
+      const response = await fetch(`/admin/adminRoomManage/room${bedId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("삭제 실패");
+      }
+    });
+
+    // 모달 닫기
+    document.querySelectorAll('.close').forEach(closeBtn => {
+      closeBtn.addEventListener('click', () => {
+        closeBtn.parentElement.parentElement.style.display = 'none';
+      });
+    });
+
+    window.addEventListener('click', e => {
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+      }
     });
     
-    const editModal = document.getElementById('editModal');
-    const editForm = document.getElementById('editForm');
-    const closeEdit = document.getElementById('closeEdit');
-    const deleteBtn = document.getElementById('deleteBtn');
-    let currentRoomBox = null;
-
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('room-box')) {
-        currentRoomBox = e.target;
-        const lines = currentRoomBox.innerHTML.split('<br>');
-        const bedNumber = lines[0].replace('침대 번호: ', '');
-        const bedStatus = lines[1].replace('상태: ', '');
-
-        document.getElementById('editBedNumber').value = bedNumber;
-        document.getElementById('editBedStatus').value = bedStatus;
-        
-        editModal.style.display = 'block';
-      }
+ // 병동 추가/수정 모달 열기
+    const wardModal = document.getElementById('wardModal');
+    document.getElementById('openWardModal').addEventListener('click', () => {
+      document.getElementById('wardForm').reset();
+      document.getElementById('wardIdForEdit').value = '';
+      wardModal.style.display = 'block';
     });
 
-    editForm.addEventListener('submit', e => {
+    document.getElementById('closeWardModal').addEventListener('click', () => {
+      wardModal.style.display = 'none';
+    });
+
+    // 병동 저장 (추가 또는 수정)
+    document.getElementById('wardForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentRoomBox) return;
+      const wardName = document.getElementById('wardName').value;
+      const wardId = document.getElementById('wardIdForEdit').value;
 
-      const bedNumber = document.getElementById('editBedNumber').value.trim();
-      const bedStatus = document.getElementById('editBedStatus').value;
-      
-      currentRoomBox.innerHTML = `침대 번호: ${bedNumber}<br>상태: ${bedStatus}<br>`;
+      const url = wardId ? `/admin/adminRoomManage/${wardId}` : '/admin/adminRoomManage/add';
+      const method = wardId ? 'PUT' : 'POST';
 
-      editModal.style.display = 'none';
-      currentRoomBox = null;
-    });
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: wardName })
+      });
 
-    deleteBtn.addEventListener('click', () => {
-      if (!currentRoomBox) return;
-      currentRoomBox.remove();
-      editModal.style.display = 'none';
-      currentRoomBox = null;
-    });
-
-    closeEdit.addEventListener('click', () => {
-      editModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', e => {
-      if (e.target === editModal) {
-        editModal.style.display = 'none';
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("병동 저장 실패");
       }
+    });
+    
+ // 병동 수정
+    document.querySelectorAll('.edit-ward-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('wardName').value = btn.getAttribute('data-ward-name');
+        document.getElementById('wardIdForEdit').value = btn.getAttribute('data-ward-id');
+        wardModal.style.display = 'block';
+      });
+    });
+
+    // 병동 삭제
+    document.querySelectorAll('.delete-ward-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const wardId = btn.getAttribute('data-ward-id');
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+
+        const response = await fetch(`/admin/adminRoomManage/${wardId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          location.reload();
+        } else {
+          alert("병동 삭제 실패");
+        }
+      });
     });
     
   </script>
