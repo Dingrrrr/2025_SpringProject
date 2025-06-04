@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,10 @@ public class Nurse_chart {
 	@CreationTimestamp
 	@Column(name = "entry_time")
 	private LocalDateTime entryTime;//작성 일시
+	
+	@OneToOne
+	@JoinColumn(name = "patient_id")
+	private Patient patientId; //환자 정보
 	
 	
 }

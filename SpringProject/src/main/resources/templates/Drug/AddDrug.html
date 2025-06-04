@@ -3,89 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>약품 등록</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 40px;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
-    }
-
-    .container {
-      background-color: white;
-      width: 400px;
-      margin: 0 auto;
-      padding: 24px;
-      border: 1px solid #ccc;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: bold;
-    }
-
-    input, select {
-      width: 100%;
-      margin-bottom: 16px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .actions {
-      text-align: right;
-    }
-
-    .actions button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .actions .cancel {
-      background-color: #ddd;
-      margin-right: 8px;
-    }
-
-    .actions .submit {
-      background-color: #1976d2;
-      color: white;
-    }
-
-    .error-message {
-      color: red;
-      font-size: 13px;
-      margin-bottom: 16px;
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/drug.css">
 </head>
 <body>
 
-<div class="container">
+<div class="add-drug-container">
   <h2>약품 등록</h2>
 
   <div id="error" class="error-message">모든 항목을 입력해주세요.</div>
 
-  <label for="drugName">약품명</label>
+  <div class="autocomplete-wrapper">
   <input type="text" id="drugName" placeholder="예: 생리식염수">
+  <div id="autocomplete-list"></div>
+</div>
 
+	
   <label for="drugType">종류</label>
   <input type="text" id="drugType" placeholder="예: 수액">
 
-  <label for="drugVolume">용량</label>
-  <input type="text" id="drugVolume" placeholder="예: 500ml">
-
-  <label for="manufacturer">제조사</label>
-  <input type="text" id="manufacturer" placeholder="예: 대웅제약">
+  <label for="manufacturer">약품코드</label>
+  <input type="text" id="manufacturer" placeholder="예: DDONE2">
 
   <label for="location">보관 위치</label>
   <input type="text" id="location" placeholder="예: 창고-A박스">
@@ -100,32 +37,106 @@
 </div>
 
 <script>
-  function submitDrug() {
-    const drug = {
-      name: document.getElementById('drugName').value.trim(),
-      type: document.getElementById('drugType').value.trim(),
-      volume: document.getElementById('drugVolume').value.trim(),
-      manufacturer: document.getElementById('manufacturer').value.trim(),
-      location: document.getElementById('location').value.trim(),
-      stock: document.getElementById('stock').value.trim(),
-    };
+  // 약품 추가 시 입력값 유효성 검사 후 부모창에 메시지 전달
+async function submitDrug() {
+  const drugId = parseInt(document.getElementById("manufacturer").dataset.id, 10);
 
-    const isValid = Object.values(drug).every(v => v !== "");
+  const log = {
+    drug: {
+      drugId: drugId
+    },
+    location: getValue("location"),
+    quantity: parseInt(getValue("stock"), 10)
+  };
+
+  if (!drugId || !log.location || isNaN(log.quantity) || log.quantity <= 0) {
+    showError("모든 항목을 정확히 입력해주세요.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/inventory/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(log)
+    });
+
+    if (res.ok) {
+      alert("약품 재고가 성공적으로 추가되었습니다.");
+      window.close();
+    } else {
+      const errorText = await res.text();
+      showError("서버 오류: " + errorText);
+    }
+  } catch (err) {
+    console.error("전송 실패:", err);
+    showError("서버 통신 오류가 발생했습니다.");
+  }
+}
+
+  // 값 가져오기 유틸
+  function getValue(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  // 빈 값 체크
+  function isValid(drug) {
+    return Object.values(drug).every(v => v !== "");
+  }
+
+  // 에러 메시지 표시
+  function showError(msg) {
     const errorDiv = document.getElementById("error");
+    errorDiv.textContent = msg;
+    errorDiv.style.display = "block";
+  }
 
-    if (!isValid) {
-      errorDiv.style.display = "block";
+  // 자동완성: 약품명 입력 시 검색 요청
+  document.getElementById("drugName").addEventListener("input", async function () {
+    const keyword = this.value.trim();
+    const dropdown = document.getElementById("autocomplete-list");
+
+    if (keyword.length < 2) {
+      dropdown.innerHTML = "";
       return;
     }
 
-    // 유효성 통과 시 메시지 전송
-    if (window.opener) {
-      window.opener.postMessage({ type: "ADD_DRUG", payload: drug }, "*");
+    try {
+      const res = await fetch(`/Drug/api/drugs/search?keyword=${encodeURIComponent(keyword)}`);
+      const data = await res.json();
+      renderDropdown(data);
+    } catch (e) {
+      console.error("검색 실패:", e);
     }
+  });
 
-    window.close();
+  // 자동완성 드롭다운 렌더링
+  function renderDropdown(drugs) {
+    const dropdown = document.getElementById("autocomplete-list");
+    dropdown.innerHTML = "";
+
+    drugs.forEach(drug => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.textContent = drug.drugName;
+      item.onclick = () => fillDrugFields(drug);
+      dropdown.appendChild(item);
+    });
+  }
+
+  // 약품 선택 시 필드 자동 채움
+  function fillDrugFields(drug) {
+    document.getElementById("drugName").value = drug.drugName || "";
+    document.getElementById("drugType").value = drug.formType || "";
+    document.getElementById("manufacturer").dataset.id = drug.drugId || "";
+    document.getElementById("manufacturer").value = drug.drugCode || "";
+    document.getElementById("location").value = drug.location || "";
+    document.getElementById("stock").value = 0;
+
+    document.getElementById("autocomplete-list").innerHTML = "";
   }
 </script>
+
 
 </body>
 </html>

@@ -93,7 +93,7 @@
                 
                 <div class="chart-controls">
                     <button class="chart-btn active">작성하기</button>
-                    <button class="chart-btn">저장하기</button>
+                    <button class="chart-btn" id="save-chart-btn">저장하기</button>
                 </div>
 
                 <table class="chart-table">
@@ -109,31 +109,31 @@
                     <tbody>
                         <tr>
                             <td class="row-header">혈압</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="editable-cell" data-row="혈압" data-time="아침"></td>
+                            <td class="editable-cell" data-row="혈압" data-time="점심"></td>
+                            <td class="editable-cell" data-row="혈압" data-time="저녁"></td>
+                            <td class="editable-cell" data-row="혈압" data-time="야간"></td>
                         </tr>
                         <tr>
                             <td class="row-header">심박수</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="editable-cell" data-row="심박수" data-time="아침"></td>
+                            <td class="editable-cell" data-row="심박수" data-time="점심"></td>
+                            <td class="editable-cell" data-row="심박수" data-time="저녁"></td>
+                            <td class="editable-cell" data-row="심박수" data-time="야간"></td>
                         </tr>
                         <tr>
                             <td class="row-header">체온</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="editable-cell" data-row="체온" data-time="아침"></td>
+                            <td class="editable-cell" data-row="체온" data-time="점심"></td>
+                            <td class="editable-cell" data-row="체온" data-time="저녁"></td>
+                            <td class="editable-cell" data-row="체온" data-time="야간"></td>
                         </tr>
                         <tr>
                             <td class="row-header">호흡수</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="editable-cell" data-row="호흡수" data-time="아침"></td>
+                            <td class="editable-cell" data-row="호흡수" data-time="점심"></td>
+                            <td class="editable-cell" data-row="호흡수" data-time="저녁"></td>
+                            <td class="editable-cell" data-row="호흡수" data-time="야간"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -179,7 +179,18 @@
         // 차트 데이터 (예시)
         const chartData = {
             1: [ // 민규짱의 차트들
-                { id: 1, date: "2025-06-01", time: "09:30", status: "complete" },
+                { 
+                    id: 1, 
+                    date: "2025-06-01", 
+                    time: "09:30", 
+                    status: "complete",
+                    data: {
+                        "혈압": { "아침": "120/80", "점심": "118/78", "저녁": "", "야간": "" },
+                        "심박수": { "아침": "72", "점심": "68", "저녁": "", "야간": "" },
+                        "체온": { "아침": "36.5", "점심": "36.7", "저녁": "", "야간": "" },
+                        "호흡수": { "아침": "18", "점심": "16", "저녁": "", "야간": "" }
+                    }
+                },
                 { id: 2, date: "2025-05-31", time: "14:20", status: "complete" },
                 { id: 3, date: "2025-05-30", time: "11:15", status: "incomplete" }
             ],
@@ -210,6 +221,54 @@
         const chartListContent = document.getElementById('chart-list-content');
         const newChartBtn = document.getElementById('new-chart-btn');
         const backToListBtn = document.getElementById('back-to-list');
+        const saveChartBtn = document.getElementById('save-chart-btn');
+
+        // 차트 셀 편집 기능 초기화
+        function initializeChartCells() {
+            document.querySelectorAll('.editable-cell').forEach(cell => {
+                cell.addEventListener('click', function() {
+                    if (this.querySelector('.chart-input')) {
+                        return; // 이미 입력 중이면 무시
+                    }
+                    
+                    const currentText = this.textContent.trim();
+                    this.innerHTML = '';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'chart-input';
+                    input.value = currentText === '클릭하여 입력' ? '' : currentText;
+                    
+                    // 포커스 및 선택
+                    this.appendChild(input);
+                    input.focus();
+                    input.select();
+                    
+                    // Enter 키나 포커스 잃을 때 저장
+                    const saveValue = () => {
+                        const value = input.value.trim();
+                        this.textContent = value;
+                        if (!value) {
+                            this.innerHTML = ''; // 빈 값이면 placeholder 표시를 위해 비움
+                        }
+                    };
+                    
+                    input.addEventListener('blur', saveValue);
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            saveValue();
+                        }
+                    });
+                    
+                    // ESC 키로 취소
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') {
+                            this.parentElement.textContent = currentText === '클릭하여 입력' ? '' : currentText;
+                        }
+                    });
+                });
+            });
+        }
 
         // 검색 기능
         function searchPatients() {
@@ -364,26 +423,17 @@
             const rows = ['혈압', '심박수', '체온', '호흡수'];
             const times = ['아침', '점심', '저녁', '야간'];
             
-            rows.forEach((row, rowIndex) => {
-                times.forEach((time, timeIndex) => {
-                    const cell = document.querySelector(`.chart-table tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${timeIndex + 2})`);
+            rows.forEach((row) => {
+                times.forEach((time) => {
+                    const cell = document.querySelector(`[data-row="${row}"][data-time="${time}"]`);
                     if (cell && chart.data[row] && chart.data[row][time]) {
                         cell.textContent = chart.data[row][time];
                     }
                 });
             });
-
-            // 특이사항 데이터 로드
-            if (chart.notes) {
-                const medicationInput = document.querySelector('.form-input[placeholder*="약물"]');
-                const diseaseInput = document.querySelector('.form-textarea[placeholder*="질병"]');
-                const etcInput = document.querySelector('.form-textarea[placeholder*="기타"]');
-
-                if (medicationInput) medicationInput.value = chart.notes.medication || '';
-                if (diseaseInput) diseaseInput.value = chart.notes.disease || '';
-                if (etcInput) etcInput.value = chart.notes.etc || '';
-            }
         }
+
+        // 차트 저장 함수
         function saveChart() {
             if (!currentPatientId) {
                 alert('환자가 선택되지 않았습니다.');
@@ -395,24 +445,13 @@
             const rows = ['혈압', '심박수', '체온', '호흡수'];
             const times = ['아침', '점심', '저녁', '야간'];
             
-            rows.forEach((row, rowIndex) => {
+            rows.forEach((row) => {
                 chartTableData[row] = {};
-                times.forEach((time, timeIndex) => {
-                    const cell = document.querySelector(`.chart-table tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${timeIndex + 2})`);
-                    chartTableData[row][time] = cell.textContent.trim();
+                times.forEach((time) => {
+                    const cell = document.querySelector(`[data-row="${row}"][data-time="${time}"]`);
+                    chartTableData[row][time] = cell.textContent.trim() || '';
                 });
             });
-
-            // 특이사항 데이터 수집
-            const medicationInput = document.querySelector('.form-input[placeholder*="약물"]');
-            const diseaseInput = document.querySelector('.form-textarea[placeholder*="질병"]');
-            const etcInput = document.querySelector('.form-textarea[placeholder*="기타"]');
-
-            const notesData = {
-                medication: medicationInput ? medicationInput.value : '',
-                disease: diseaseInput ? diseaseInput.value : '',
-                etc: etcInput ? etcInput.value : ''
-            };
 
             if (isNewChart) {
                 // 새 차트 저장
@@ -426,8 +465,7 @@
                     date: dateStr,
                     time: timeStr,
                     status: 'complete',
-                    data: chartTableData,
-                    notes: notesData
+                    data: chartTableData
                 };
 
                 // 차트 데이터에 추가
@@ -444,7 +482,6 @@
                     const chartIndex = patientCharts.findIndex(chart => chart.id === currentChartId);
                     if (chartIndex !== -1) {
                         patientCharts[chartIndex].data = chartTableData;
-                        patientCharts[chartIndex].notes = notesData;
                         patientCharts[chartIndex].status = 'complete';
                     }
                 }
@@ -458,14 +495,11 @@
             // 차트 리스트 새로고침
             displayChartList(currentPatientId);
         }
+
+        // 차트 테이블 초기화
         function clearChartTable() {
-            document.querySelectorAll('.chart-table td:not(.row-header)').forEach(cell => {
+            document.querySelectorAll('.editable-cell').forEach(cell => {
                 cell.textContent = '';
-            });
-            
-            // 특이사항 폼도 초기화
-            document.querySelectorAll('.form-input').forEach(input => {
-                input.value = '';
             });
         }
 
@@ -544,33 +578,16 @@
             });
         });
 
-        // 차트 셀 클릭 이벤트 (값 입력)
-        document.querySelectorAll('.chart-table td:not(.row-header)').forEach(cell => {
-            cell.addEventListener('click', function() {
-                if (!this.querySelector('input')) {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.style.width = '100%';
-                    input.style.border = 'none';
-                    input.style.textAlign = 'center';
-                    input.value = this.textContent;
-                    
-                    input.addEventListener('blur', function() {
-                        cell.textContent = this.value;
-                    });
-                    
-                    input.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            this.blur();
-                        }
-                    });
-                    
-                    this.textContent = '';
-                    this.appendChild(input);
-                    input.focus();
-                }
-            });
+        // 저장 버튼 클릭 이벤트
+        saveChartBtn.addEventListener('click', function() {
+            saveChart();
         });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChartCells();
+        });
+
     </script>
 </body>
 </html>
