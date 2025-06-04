@@ -13,9 +13,9 @@
 				<div class="logo">
 					<h3>메디링크</h3>
 				</div>
-				<form class="login-form">
-					<input type="text" placeholder="아이디를 입력하세요."> <input
-						type="password" placeholder="비밀번호를 입력하세요.">
+				<form class="login-form" method="post" action="Login">
+					<input type="text" name="usersId" placeholder="아이디를 입력하세요." required> <input
+						type="password" name="usersPwd" placeholder="비밀번호를 입력하세요." required>
 					<div class="checkbox">
 						<input type="checkbox" id="remember"><label for="remember">아이디
 							저장</label>

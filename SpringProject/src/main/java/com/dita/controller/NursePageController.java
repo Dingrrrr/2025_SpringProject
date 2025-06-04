@@ -1,10 +1,15 @@
 package com.dita.controller;
 
+
+import java.security.Principal;
+
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,13 +22,26 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dita.persistence.NurseChartRepository;
 import com.dita.vo.ChartSaveRequestDto;
 
+import com.dita.domain.Grade;
+import com.dita.domain.User;
+import com.dita.persistence.LoginPageRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.java.Log;
 
 @Controller
 @Log
 @RequestMapping("/nurse/")
 public class NursePageController {
+	
+	private final LoginPageRepository repo;
 
+    public NursePageController(LoginPageRepository repo) {
+        this.repo = repo;
+    }
+	
+	@GetMapping("/NurseChart")
     @Autowired
     private NurseChartRepository nurseChartRepository;
 
@@ -110,4 +128,23 @@ public class NursePageController {
             return ResponseEntity.status(500).build();
         }
     }
+	
+	@GetMapping("/NurseHome")
+	public String showNurseHome(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return "redirect:/Login/Login";
+		}
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+			return "redirect:/Login/Login";
+		}
+		
+		model.addAttribute("userName", loginUser.getUsersName());
+        model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
+		
+		return "nurse/NurseHome";
+	}
+
 }
