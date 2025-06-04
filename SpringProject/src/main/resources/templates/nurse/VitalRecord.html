@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>바이탈 기록 대시보드</title>
-    <link rel="stylesheet" href="/css/VitalRecordstyle.css">
+       <link rel="stylesheet" href="/css/VitalRecordstyle.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
@@ -41,11 +41,35 @@
         <!-- 헤더 -->
         <div class="header">
             <div class="search-bar">
-                <input type="text" class="search-input" placeholder="환자 검색" value="민규짱 환자">
-                <button class="search-btn">🔍</button>
+                <input type="text" class="search-input" placeholder="환자 검색" id="patientSearch">
+                <button class="search-btn" onclick="searchPatient()">🔍</button>
             </div>
-            <div class="patient-info">민규짱 환자</div>
-            <div class="patient-details">성별:남 나이:00 신장:000 체중:00</div>
+            <div class="patient-info" id="patientName">환자를 선택해주세요</div>
+            <div class="patient-details" id="patientDetails">환자 정보가 표시됩니다</div>
+        </div>
+
+        <!-- 최신 바이탈 요약 -->
+        <div class="vital-summary">
+            <div class="vital-card">
+                <div class="vital-value" id="latestBP">-/-</div>
+                <div class="vital-label">혈압 (mmHg)</div>
+                <div class="vital-time" id="bpTime">-</div>
+            </div>
+            <div class="vital-card">
+                <div class="vital-value" id="latestPulse">-</div>
+                <div class="vital-label">맥박 (bpm)</div>
+                <div class="vital-time" id="pulseTime">-</div>
+            </div>
+            <div class="vital-card">
+                <div class="vital-value" id="latestTemp">-</div>
+                <div class="vital-label">체온 (°C)</div>
+                <div class="vital-time" id="tempTime">-</div>
+            </div>
+            <div class="vital-card">
+                <div class="vital-value" id="latestResp">-</div>
+                <div class="vital-label">호흡수 (/분)</div>
+                <div class="vital-time" id="respTime">-</div>
+            </div>
         </div>
 
         <!-- 대시보드 그리드 -->
@@ -55,9 +79,9 @@
                 <h3>
                     혈압 추이
                     <div class="chart-options">
-                        <span class="chart-option active">일간</span>
-                        <span class="chart-option">주간</span>
-                        <span class="chart-option">월간</span>
+                        <span class="chart-option active" onclick="updateBPChart('daily')">일간</span>
+                        <span class="chart-option" onclick="updateBPChart('weekly')">주간</span>
+                        <span class="chart-option" onclick="updateBPChart('monthly')">월간</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -65,17 +89,16 @@
                 </div>
             </div>
 
-            <!-- 심박수 모니터링 -->
+            <!-- 맥박수 -->
             <div class="chart-card">
                 <h3>
-                    심박수 모니터링
+                    맥박수
                     <div class="chart-options">
-                        <span class="chart-option active">실시간</span>
-                        <span class="chart-option">시간별</span>
+                        <span class="chart-option" onclick="updatePulseChart('hourly')">시간별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
-                    <canvas id="heartRateChart"></canvas>
+                    <canvas id="pulseRateChart"></canvas>
                 </div>
             </div>
 
@@ -84,8 +107,8 @@
                 <h3>
                     체온 및 호흡 분석
                     <div class="chart-options">
-                        <span class="chart-option active">24시간</span>
-                        <span class="chart-option">주간</span>
+                        <span class="chart-option active" onclick="updateTempRespChart('24hour')">24시간</span>
+                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -93,346 +116,329 @@
                 </div>
             </div>
         </div>
-
-        <!-- 하단 차트 영역 -->
-        <div class="bottom-row">
-            <!-- 혈당 및 체중 추이 -->
-            <div class="chart-card">
-                <h3>
-                    혈당 및 체중 추이
-                    <div class="chart-options">
-                        <span class="chart-option active">월간</span>
-                        <span class="chart-option">분기</span>
-                    </div>
-                </h3>
-                <div class="chart-container">
-                    <canvas id="glucoseWeightChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 보행수 및 운동량 -->
-            <div class="chart-card">
-                <h3>
-                    보행수 및 운동량
-                    <div class="chart-options">
-                        <span class="chart-option active">주간</span>
-                        <span class="chart-option">월간</span>
-                    </div>
-                </h3>
-                <div class="chart-container">
-                    <canvas id="activityChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 지역별 환자 수 현황 -->
-            <div class="chart-card">
-                <h3>지역별 환자 수 현황</h3>
-                <div class="chart-container map-container">
-                    <div class="map-points">
-                        <div class="map-point" style="top: 30%; left: 25%;"></div>
-                        <div class="map-point" style="top: 45%; left: 40%;"></div>
-                        <div class="map-point" style="top: 60%; left: 30%;"></div>
-                        <div class="map-point" style="top: 35%; left: 60%;"></div>
-                        <div class="map-point" style="top: 70%; left: 55%;"></div>
-                        <div class="map-point" style="top: 25%; left: 75%;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 추가 통계 영역 -->
-        <div class="bottom-row" style="margin-top: 20px;">
-            <!-- 수면 패턴 -->
-            <div class="chart-card">
-                <h3>수면 패턴</h3>
-                <div class="chart-container">
-                    <canvas id="sleepChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 건강 상태 대시보드 -->
-            <div class="chart-card">
-                <h3>건강 상태 대시보드</h3>
-                <div class="chart-container">
-                    <canvas id="healthGaugeChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 일별 체크 항목 -->
-            <div class="chart-card">
-                <h3>일별 체크 항목</h3>
-                <div class="chart-container">
-                    <div class="progress-list">
-                        <div class="progress-item">
-                            <div class="progress-label">혈압 측정</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 85%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-label">체온 체크</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 92%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-label">심박수</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-label">호흡수</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 88%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-label">혈당 측정</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%;"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-label">운동량</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 73%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Chart.js 설정
+        // 전역 변수
+        let currentPatientId = null;
+        let charts = {};
+
+        // Chart.js 기본 설정
         Chart.defaults.font.family = 'Malgun Gothic';
         Chart.defaults.font.size = 12;
 
-        // 혈압 추이 차트
-        const bloodPressureCtx = document.getElementById('bloodPressureChart').getContext('2d');
-        new Chart(bloodPressureCtx, {
-            type: 'bar',
-            data: {
-                labels: ['월', '화', '수', '목', '금', '토', '일'],
-                datasets: [{
-                    label: '수축기',
-                    data: [120, 125, 118, 132, 128, 122, 130],
-                    backgroundColor: '#2196f3',
-                    borderRadius: 4
-                }, {
-                    label: '이완기',
-                    data: [80, 82, 78, 85, 83, 79, 84],
-                    backgroundColor: '#64b5f6',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 150
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            // 샘플 데이터로 차트 초기화 (실제로는 DB에서 데이터를 가져옴)
+            loadSampleData();
         });
 
-        // 심박수 모니터링 차트
-        const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
-        new Chart(heartRateCtx, {
-            type: 'bar',
-            data: {
-                labels: ['06:00', '12:00', '18:00', '24:00'],
-                datasets: [{
-                    label: '심박수',
-                    data: [72, 85, 78, 68],
-                    backgroundColor: ['#81c784', '#64b5f6', '#ffb74d', '#f06292'],
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
-                    }
+        // 차트 초기화
+        function initializeCharts() {
+            // 혈압 추이 차트
+            const bloodPressureCtx = document.getElementById('bloodPressureChart').getContext('2d');
+            charts.bloodPressure = new Chart(bloodPressureCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '수축기압 (bp_systolic)',
+                        data: [],
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '이완기압 (bp_diastolic)',
+                        data: [],
+                        borderColor: '#64b5f6',
+                        backgroundColor: 'rgba(100, 181, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // 체온 및 호흡 분석 차트
-        const tempRespCtx = document.getElementById('tempRespChart').getContext('2d');
-        new Chart(tempRespCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['정상 체온', '미열', '정상 호흡', '빠른 호흡'],
-                datasets: [{
-                    data: [60, 15, 70, 10],
-                    backgroundColor: ['#4caf50', '#ff9800', '#2196f3', '#f44336'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '50%',
-                layout: {
-        padding: {
-            top: 10,
-            bottom: 10,
-            left: 10,
-            right: 10
-        }
-    },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            fontSize: 10
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 200
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
                         }
                     }
                 }
-            }
-        });
+            });
 
-        // 혈당 및 체중 추이 차트
-        const glucoseWeightCtx = document.getElementById('glucoseWeightChart').getContext('2d');
-        new Chart(glucoseWeightCtx, {
-            type: 'bar',
-            data: {
-                labels: ['1주', '2주', '3주', '4주'],
-                datasets: [{
-                    label: '혈당',
-                    data: [95, 102, 98, 105],
-                    backgroundColor: '#9c27b0',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 80,
-                        max: 120
-                    }
+            // 맥박수 모니터링 차트
+            const pulseRateCtx = document.getElementById('pulseRateChart').getContext('2d');
+            charts.pulseRate = new Chart(pulseRateCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '맥박수 (pulse_rate)',
+                        data: [],
+                        backgroundColor: ['#81c784', '#64b5f6', '#ffb74d', '#f06292'],
+                        borderRadius: 4
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: false
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 120
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // 보행수 및 운동량 차트
-        const activityCtx = document.getElementById('activityChart').getContext('2d');
-        new Chart(activityCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['목표 달성', '미달성'],
-                datasets: [{
-                    data: [75, 25],
-                    backgroundColor: ['#4caf50', '#e0e0e0'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '50%',
-                layout: {
-        padding: {
-            top: 10,
-            bottom: 10,
-            left: 10,
-            right: 10
+            // 체온 및 호흡 분석 차트
+            const tempRespCtx = document.getElementById('tempRespChart').getContext('2d');
+            charts.tempResp = new Chart(tempRespCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '체온 (temperature)',
+                        data: [],
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: '호흡수 (respiration_rate)',
+                        data: [],
+                        borderColor: '#4caf50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            min: 35,
+                            max: 42,
+                            title: {
+                                display: true,
+                                text: '체온 (°C)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 10,
+                            max: 30,
+                            title: {
+                                display: true,
+                                text: '호흡수 (/분)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
         }
-    },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
 
-        // 수면 패턴 차트
-        const sleepCtx = document.getElementById('sleepChart').getContext('2d');
-        new Chart(sleepCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['깊은 잠', '얕은 잠', '렘수면'],
-                datasets: [{
-                    data: [40, 35, 25],
-                    backgroundColor: ['#3f51b5', '#9c27b0', '#e91e63'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
+        // 환자 검색 함수
+        function searchPatient() {
+            const searchValue = document.getElementById('patientSearch').value;
+            if (searchValue.trim()) {
+                // 실제 DB 연동 시에는 patient_id로 검색
+                loadPatientData(searchValue);
             }
-        });
+        }
 
-        // 건강 상태 대시보드 차트
-        const healthGaugeCtx = document.getElementById('healthGaugeChart').getContext('2d');
-        new Chart(healthGaugeCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['양호', '주의', '위험'],
-                datasets: [{
-                    data: [70, 25, 5],
-                    backgroundColor: ['#4caf50', '#ff9800', '#f44336'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '50%',
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+        // 환자 데이터 로드 (DB 연동 함수)
+        function loadPatientData(patientQuery) {
+            // 실제 DB 연동 코드 예시:
+            /*
+            fetch('/api/patient/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: patientQuery })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentPatientId = data.patient.patient_id;
+                    updatePatientInfo(data.patient);
+                    loadVitalRecords(currentPatientId);
                 }
+            });
+            */
+            
+            // 샘플 데이터로 테스트
+            currentPatientId = 'P001';
+            updatePatientInfo({
+                patient_id: 'P001',
+                name: patientQuery,
+                gender: '남',
+                birth_date: '2000-08-04',
+                phone: '010-7462-6853'
+            });
+            loadVitalRecords(currentPatientId);
+        }
+
+        // 환자 정보 업데이트
+        function updatePatientInfo(patient) {
+            document.getElementById('patientName').textContent = patient.name + ' 환자';
+            document.getElementById('patientDetails').textContent = 
+                `성별:${patient.gender} 생년월일:${patient.birth_date} 전화번호:${patient.phone}`;
+        }
+
+        // 바이탈 기록 로드 (DB 연동 함수)
+        function loadVitalRecords(patientId) {
+            // 실제 DB 연동 코드 예시:
+            /*
+            fetch(`/api/vital-records/${patientId}`)
+            .then(response => response.json())
+            .then(data => {
+                updateVitalSummary(data.latest);
+                updateAllCharts(data.records);
+            });
+            */
+            
+            // 샘플 데이터로 테스트
+            loadSampleVitalData();
+        }
+
+        // 최신 바이탈 요약 업데이트
+        function updateVitalSummary(latestVital) {
+            if (latestVital) {
+                document.getElementById('latestBP').textContent = 
+                    `${latestVital.bp_systolic}/${latestVital.bp_diastolic}`;
+                document.getElementById('latestPulse').textContent = latestVital.pulse_rate;
+                document.getElementById('latestTemp').textContent = latestVital.temperature.toFixed(1);
+                document.getElementById('latestResp').textContent = latestVital.respiration_rate;
+                
+                const recordTime = new Date(latestVital.recorded_at).toLocaleString('ko-KR');
+                document.getElementById('bpTime').textContent = recordTime;
+                document.getElementById('pulseTime').textContent = recordTime;
+                document.getElementById('tempTime').textContent = recordTime;
+                document.getElementById('respTime').textContent = recordTime;
             }
-        });
+        }
+
+        // 혈압 차트 업데이트
+        function updateBPChart(period) {
+            setActiveOption(event.target);
+            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
+            // fetch(`/api/vital-records/${currentPatientId}/bp?period=${period}`)
+        }
+
+        // 맥박 차트 업데이트
+        function updatePulseChart(period) {
+            setActiveOption(event.target);
+            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
+        }
+
+        // 체온/호흡 차트 업데이트
+        function updateTempRespChart(period) {
+            setActiveOption(event.target);
+            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
+        }
+
+        // 활성 옵션 설정
+        function setActiveOption(clickedElement) {
+            const parent = clickedElement.parentElement;
+            parent.querySelectorAll('.chart-option').forEach(opt => opt.classList.remove('active'));
+            clickedElement.classList.add('active');
+        }
+
+        // 샘플 데이터 로드 함수
+        function loadSampleData() {
+            // 샘플 환자 데이터 로드
+            updatePatientInfo({
+                patient_id: 'P001',
+                name: '민규짱',
+                gender: '남',
+                birth_date: '2000-08-04',
+                phone: '010-7462-6853'
+            });
+            
+            loadSampleVitalData();
+        }
+
+        function loadSampleVitalData() {
+            // 최신 바이탈 데이터 샘플
+            const latestVital = {
+                bp_systolic: 125,
+                bp_diastolic: 82,
+                pulse_rate: 78,
+                temperature: 36.7,
+                respiration_rate: 18,
+                recorded_at: new Date().toISOString()
+            };
+            updateVitalSummary(latestVital);
+
+            // 차트 데이터 샘플
+            const sampleData = {
+                labels: ['월', '화', '수', '목', '금', '토', '일'],
+                bloodPressure: {
+                    systolic: [120, 125, 118, 132, 128, 122, 130],
+                    diastolic: [80, 82, 78, 85, 83, 79, 84]
+                },
+                pulseRate: {
+                    labels: ['06:00', '12:00', '18:00', '24:00'],
+                    data: [72, 85, 78, 68]
+                },
+                tempResp: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    temperature: [36.5, 36.7, 36.8, 37.1, 36.9, 36.6],
+                    respiration: [16, 18, 17, 20, 19, 17]
+                }
+            };
+
+            // 차트 업데이트
+            charts.bloodPressure.data.labels = sampleData.labels;
+            charts.bloodPressure.data.datasets[0].data = sampleData.bloodPressure.systolic;
+            charts.bloodPressure.data.datasets[1].data = sampleData.bloodPressure.diastolic;
+            charts.bloodPressure.update();
+
+            charts.pulseRate.data.labels = sampleData.pulseRate.labels;
+            charts.pulseRate.data.datasets[0].data = sampleData.pulseRate.data;
+            charts.pulseRate.update();
+
+            charts.tempResp.data.labels = sampleData.tempResp.labels;
+            charts.tempResp.data.datasets[0].data = sampleData.tempResp.temperature;
+            charts.tempResp.data.datasets[1].data = sampleData.tempResp.respiration;
+            charts.tempResp.update();
+        }
 
         // 메뉴 클릭 이벤트
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // 차트 옵션 클릭 이벤트
-        document.querySelectorAll('.chart-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const parent = this.parentElement;
-                parent.querySelectorAll('.chart-option').forEach(opt => opt.classList.remove('active'));
                 this.classList.add('active');
             });
         });

@@ -1,4 +1,4 @@
-@charset "UTF-8";
+       @charset "UTF-8";
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +14,7 @@
 
         /* 사이드바 */
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: white;
             border-right: 1px solid #ddd;
             padding: 20px 0;
@@ -46,8 +46,8 @@
             padding: 15px 20px;
             cursor: pointer;
             transition: background-color 0.2s;
-              text-decoration: none;
-                  color: inherit;
+            text-decoration: none;
+            color: inherit;
         }
 
         .sidebar .menu-item:hover {
@@ -86,6 +86,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
         }
 
         .search-input {
@@ -104,6 +105,59 @@
             cursor: pointer;
         }
 
+        /* 검색 결과 드롭다운 */
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 50px;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .search-dropdown.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .search-result-detail {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .no-results {
+            padding: 10px 15px;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+
         .patient-info {
             font-size: 18px;
             font-weight: bold;
@@ -113,6 +167,137 @@
         .patient-details {
             color: #666;
             font-size: 14px;
+        }
+
+        /* 환자 리스트 */
+        .patient-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .patient-list.show {
+            display: block;
+        }
+
+        .patient-list-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+
+        .patient-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .patient-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .patient-detail {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 차트 리스트 */
+        .chart-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .chart-list.show {
+            display: block;
+        }
+
+        .chart-list-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-chart-btn {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .new-chart-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .chart-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .chart-item:last-child {
+            border-bottom: none;
+        }
+
+        .chart-date {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .chart-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chart-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chart-status.complete {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .chart-status.incomplete {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         .content-area {
@@ -220,4 +405,27 @@
         .form-textarea {
             min-height: 80px;
             resize: vertical;
+        }
+
+        .chart-content {
+            display: none;
+        }
+
+        .chart-content.show {
+            display: block;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:hover {
+            background-color: #545b62;
         }

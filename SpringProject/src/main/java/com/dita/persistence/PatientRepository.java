@@ -9,5 +9,6 @@ import com.dita.domain.PatientType;
 
 
 public interface PatientRepository extends JpaRepository<Patient, Integer>{
-	List<Patient> findByPatientType(PatientType patientType);
+
+	List<Patient> findByPatientType(PatientType patientType); //입원대기 조회다음
 }
