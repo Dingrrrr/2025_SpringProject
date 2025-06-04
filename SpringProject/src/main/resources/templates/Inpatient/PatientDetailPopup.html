@@ -10,22 +10,40 @@
   <div id="form-area"></div>
 
   <div class="button-group">
-    <button class="edit" id="editBtn">수정</button>
-    <button class="delete" id="deleteBtn">삭제</button>
+    <button id="editBtn">수정</button>
+    <button id="deleteBtn">삭제</button>
     <button class="cancel" onclick="window.close()">닫기</button>
   </div>
 
   <script>
     const params = new URLSearchParams(location.search);
-    const data = Object.fromEntries(params.entries());
+    const patientId = params.get("patientId");
 
-    const $ = (id) => document.getElementById(id);
+    if (!patientId || isNaN(patientId)) {
+      alert("유효하지 않은 환자 ID입니다.");
+      window.close();
+    }
+
+    const $ = id => document.getElementById(id);
     let currentMode = "view";
+    let data = {};
+
+    async function loadPatientDetail() {
+      try {
+        const res = await fetch(`/Inpatient/detail?patientId=${patientId}`);
+        if (!res.ok) throw new Error("서버 응답 실패");
+        data = await res.json();
+        renderDetail();
+      } catch (e) {
+       // alert("환자 정보를 불러올 수 없습니다.");
+        window.close();
+      }
+    }
 
     function renderDetail() {
       const isEdit = currentMode === "edit";
 
-      document.getElementById("form-area").innerHTML = `
+      $("form-area").innerHTML = `
         <label>이름</label>
         <p>${data.name}</p>
 
@@ -33,52 +51,70 @@
         <p>${data.gender} / ${data.age}세</p>
 
         <label>진단명</label>
-        ${isEdit ? `<input id="inputDiagnosis" value="${data.diagnosis}">` : `<p>${data.diagnosis}</p>`}
+        ${isEdit ? `<input id="inputDiagnosis" value="${data.diagnosis ?? ''}">` : `<p>${data.diagnosis ?? ''}</p>`}
 
         <label>입원일</label>
-        ${isEdit ? `<input id="inputDate" value="${data.date}">` : `<p>${data.date}</p>`}
+        ${isEdit ? `<input id="inputDate" value="${data.date ?? ''}">` : `<p>${data.date ?? ''}</p>`}
 
         <label>담당의</label>
-        ${isEdit ? `<input id="inputDoctor" value="${data.doctor}">` : `<p>${data.doctor}</p>`}
+        <p>${data.doctor}</p>
 
         <label>상태</label>
-        ${isEdit
-          ? `<select id="inputStatus">
-              <option value="입원대기" ${data.status === "입원대기" ? "selected" : ""}>입원대기</option>
-              <option value="입원중" ${data.status === "입원중" ? "selected" : ""}>입원중</option>
-              <option value="퇴원" ${data.status === "퇴원" ? "selected" : ""}>퇴원</option>
-            </select>`
-          : `<p>${data.status ?? "입원대기"}</p>`}
+        ${isEdit ? `
+          <select id="inputStatus">
+            <option value="입원대기" ${data.status === "입원대기" ? "selected" : ""}>입원대기</option>
+            <option value="입원중" ${data.status === "입원중" ? "selected" : ""}>입원중</option>
+            <option value="퇴원" ${data.status === "퇴원" ? "selected" : ""}>퇴원</option>
+          </select>` : `<p>${data.status}</p>`}
       `;
     }
 
-    renderDetail();
-
-    document.getElementById("editBtn").addEventListener("click", function () {
+    $("editBtn").addEventListener("click", async () => {
       if (currentMode === "view") {
         currentMode = "edit";
-        this.innerText = "저장";
+        $("editBtn").innerText = "저장";
         renderDetail();
       } else {
-        data.diagnosis = document.getElementById("inputDiagnosis").value;
-        data.date = document.getElementById("inputDate").value;
-        data.doctor = document.getElementById("inputDoctor").value;
-        data.status = document.getElementById("inputStatus").value;
+        const updated = {
+          patientId: parseInt(patientId),
+          diagnosis: $("inputDiagnosis")?.value || "",
+          date: $("inputDate")?.value || "",
+          status: $("inputStatus")?.value || ""
+        };
 
-        alert("저장되었습니다.");
-        currentMode = "view";
-        this.innerText = "수정";
-        renderDetail();
-        location.reload();
+        try {
+          const res = await fetch("/Inpatient/detail", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updated)
+          });
+
+          if (!res.ok) throw new Error("수정 실패");
+
+          alert("수정 완료");
+          currentMode = "view";
+          $("editBtn").innerText = "수정";
+          await loadPatientDetail();
+        } catch (e) {
+          alert("수정에 실패했습니다.");
+        }
       }
     });
 
-    document.getElementById("deleteBtn").addEventListener("click", function () {
-      if (confirm("정말 삭제하시겠습니까?")) {
-        alert("삭제되었습니다.");
+    $("deleteBtn").addEventListener("click", async () => {
+      if (!confirm("정말 삭제하시겠습니까?")) return;
+
+      try {
+        const res = await fetch(`/Inpatient/delete?patientId=${patientId}`, { method: "DELETE" });
+        if (!res.ok) throw new Error();
+        alert("삭제 완료");
         window.close();
+      } catch (e) {
+        alert("삭제에 실패했습니다.");
       }
     });
+
+    loadPatientDetail();
   </script>
 </body>
 </html>

@@ -1,0 +1,324 @@
+@charset "UTF-8";
+/* 공통 */
+body.inventory {
+  display: flex;
+}
+
+.inventory-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px;
+  gap: 20px;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+}
+
+/* ============================
+   ▶ AddDrug.html 전용 스타일
+   ============================ */
+.add-drug-container {
+  background-color: white;
+  width: 400px;
+  margin: 40px auto;
+  padding: 24px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.add-drug-container h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.add-drug-container label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+/* input + select 전반 통일 */
+.add-drug-container input,
+.add-drug-container select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.add-drug-container .actions {
+  text-align: right;
+}
+.add-drug-container .actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.add-drug-container .cancel {
+  background-color: #ddd;
+  margin-right: 8px;
+}
+.add-drug-container .submit {
+  background-color: #1976d2;
+  color: white;
+}
+.add-drug-container .error-message {
+  color: red;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* 자동완성 입력 필드 래퍼 */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+/* 약품명 input 전용 조정 */
+.autocomplete-wrapper input {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  box-sizing: border-box;
+}
+
+/* 자동완성 목록 */
+#autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+/* 자동완성 항목 */
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.autocomplete-item:hover {
+  background-color: #f0f0f0;
+}
+
+
+/* =============================
+   ▶ Drug.html 전용 스타일
+   ============================= */
+.sidebar {
+  width: 240px;
+  background-color: white;
+  border-right: 1px solid #ddd;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+.profile-text {
+  flex: 1;
+  font-weight: bold;
+}
+.menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.menu-item,
+.submenu-item {
+  padding: 12px 20px;
+  cursor: pointer;
+}
+.menu-item.active {
+  background-color: #e3f2fd;
+  border-right: 3px solid #2196f3;
+}
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-left input[type="text"] {
+  padding: 6px 10px;
+  width: 240px;
+  border: 1px solid #ccc;
+}
+.header-left select {
+  padding: 6px;
+  border: 1px solid #ccc;
+}
+.header-left label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+.header-right button {
+  padding: 6px 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.content {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+}
+.panel {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 16px;
+}
+.product-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  gap: 16px;
+  cursor: pointer;
+}
+.product-card:hover {
+  background-color: #f9f9f9;
+}
+.stock {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1976d2;
+  width: 60px;
+  text-align: center;
+}
+.info-block {
+  flex: 1;
+}
+.info-block .name {
+  font-weight: bold;
+  font-size: 16px;
+}
+.info-block .info {
+  font-size: 13px;
+  color: #777;
+}
+.thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+.right-panel h2 {
+  margin-top: 0;
+}
+.section-title {
+  margin: 20px 0 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+th {
+  background-color: #f4f6f8;
+}
+.drug-info-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title-row h2 {
+  margin: 0;
+}
+.title-row button {
+  padding: 6px 12px;
+  background-color: #757de8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.info-item label {
+  font-weight: bold;
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 4px;
+  display: block;
+}
+.info-item div,
+.info-item input {
+  font-size: 14px;
+  color: #222;
+  padding: 6px 8px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+}
+
