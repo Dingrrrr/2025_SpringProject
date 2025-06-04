@@ -49,6 +49,7 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+			<button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
         <table>
           <thead>
@@ -82,6 +83,7 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+		  	<button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
         <table>
           <thead>
@@ -115,6 +117,7 @@
 		    <option value="0">ID순</option>
 		    <option value="1">이름순</option>
 		  </select>
+		  <button type="button" class="btn-action add-schedule-btn" style="margin-left: 10px;">추가</button>
 		</div>
         <table>
           <thead>
@@ -279,33 +282,42 @@
       });
     });
  
- // 저장 시 Ajax 요청
+ 	// 저장 시 Ajax 요청
     saveBtn.addEventListener("click", () => {
-      const inputs = document.querySelectorAll("#formFields input");
-      const data = {};
+  	const inputs = document.querySelectorAll("#formFields input");
+  	const data = {};
 
-      inputs.forEach((input) => {
-        const idx = input.getAttribute("data-idx");
-        const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
-        data[header] = input.value;
-      });
-
-      fetch("/admin/adminCalendarManage/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scheduleId: selectedRow.getAttribute("data-id"),
-          userId: data["ID"],
-          startTime: data["근무 시작 시간"],
-          endTime: data["근무 종료 시간"],
-          type: data["스케줄 유형"],
-          workDays: data["근무 요일"].split(",").map(day => day.trim().toUpperCase())
-        })
-      })
-        .then((res) => res.text())
-        .then((msg) => alert(msg));
-    });
-
+	  inputs.forEach((input) => {
+	    const idx = input.getAttribute("data-idx");
+	    const header = document.querySelector(".tab-content.active thead").querySelectorAll("th")[idx].textContent.trim();
+	    data[header] = input.value;
+	  });
+	
+	  const payload = {
+	    userId: data["ID"],
+	    startTime: data["근무 시작 시간"],
+	    endTime: data["근무 종료 시간"],
+	    type: data["스케줄 유형"],
+	    workDays: data["근무 요일"].split(",").map(day => day.trim())
+	  };
+	
+	  const url = selectedRow
+	    ? `/admin/adminCalendarManage/update`
+	    : `/admin/adminCalendarManage/create`;
+	
+	  fetch(url, {
+	    method: "POST",
+	    headers: { "Content-Type": "application/json" },
+	    body: JSON.stringify(
+	      selectedRow ? { scheduleId: selectedRow.getAttribute("data-id"), ...payload } : payload
+	    )
+	  })
+	    .then((res) => res.text())
+	    .then((msg) => {
+	      alert(msg);
+	      location.reload(); // 새로고침으로 반영
+	    });
+	});
 
     // 삭제 시 Ajax 요청
     document.getElementById('deleteBtn').addEventListener('click', () => {
@@ -328,6 +340,59 @@
       infoModal.style.display = 'none';
       selectedRow = null;
     });
+
+    document.querySelectorAll('.add-schedule-btn').forEach(btn => {
+    	  btn.addEventListener('click', () => {
+    	    const tab = btn.closest('.tab-content');
+    	    const tabId = tab.id; // doctor, nurse, billing
+    	    selectedRow = null;
+
+    	    const gradeMap = {
+    	      doctor: '의사',
+    	      nurse: '간호사',
+    	      billing: '수납'
+    	    };
+
+    	    fetch(`/admin/adminCalendarManage/users?grade=${gradeMap[tabId]}`)
+    	      .then(response => response.json())
+    	      .then(userList => {
+    	        const idSelectHTML = `
+    	          <label>ID</label><br>
+    	          <select id="idSelect" style="width: 100%; margin-bottom: 10px;">
+    	            <option value="">선택하세요</option>
+    	            ${userList.map(user => `<option value="${user.usersId}">${user.usersId}</option>`).join('')}
+    	          </select>
+    	        `;
+
+    	        const nameInputHTML = `
+    	          <label>이름</label><br>
+    	          <input type="text" id="nameInput" disabled style="width: 100%; margin-bottom: 10px;">
+    	        `;
+
+    	        const otherFields = [
+    	          { label: '근무 요일', placeholder: '예: 월,화,수' },
+    	          { label: '근무 시작 시간', placeholder: '예: 09:00' },
+    	          { label: '근무 종료 시간', placeholder: '예: 18:00' },
+    	          { label: '스케줄 유형', placeholder: '예: MORNING' }
+    	        ];
+
+    	        const otherInputsHTML = otherFields.map((field, idx) => `
+    	          <label>${field.label}</label><br>
+    	          <input type="text" placeholder="${field.placeholder}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
+    	        `).join('');
+
+    	        document.getElementById('formFields').innerHTML = idSelectHTML + nameInputHTML + otherInputsHTML;
+
+    	        document.getElementById('idSelect').addEventListener('change', e => {
+    	          const selectedId = e.target.value;
+    	          const selectedUser = userList.find(u => u.usersId === selectedId);
+    	          document.getElementById('nameInput').value = selectedUser ? selectedUser.usersName : '';
+    	        });
+
+    	        infoModal.style.display = 'block';
+    	      });
+    	  });
+    	});
 
   </script>
 </body>
