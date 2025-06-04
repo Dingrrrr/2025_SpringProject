@@ -23,7 +23,7 @@
 	   <li onclick="loadAndToggleNotification()"><img src="/icons/alert.png" alt=""> 알림</li>
 	  <li onclick="goToHome()"><img src="/icons/home.png" alt=""> 홈</li>
 	  <li onclick="goToTreatment()"><img src="/icons/doctor.png" alt="진료"> 진료</li>
-      <li onclick="goToReservation()"><img src="/icons/calendar.png" alt="">예약</li>
+      <li class="active" onclick="goToReservation()"><img src="/icons/calendar.png" alt="">예약</li>
       <li onclick="goToChart()"><img src="/icons/chart.png" alt="차트"><span>차트</span></li>
       <li onclick="goToStats()"><img src="/icons/statistics.png" alt="통계"><span>통계</span>
       <li><img src="/icons/bed.png" alt=""> 입원</li>
@@ -193,8 +193,28 @@
   function goToAdmission()   { location.href = '/hospital/admission'; }
   function goLogout()        { location.href = '/logout'; }
 
-  // (기존 알림창 토글 로직 유지)
-  function loadAndToggleNotification() { /* … */ }
+   // ✅ 알림창 토글 함수
+  function loadAndToggleNotification() {
+    const existing = document.getElementById('notificationPanel');
+
+    if (existing) {
+      existing.classList.toggle('open'); // 보이면 닫고, 없으면 다시 열기
+    } else {
+      fetch('/hospital/notification') // 서버에서 알림 패널 HTML 반환
+        .then(res => res.text())
+        .then(html => {
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = html;
+          const panel = wrapper.querySelector('.notification-panel');
+          if (panel) {
+            panel.id = 'notificationPanel';
+            panel.classList.add('open');
+            document.body.appendChild(panel);
+          }
+        })
+        .catch(err => console.error('❌ 알림창 불러오기 실패:', err));
+    }
+  }
 </script>
 </body>
 </html>
