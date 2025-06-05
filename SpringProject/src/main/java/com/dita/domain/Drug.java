@@ -30,5 +30,9 @@ public class Drug {
 
     @Column(name = "form_type", length = 20)
     private Form_Type formType; // '내복약', '외용약', '주사', '수액', '기타'
+
+    @Column(name = "price", nullable = true)
+    private Integer price = 1000;//가격
+
 }
 

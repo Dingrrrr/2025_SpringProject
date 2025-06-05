@@ -1,6 +1,5 @@
 package com.dita.domain;
 
-import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -48,4 +47,8 @@ public class Bed {
     @Enumerated(EnumType.STRING)
     @Column(name = "bed_status", nullable = false)
     private StatusBed bedstatus = StatusBed.사용가능;// 병상상태
+    
+    @Column(name = "bed_cost", nullable = true)
+    private Integer bedCost = 50000;
+
 }
