@@ -262,60 +262,76 @@
     
     let selectedRow = null;
 
- // 테이블 행 클릭 시 모달 표시 및 input 생성
-    document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
-      row.addEventListener('click', () => {
-        selectedRow = row;
-
-        const cells = Array.from(row.cells);
-        const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
-
-        const formFields = headers.map((th, idx) => {
-          return `
-            <label>${th.textContent}</label><br>
-            <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
-          `;
-        }).join('');
-        document.getElementById('formFields').innerHTML = formFields;
-
-        infoModal.style.display = 'block';
-      });
-    });
+    // 테이블 행 클릭 시 모달 표시 및 input 생성
+	document.querySelectorAll('.tab-content table tbody tr').forEach(row => {
+	  row.addEventListener('click', () => {
+	    selectedRow = row;
+	
+	    const cells = Array.from(row.cells);
+	    const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
+	
+	    const nameMap = {
+	      "ID": "usersId",
+	      "이름": "usersName",
+	      "근무 요일": "workDays",
+	      "근무 시작 시간": "startTime",
+	      "근무 종료 시간": "endTime",
+	      "스케줄 유형": "type"
+	    };
+	
+	    const formFields = headers.map((th, idx) => {
+	      const nameAttr = nameMap[th.textContent.trim()] || `field${idx}`;
+	      return `
+	        <label>${th.textContent}</label><br>
+	        <input type="text" name="${nameAttr}" value="${cells[idx].textContent.trim()}" style="width: 100%; margin-bottom: 10px;">
+	      `;
+	    }).join('');
+	    
+	    document.getElementById('formFields').innerHTML = formFields;
+	    infoModal.style.display = 'block';
+	  });
+	});
  
  	// 저장 시 Ajax 요청
     saveBtn.addEventListener("click", () => {
-  	const inputs = document.querySelectorAll("#formFields input");
-  	const data = {};
-
+	  const data = {};
+	
+	  // 모든 input(name 포함된 것들) 수집
+	  const inputs = document.querySelectorAll("#formFields input[name], #formFields select[name]");
 	  inputs.forEach((input) => {
-	    const idx = input.getAttribute("data-idx");
-	    const header = document.querySelector(".tab-content.active thead").querySelectorAll("th")[idx].textContent.trim();
-	    data[header] = input.value;
+	    data[input.name] = input.value.trim();
 	  });
 	
-	  const payload = {
-	    userId: data["ID"],
-	    startTime: data["근무 시작 시간"],
-	    endTime: data["근무 종료 시간"],
-	    type: data["스케줄 유형"],
-	    workDays: data["근무 요일"].split(",").map(day => day.trim())
-	  };
+	  // 시간 유효성 검사
+	  const isValidTime = (t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+	  if (!isValidTime(data.startTime) || !isValidTime(data.endTime)) {
+	    alert("시간 형식은 HH:mm (예: 09:00) 형식이어야 합니다.");
+	    return;
+	  }
+	
+	  // workDays 문자열 → 배열 변환
+	  data.workDays = (data.workDays || "").split(",").map(day => day.trim());
 	
 	  const url = selectedRow
 	    ? `/admin/adminCalendarManage/update`
 	    : `/admin/adminCalendarManage/create`;
 	
+	  const payload = selectedRow
+	    ? { scheduleId: selectedRow.getAttribute("data-id"), ...data }
+	    : data;
+	
+	  // 디버깅용 출력
+	  console.log("보낼 데이터 payload:", payload);
+	
 	  fetch(url, {
 	    method: "POST",
 	    headers: { "Content-Type": "application/json" },
-	    body: JSON.stringify(
-	      selectedRow ? { scheduleId: selectedRow.getAttribute("data-id"), ...payload } : payload
-	    )
+	    body: JSON.stringify(payload)
 	  })
 	    .then((res) => res.text())
 	    .then((msg) => {
 	      alert(msg);
-	      location.reload(); // 새로고침으로 반영
+	      location.reload();
 	    });
 	});
 
@@ -356,30 +372,30 @@
     	    fetch(`/admin/adminCalendarManage/users?grade=${gradeMap[tabId]}`)
     	      .then(response => response.json())
     	      .then(userList => {
-    	        const idSelectHTML = `
-    	          <label>ID</label><br>
-    	          <select id="idSelect" style="width: 100%; margin-bottom: 10px;">
-    	            <option value="">선택하세요</option>
-    	            ${userList.map(user => `<option value="${user.usersId}">${user.usersId}</option>`).join('')}
-    	          </select>
-    	        `;
+    	    	  const idSelectHTML = `
+    	    		  <label>ID</label><br>
+    	    		  <select id="idSelect" name="usersId" style="width: 100%; margin-bottom: 10px;">
+    	    		    <option value="">선택하세요</option>
+    	    		    ${userList.map(user => `<option value="${user.usersId}">${user.usersId}</option>`).join('')}
+    	    		  </select>
+    	    		`;
 
-    	        const nameInputHTML = `
-    	          <label>이름</label><br>
-    	          <input type="text" id="nameInput" disabled style="width: 100%; margin-bottom: 10px;">
-    	        `;
+    	    		const nameInputHTML = `
+    	    		  <label>이름</label><br>
+    	    		  <input type="text" id="nameInput" name="usersName" disabled style="width: 100%; margin-bottom: 10px;">
+    	    		`;
 
-    	        const otherFields = [
-    	          { label: '근무 요일', placeholder: '예: 월,화,수' },
-    	          { label: '근무 시작 시간', placeholder: '예: 09:00' },
-    	          { label: '근무 종료 시간', placeholder: '예: 18:00' },
-    	          { label: '스케줄 유형', placeholder: '예: MORNING' }
-    	        ];
+    	    		const otherFields = [
+    	    		  { label: '근무 요일', placeholder: '예: 월,화,수', name: 'workDays' },
+    	    		  { label: '근무 시작 시간', placeholder: '예: 09:00', name: 'startTime' },
+    	    		  { label: '근무 종료 시간', placeholder: '예: 18:00', name: 'endTime' },
+    	    		  { label: '스케줄 유형', placeholder: '예: 출근, 퇴근', name: 'type' }
+    	    		];
 
-    	        const otherInputsHTML = otherFields.map((field, idx) => `
-    	          <label>${field.label}</label><br>
-    	          <input type="text" placeholder="${field.placeholder}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
-    	        `).join('');
+    	    		const otherInputsHTML = otherFields.map((field) => `
+    	    		  <label>${field.label}</label><br>
+    	    		  <input type="text" name="${field.name}" placeholder="${field.placeholder}" style="width: 100%; margin-bottom: 10px;">
+    	    		`).join('');
 
     	        document.getElementById('formFields').innerHTML = idSelectHTML + nameInputHTML + otherInputsHTML;
 
