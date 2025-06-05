@@ -127,6 +127,8 @@ public class NursePageController {
             return ResponseEntity.status(500).build();
         }
     }
+    
+    
 	
 	@GetMapping("/NurseHome")
 	public String showNurseHome(HttpServletRequest request, Model model) {
@@ -144,6 +146,33 @@ public class NursePageController {
         model.addAttribute("grade", loginUser.getGrade().name());
 		
 		return "nurse/NurseHome";
+	}
+	
+	// NursePageController에 추가할 API들
+	@GetMapping("/api/vitals/latest/{patientId}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getLatestVitals(@PathVariable int patientId) {
+	    try {
+	        log.info("환자 " + patientId + "의 최신 바이탈 사인 요청");
+	        Map<String, Object> latestVital = nurseChartRepository.getLatestVitalSigns(patientId);
+	        return ResponseEntity.ok(latestVital);
+	    } catch (Exception e) {
+	        log.severe("최신 바이탈 사인 조회 실패: " + e.getMessage());
+	        return ResponseEntity.status(500).build();
+	    }
+	}
+
+	@GetMapping("/api/vitals/chart-data/{patientId}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getVitalChartData(@PathVariable int patientId) {
+	    try {
+	        log.info("환자 " + patientId + "의 차트 데이터 요청");
+	        Map<String, Object> chartData = nurseChartRepository.getVitalChartData(patientId);
+	        return ResponseEntity.ok(chartData);
+	    } catch (Exception e) {
+	        log.severe("바이탈 차트 데이터 조회 실패: " + e.getMessage());
+	        return ResponseEntity.status(500).build();
+	    }
 	}
 
 }
