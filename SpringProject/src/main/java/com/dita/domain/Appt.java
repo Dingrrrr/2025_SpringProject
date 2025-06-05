@@ -49,7 +49,7 @@ public class Appt {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status",nullable = false)
-	private Status status;
+	private Status status = Status.대기;
 	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
@@ -57,5 +57,5 @@ public class Appt {
 	
 	@Column(name = "room")
 	private String room;
-	
+
 }
