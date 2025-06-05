@@ -70,74 +70,92 @@ public class NurseChartRepository {
         try {
             log.info("바이탈 사인 저장 시작 - 환자ID: " + request.getPatientId());
             
+            String nurseId;
+            try {
+            	String sqlNurse = "SELECT users_id FROM users WHERE grade = ? LIMIT 1";
+                nurseId = jdbcTemplate.queryForObject(sqlNurse, new Object[]{"간호사"}, String.class);
+                log.info("조회된 간호사 ID: " + nurseId);
+			} catch (Exception e) {
+				log.severe("간호사 조회 실패: " + e.getMessage());
+                throw new RuntimeException("간호사 계정이 존재하지 않습니다.", e);
+			}
+            
             String sql = "INSERT INTO vital_sign " +
-                    "(patient_id, users_id, recorded_date, time_period, temperature, bp_systolic, bp_diastolic, pulse_rate, respiration_rate) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "(patient_id, users_id, recorded_date, time_period, temperature, bp_systolic, bp_diastolic, pulse_rate, respiration_rate, recorded_at) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()) " +
                     "ON DUPLICATE KEY UPDATE " +
                     "temperature = VALUES(temperature), " +
                     "bp_systolic = VALUES(bp_systolic), " +
                     "bp_diastolic = VALUES(bp_diastolic), " +
                     "pulse_rate = VALUES(pulse_rate), " +
-                    "respiration_rate = VALUES(respiration_rate)";
-            
+                    "respiration_rate = VALUES(respiration_rate), " +
+                    "recorded_at = NOW()";
+
             String[] timePeriods = {"아침", "점심", "저녁", "야간"};
             int savedCount = 0;
-            
-            // 날짜 파싱을 안전하게 처리
+
+            // 날짜 파싱
             LocalDate recordedDate;
             try {
                 recordedDate = LocalDate.parse(request.getRecordedDate());
             } catch (Exception e) {
-                log.warning("날짜 파싱 실패, 오늘 날짜 사용: " + request.getRecordedDate());
+                log.warning("recordedDate 파싱 실패(" + request.getRecordedDate() + "), 오늘 날짜 사용");
                 recordedDate = LocalDate.now();
             }
-            
+
+            // ─────────────────────────────────────────────────────────
+            // 3) 각 시간대별로 데이터 유무 체크 후 INSERT/UPDATE
+            // ─────────────────────────────────────────────────────────
             for (String timePeriod : timePeriods) {
-                // 해당 시간대에 데이터가 있는지 확인
-                if (hasDataForTimePeriod(request.getData(), timePeriod)) {
-                    
-                    // 혈압 파싱
-                    String bpValue = request.getData().get("혈압").get(timePeriod);
-                    Integer bpSystolic = null;
-                    Integer bpDiastolic = null;
-                    if (bpValue != null && !bpValue.trim().isEmpty() && bpValue.contains("/")) {
-                        String[] bp = bpValue.split("/");
-                        try {
-                            bpSystolic = Integer.parseInt(bp[0].trim());
-                            bpDiastolic = Integer.parseInt(bp[1].trim());
-                        } catch (NumberFormatException e) {
-                            log.warning("혈압 파싱 실패: " + bpValue);
-                        }
+                if (!hasDataForTimePeriod(request.getData(), timePeriod)) {
+                    continue; // 해당 시간대 데이터가 없으면 건너뜀
+                }
+
+                // 혈압 파싱 (예: "120/80" → 120, 80)
+                String bpValue = request.getData().get("혈압").get(timePeriod);
+                Integer bpSystolic = null;
+                Integer bpDiastolic = null;
+                if (bpValue != null && bpValue.contains("/")) {
+                    String[] bp = bpValue.split("/");
+                    try {
+                        bpSystolic = Integer.parseInt(bp[0].trim());
+                        bpDiastolic = Integer.parseInt(bp[1].trim());
+                    } catch (NumberFormatException e) {
+                        log.warning("혈압 파싱 실패(" + bpValue + ")");
                     }
-                    
-                    // 다른 값들 파싱
-                    BigDecimal temperature = parseDecimal(request.getData().get("체온").get(timePeriod));
-                    Integer pulseRate = parseInt(request.getData().get("심박수").get(timePeriod));
-                    Integer respirationRate = parseInt(request.getData().get("호흡수").get(timePeriod));
-                    
-                    // 데이터베이스에 저장 (수정된 부분)
-                    int result = jdbcTemplate.update(sql,
+                }
+
+                BigDecimal temperature = parseDecimal(request.getData().get("체온").get(timePeriod));
+                Integer pulseRate = parseInt(request.getData().get("심박수").get(timePeriod));
+                Integer respirationRate = parseInt(request.getData().get("호흡수").get(timePeriod));
+
+                // ─────────────────────────────────────────────────────────
+                // 4) 쿼리에 파라미터 바인딩
+                //    - patient_id
+                //    - users_id (DB에서 조회해온 nurseId)
+                //    - recorded_date, time_period, temperature, bp_systolic, bp_diastolic, pulse_rate, respiration_rate
+                // ─────────────────────────────────────────────────────────
+                int result = jdbcTemplate.update(sql,
                         request.getPatientId(),
-                        request.getNurseId(),
-                        recordedDate,  // 안전하게 파싱된 날짜 사용
+                        nurseId,
+                        recordedDate,
                         timePeriod,
                         temperature,
                         bpSystolic,
                         bpDiastolic,
                         pulseRate,
                         respirationRate
-                    );
-                    
-                    if (result > 0) {
-                        savedCount++;
-                        log.info(timePeriod + " 시간대 바이탈 사인 저장 완료");
-                    }
+                );
+
+                if (result > 0) {
+                    savedCount++;
+                    log.info(timePeriod + " 시간대 바이탈 사인 저장 완료");
                 }
             }
-            
+
             log.info("바이탈 사인 저장 완료 - 총 " + savedCount + "개 레코드 저장");
             return savedCount;
-            
+
         } catch (Exception e) {
             log.severe("바이탈 사인 저장 중 오류: " + e.getMessage());
             throw new RuntimeException("바이탈 사인 저장에 실패했습니다.", e);
