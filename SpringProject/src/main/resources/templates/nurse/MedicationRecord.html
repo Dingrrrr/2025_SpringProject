@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
     <div class="sidebar">
         <div class="profile">
             <div class="profile-icon">👤</div>
-            <span>내 프로필</span>
+            <span th:text="${userName}">간호사 이름</span>
         </div>
         
         <a href="NurseHome" class="menu-item">
@@ -33,6 +33,10 @@
             <div class="menu-icon">👥</div>
             <span>투약 및 처치 기록</span>
         </a>
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
 
     <!-- 메인 컨텐츠 -->

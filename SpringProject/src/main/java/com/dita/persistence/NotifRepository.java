@@ -9,4 +9,5 @@ import com.dita.domain.User;
 
 public interface NotifRepository extends JpaRepository<Notif, Integer> {
 	List<Notif> findByUserOrderByCreatedAtDesc(User user);
+	List<Notif> findAllByUserUsersIdOrderByCreatedAtDesc(String usersId);
 }

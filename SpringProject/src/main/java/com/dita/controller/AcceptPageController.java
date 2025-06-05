@@ -21,23 +21,25 @@ import com.dita.persistence.ApptRepository;
 import com.dita.persistence.LoginPageRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.service.EmailService;
+import com.dita.service.PatientService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 
 
 @Controller
-@Log
+@Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/acceptance/")
 public class AcceptPageController {
+	
+	private final PatientService patientService;
 	
 	private final PatientRepository repo;
 	private final ApptRepository arepo;
 	
-	public AcceptPageController(PatientRepository repo, ApptRepository arepo) {
-		this.repo = repo;
-		this.arepo = arepo;
-	}
 	
 	//예약 환자들만 검색해서 보여줌
 	@GetMapping("/acceptanceHome")
@@ -94,9 +96,12 @@ public class AcceptPageController {
 	
 	@PostMapping("/acceptanceHome")
 	public String processPatient(@RequestParam String patientName,
-								@RequestParam String patientBirth, @RequestParam String patientPhone,
-								@RequestParam String patientSymptom, @RequestParam String patientGender,
-								@RequestParam PatientType patientType, @RequestParam String patientAddress
+								@RequestParam String patientBirth,
+								@RequestParam String patientPhone,
+								@RequestParam String patientSymptom,
+								@RequestParam String patientGender,
+								@RequestParam PatientType patientType,
+								@RequestParam String patientAddress
 	) {
 		
 			Patient p = new Patient();
@@ -108,7 +113,10 @@ public class AcceptPageController {
 			p.setPatientType(patientType);
 			p.setPatientAddress(patientAddress);
 		
-			repo.save(p);
+			log.info("[AcceptPageController] 새로운 환자 등록 요청 → 이름={}, 상태={}", patientName, patientType);
+			
+			patientService.admitPatient(p);
+			
 			return "redirect:/acceptance/acceptanceHome";
 	}
 	
