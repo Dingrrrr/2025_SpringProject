@@ -83,125 +83,151 @@
 
   <!-- ========================= JavaScript 로직 ========================= -->
   <script th:inline="javascript">
-    /*<![CDATA[*/
-    const nurseId = /*[[${usersId}]]*/ "nurse1";
-    /*]]>*/
+  /*<![CDATA[*/
+  // 세션에서 model.addAttribute("usersId", loginUser.getUsersId()); 로 넘겨온 값
+  const nurseId = /*[[${usersId}]]*/ "nurse1";
+  /*]]>*/
 
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchNotifications();
-    });
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchNotifications();
+    document.getElementById("markAllReadBtn")
+            .addEventListener("click", markAllAsRead);
+    document.getElementById("addChecklistBtn")
+            .addEventListener("click", addChecklistItem);
+  });
 
-    function fetchNotifications() {
-      fetch(`/api/notif/${nurseId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const listEl = document.getElementById("notificationList");
-          listEl.innerHTML = "";
-          for (let i = 0; i < 10; i++) {
-            const item = data[i];
-            const li = document.createElement("li");
-            if (item) {
-              const cls = item.isRead ? "read" : "unread";
-              li.className = `notification-item ${cls}`;
-              li.setAttribute("data-notif-id", item.notifId);
-              const icon = "⏰";
-              const d = new Date(item.createdAt);
-              const hh = d.getHours();
-              const mm = ("0" + d.getMinutes()).slice(-2);
-              const timeText = `${hh}:${mm}`;
-              li.innerHTML = `
-                <div class="notif-left">
-                  <span class="notif-icon">${icon}</span>
-                  <span class="notif-text">${item.message}</span>
-                </div>
-                <div class="notif-right">
-                  <span class="time">${timeText}</span>
-                  ${
-                    item.isRead
-                      ? ""
-                      : `<button class="mark-read" onclick="markAsRead(${item.notifId}, this)">읽음</button>`
-                  }
-                </div>
-              `;
-            } else {
-              li.className = "notification-item empty";
-              li.innerHTML = `
-                <div class="notif-left">
-                  <span class="notif-text">알림 없음</span>
-                </div>
-              `;
-            }
-            listEl.appendChild(li);
+  /**
+   * 1) 간호사(nurseId)의 알림을 받아와서 <ul id="notificationList">에 렌더링
+   */
+  function fetchNotifications() {
+    fetch(`/api/notif/${nurseId}`)
+      .then(res => res.json())
+      .then(data => {
+        const listEl = document.getElementById("notificationList");
+        listEl.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          // 알림이 하나도 없으면 빈 슬롯 대신 “알림 없음”만 보여준다
+          const li = document.createElement("li");
+          li.className = "notification-item empty";
+          li.innerHTML = `
+            <div class="notif-left">
+              <span class="notif-text">알림 없음</span>
+            </div>
+          `;
+          listEl.appendChild(li);
+          return;
+        }
+
+        data.forEach(item => {
+          const li = document.createElement("li");
+          // ★ 여기서 item.read 를 사용 ★
+          const cls = item.read ? "read" : "unread";
+          li.className = `notification-item ${cls}`;
+          li.setAttribute("data-notif-id", item.notifId);
+
+          // 아이콘, 시간 문자열 생성
+          const icon = "⏰";
+          const d = new Date(item.createdAt);
+          const hh = d.getHours();
+          const mm = ("0" + d.getMinutes()).slice(-2);
+          const timeText = `${hh}:${mm}`;
+
+          // 읽음 상태에 따라 버튼을 추가하거나 제거
+          let readButtonHtml = "";
+          if (!item.read) {
+            readButtonHtml = `<button class="mark-read"
+                                onclick="markAsRead(${item.notifId}, this)">
+                                읽음
+                              </button>`;
           }
-        })
-        .catch((err) => console.error(err));
-    }
 
-    function markAsRead(notifId, btn) {
-      fetch(`/api/notif/read/${notifId}`, { method: "PATCH" })
-        .then(() => {
-          const li = btn.closest(".notification-item");
+          li.innerHTML = `
+            <div class="notif-left">
+              <span class="notif-icon">${icon}</span>
+              <span class="notif-text">${item.message}</span>
+            </div>
+            <div class="notif-right">
+              <span class="time">${timeText}</span>
+              ${readButtonHtml}
+            </div>
+          `;
+          listEl.appendChild(li);
+        });
+      })
+      .catch(err => console.error(err));
+  }
+
+  /**
+   * 2) 개별 알림 읽음 처리 (PATCH /api/notif/read/{notifId})
+   */
+  function markAsRead(notifId, btn) {
+    fetch(`/api/notif/read/${notifId}`, { method: "PATCH" })
+      .then(() => {
+        const li = btn.closest(".notification-item");
+        li.classList.remove("unread");
+        li.classList.add("read");
+        btn.remove(); // 버튼 제거
+      })
+      .catch(err => console.error(err));
+  }
+
+  /**
+   * 3) 전체 읽음 처리 (POST /api/notif/mark-all-read)
+   */
+  function markAllAsRead() {
+    fetch(`/api/notif/mark-all-read`, { method: "POST" })
+      .then(() => {
+        // 성공하면 화면에 남아 있는 모든 unread 항목에 대해 버튼 제거
+        document.querySelectorAll(".notification-item.unread").forEach(li => {
           li.classList.remove("unread");
           li.classList.add("read");
-          btn.remove();
-        })
-        .catch((err) => console.error(err));
-    }
+          const btn = li.querySelector(".mark-read");
+          if (btn) btn.remove();
+        });
+      })
+      .catch(err => console.error(err));
+  }
 
-    document.getElementById("markAllReadBtn").addEventListener("click", () => {
-      fetch(`/api/notif/${nurseId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const unread = data.filter((it) => !it.isRead);
-          return Promise.all(
-            unread.map((it) =>
-              fetch(`/api/notif/read/${it.notifId}`, { method: "PATCH" })
-            )
-          );
-        })
-        .then(() => {
-          document
-            .querySelectorAll(".notification-item.unread")
-            .forEach((li) => {
-              li.classList.remove("unread");
-              li.classList.add("read");
-              const btn = li.querySelector(".mark-read");
-              if (btn) btn.remove();
-            });
-        })
-        .catch((err) => console.error(err));
+  /**
+   * 4) 알림 검색 필터 (keyup 이벤트)
+   */
+  function filterNotifications() {
+    const input = document.getElementById("notifSearch");
+    const filter = input.value.toLowerCase();
+    document.querySelectorAll(".notification-item").forEach(li => {
+      const textNode = li.querySelector(".notif-text");
+      if (!textNode) return;
+      const txt = textNode.innerText.toLowerCase();
+      li.style.display = txt.includes(filter) ? "" : "none";
     });
+  }
 
-    function filterNotifications() {
-      const input = document.getElementById("notifSearch");
-      const filter = input.value.toLowerCase();
-      document.querySelectorAll(".notification-item").forEach((li) => {
-        const textNode = li.querySelector(".notif-text");
-        if (!textNode) return;
-        const txt = textNode.innerText.toLowerCase();
-        li.style.display = txt.includes(filter) ? "" : "none";
-      });
+  /**
+   * 5) 체크리스트 생성 버튼 클릭 시 호출
+   */
+  function addChecklistItem() {
+    const name = prompt("새 체크리스트 항목 이름을 입력하세요:");
+    if (name && name.trim()) {
+      const ul = document.getElementById("checklist");
+      const id = "task" + Date.now();
+      const li = document.createElement("li");
+      li.className = "checklist-item";
+      li.innerHTML = `
+        <input type="checkbox" id="${id}" />
+        <label for="${id}">${name}</label>
+        <button class="delete-task" onclick="deleteTask(this)">삭제</button>
+      `;
+      ul.appendChild(li);
     }
+  }
 
-    document.getElementById("addChecklistBtn").addEventListener("click", () => {
-      const name = prompt("새 체크리스트 항목 이름을 입력하세요:");
-      if (name && name.trim()) {
-        const ul = document.getElementById("checklist");
-        const id = "task" + Date.now();
-        const li = document.createElement("li");
-        li.className = "checklist-item";
-        li.innerHTML = `
-          <input type="checkbox" id="${id}" />
-          <label for="${id}">${name}</label>
-          <button class="delete-task" onclick="deleteTask(this)">삭제</button>
-        `;
-        ul.appendChild(li);
-      }
-    });
-
-    function deleteTask(btn) {
-      btn.closest(".checklist-item").remove();
-    }
-  </script>
+  /**
+   * 6) 체크리스트 항목 삭제
+   */
+  function deleteTask(btn) {
+    btn.closest(".checklist-item").remove();
+  }
+</script>
 </body>
 </html>

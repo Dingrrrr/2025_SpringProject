@@ -20,26 +20,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dita.persistence.NurseChartRepository;
+import com.dita.persistence.UserRepository;
+import com.dita.service.NotifService;
 import com.dita.vo.ChartSaveRequestDto;
 
 import com.dita.domain.Grade;
+import com.dita.domain.Notif;
 import com.dita.domain.User;
 import com.dita.persistence.LoginPageRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 @Controller
 @Log
 @RequestMapping("/nurse/")
+@RequiredArgsConstructor
 public class NursePageController {
 	
+	private final NotifService notifService;
 	private final LoginPageRepository repo;
-
-    public NursePageController(LoginPageRepository repo) {
-        this.repo = repo;
-    }
+	private final UserRepository userRepository;
 
     @Autowired
     private NurseChartRepository nurseChartRepository;
@@ -167,7 +170,8 @@ public class NursePageController {
     
 	
 	@GetMapping("/NurseHome")
-	public String showNurseHome(HttpServletRequest request, Model model) {
+	public String showNurseHome(HttpServletRequest request, Authentication authentication, Model model) {
+		
 		HttpSession session = request.getSession(false);
 		if (session == null) {
 			return "redirect:/Login/Login";
