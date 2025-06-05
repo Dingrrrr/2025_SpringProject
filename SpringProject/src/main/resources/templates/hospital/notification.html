@@ -1,4 +1,89 @@
 <div class="notification-panel" id="notificationPanel">
-  <div class="notification-message">오늘 xxx님의 예약이 있습니다.</div>
-  <div class="notification-message">오늘 xxx님의 예약이 있습니다.</div>
+  <style>
+    .notification-panel {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      width: 360px;
+      max-height: 480px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      padding: 16px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .notification-message {
+      position: relative;
+      padding: 10px 36px 10px 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      word-break: keep-all;
+    }
+
+    .notification-message .msg-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .status-확정 {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-대기 {
+      background-color: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .status-취소 {
+      background-color: #eeeeee;
+      color: #888888;
+      text-decoration: line-through;
+    }
+  </style>
+  <div class="notification-header">
+    오늘의 예약 알림
+    <button class="close-btn" onclick="closeNotificationPanel()">✕</button>
+  </div>
+
+  <th:block th:if="${#lists.isEmpty(todayAppts)}">
+    <div class="notification-message">오늘 예약된 환자가 없습니다.</div>
+  </th:block>
+
+  <th:block th:each="appt : ${todayAppts}">
+    <div class="notification-message"
+         th:classappend="' status-' + ${appt.status.name()}"
+         th:text="${#temporals.format(appt.scheduledAt, 'HH:mm')} + ' - ' + ${appt.patient.patientName} + '님의 예약이 있습니다.'">
+    </div>
+  </th:block>
 </div>

@@ -19,7 +19,7 @@
       <ul class="hospital-menu">
         <li onclick="loadAndToggleNotification()"><img th:src="@{/icons/alert.png}" alt=""> 알림</li>
         <li onclick="goToHome()"><img th:src="@{/icons/home.png}" alt=""> 홈</li>
-        <li onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt=""> 진료</li>
+        <li class="active" onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt=""> 진료</li>
         <li onclick="goToReservation()"><img th:src="@{/icons/calendar.png}" alt=""> 예약</li>
         <li onclick="goToChart()"><img th:src="@{/icons/chart.png}" alt=""> 차트</li>
         <li class="hospital-active" onclick="goToStats()"><img th:src="@{/icons/statistics.png}" alt=""> 통계</li>
