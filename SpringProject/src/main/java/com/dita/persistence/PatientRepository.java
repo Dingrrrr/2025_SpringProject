@@ -10,10 +10,13 @@ import com.dita.domain.PatientType;
 
 
 public interface PatientRepository extends JpaRepository<Patient, Integer>{
+
 	List<Patient> findByPatientType(PatientType patientType);
 	Patient findByPatientNameAndPatientBirthAndPatientPhone(String name, String birth, String phone);
 	List<Patient> findByPatientNameAndPatientType(String name, PatientType type);
 	Patient findByPatientBirth(String patientBirth);
 	
 	}
+
+
 

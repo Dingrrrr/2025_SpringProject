@@ -6,6 +6,8 @@ import com.dita.domain.User;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import com.dita.persistence.LoginPageRepository;
 import com.dita.service.EmailService;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.java.Log;
 
@@ -28,6 +31,7 @@ public class LoginPageController {
 
 	private final LoginPageRepository repo;
 	private final EmailService emailService;
+	 private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	public LoginPageController(LoginPageRepository repo, EmailService emailService) {
 		this.repo = repo;
@@ -35,10 +39,51 @@ public class LoginPageController {
 	}
 
 	@GetMapping("/Login")
-	public String showLoginPage(Model model) {
-		// 필요 시 model에 데이터 추가 가능
+	public String showLoginPage(Model model,
+			 					@RequestParam(value = "error", required = false) String error,
+			 					@RequestParam(value = "logout", required = false) String logout) {
+		//화면에 에러 메시지를 띄우고 싶을 때
+		if (error != null) {
+			model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
+		}
+		if (logout != null) {
+			model.addAttribute("logoutMsg", "로그아웃되었습니다.");
+		}
+			 						
 		return "Login/Login";
 	}
+	
+	@PostMapping("/Login")
+	public String processLogin(HttpServletRequest request, @RequestParam String usersId, @RequestParam String usersPwd, Model model) {
+		Optional<User> opt = repo.findById(usersId);
+		if (opt.isEmpty()) {
+			return "redirect:/Login/Login?error";
+		}
+		
+		User user = opt.get();
+		if(!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
+			return "redirect:/Login/Login?error";
+		}
+		
+		if(!user.getGrade().equals(Grade.간호사)) {
+			model.addAttribute("loginError", "간호사만 접근 가능합니다.");
+            return "Login/Login";
+		}
+		
+		HttpSession session = request.getSession(true);
+		session.setAttribute("loginUser", user);
+		
+		return "redirect:/nurse/NurseHome";
+	}
+	
+	@GetMapping("/Logout")
+    public String processLogout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return "redirect:/Login/Login?logout";
+    }
 
 	@GetMapping("/Join")
 	public String showJoinPage(Model model) {
@@ -52,9 +97,10 @@ public class LoginPageController {
 			@RequestParam String usersIdcard, @RequestParam Grade grade
 	// deptId가 필요하면 추가: @RequestParam Integer deptId
 	) {
+		String encodedPwd = passwordEncoder.encode(usersPwd);
 		User u = new User();
 		u.setUsersId(usersId);
-		u.setUsersPwd(usersPwd);
+		u.setUsersPwd(encodedPwd);
 		u.setUsersName(usersName);
 		u.setUsersBirth(usersBirth);
 		u.setUsersPhone(usersPhone);
@@ -203,5 +249,21 @@ public class LoginPageController {
 	   }
 		return ResponseEntity.ok(ok);
 	}
+	
+	@GetMapping("/nurse/NurseHome")
+    public String showNurseHome(HttpServletRequest request, Model model) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/Login/Login";
+        }
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+            return "redirect:/Login/Login";
+        }
+        model.addAttribute("userName", loginUser.getUsersName());
+        model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
+        return "nurse/NurseHome";
+    }
 
 }

@@ -36,10 +36,6 @@ public class Notif {
 	@JoinColumn(name ="users_id", nullable= false)
 	private User user;// 유저 아이디
 	
-	@ManyToOne
-	@JoinColumn(name ="appt_id", nullable= false)
-	private Appt appt;// 예약 아이디
-	
 	@Column(length = 50, nullable = false)
 	private String type;// 알림 종류
 	

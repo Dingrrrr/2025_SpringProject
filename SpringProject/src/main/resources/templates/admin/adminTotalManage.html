@@ -15,12 +15,14 @@
                 <span class="profile-text">내 프로필</span>
             </div>
         </div>
+        
         <ul class="nav-menu">
-            <li>회원 관리</li>
-            <li>일정 관리</li>
-            <li>병실 관리</li>
-            <li class="active">통계</li>
-        </ul>
+		  <li><a href="/admin/adminMemberManage">회원 관리</a></li>
+		  <li><a href="/admin/adminCalendarManage">일정 관리</a></li>
+		  <li><a href="/admin/adminRoomManage">병실 관리</a></li>
+		  <li><a href="/admin/adminTotalManage">통계</a></li>
+		</ul>
+
         <div class="logout-section">
             <li class="logout-item">로그아웃</li>
         </div>
@@ -98,7 +100,7 @@
 	    <span class="close-chart-modal">&times;</span>
 	    <div class="modal-flex">
 	      <div class="modal-left">
-	        <canvas id="modalChart"></canvas>
+	        <canvas id="modalChart" width="600" height="400"></canvas>
 	      </div>
 	      <div class="modal-right">
 	        <h4 id="modalChartTitle">차트 제목</h4>
@@ -182,24 +184,30 @@
         	    const chartInstance = Chart.getChart(id);
         	    if (!chartInstance) return;
 
-        	    currentChartData = chartInstance.config;
+        	    const chartData = chartInstance.data;
+        	    const chartOptions = chartInstance.options;
+        	    const chartType = chartInstance.config.type;
 
-        	    // 안전한 제목 설정
-        	    const chartType = chartInstance.config.type || 'Chart';
-        	    const chartTitle = chartInstance.config.options?.plugins?.title?.text || chartType.toUpperCase();
-
-        	    document.getElementById('modalChartTitle').textContent = chartTitle;
+        	    document.getElementById('modalChartTitle').textContent = chartType.toUpperCase();
         	    document.getElementById('modalChartInfo').textContent =
         	      chartDescriptions[id] || '차트 정보 없음';
 
         	    const modal = document.getElementById('chartModal');
         	    modal.style.display = 'block';
 
-        	    requestAnimationFrame(() => {
-        	    	  if (modalChart) modalChart.destroy();
-        	    	  const ctx = document.getElementById('modalChart').getContext('2d');
-        	    	  modalChart = new Chart(ctx, JSON.parse(JSON.stringify(currentChartData)));
-        	    	});
+        	    setTimeout(() => {
+        	      const ctx = document.getElementById('modalChart').getContext('2d');
+
+        	      // ✅ 이전 차트 제거
+        	      if (modalChart) modalChart.destroy();
+
+        	      // ✅ 새로 Chart 생성
+        	      modalChart = new Chart(ctx, {
+        	        type: chartType,
+        	        data: JSON.parse(JSON.stringify(chartData)),     // 안전하게 복제
+        	        options: JSON.parse(JSON.stringify(chartOptions)) // 마찬가지로 복제
+        	      });
+        	    }, 100);
         	  });
         	});
         

@@ -57,4 +57,5 @@ public class Appt {
 	
 	@Column(name = "room")
 	private String room;
+
 }
