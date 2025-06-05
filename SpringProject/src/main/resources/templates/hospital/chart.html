@@ -1,153 +1,173 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>진료 관리 화면</title>
-  <link rel="stylesheet" href="/css/hospital_style.css">
-  <link rel="stylesheet" href="/css/chart_style.css">
+<meta charset="UTF-8">
+<title>진료 관리 화면</title>
+<link rel="stylesheet" href="/css/hospital_style.css">
+<link rel="stylesheet" href="/css/chart_style.css">
 </head>
 <body>
-  <div class="hospital-container">
+	<div class="hospital-container">
 
-    <!-- 1) 사이드바 -->
-    <aside class="hospital-sidebar">
-      <h2 class="hospital-profile-title">
-        <img src="/icons/profile.jpg" alt="프로필">
-        <span>내 프로필</span>
-      </h2>
-      <ul class="hospital-menu">
-	   <li onclick="loadAndToggleNotification()"><img src="/icons/alert.png" alt=""> 알림</li>
-	  <li onclick="goToHome()"><img src="/icons/home.png" alt=""> 홈</li>
-	  <li onclick="goToTreatment()"><img src="/icons/doctor.png" alt="진료"> 진료</li>
-      <li onclick="goToReservation()"><img src="/icons/calendar.png" alt="">예약</li>
-      <li onclick="goToChart()" class="active"><img src="/icons/chart.png" alt="차트"><span>차트</span></li>
-      <li onclick="goToStats()"><img src="/icons/statistics.png" alt="통계"><span>통계</span>
-      <li><img src="/icons/bed.png" alt=""> 입원</li>
-      </ul>
-       <div class="sidebar-footer">
-    <button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
-  </div>
-</aside>
-
-
-   <!-- 2) 환자 리스트 -->
-<section class="patient-list">
-  <!-- (A) 검색창 -->
-  <div class="search">
-    <input type="text" placeholder="환자 검색" id="patient-search-input">
-  </div>
-  
-    <!-- (A-1) 검색 결과 패널 -->
-  <div class="search-results" id="search-results" style="display:none;">
-    <h4>환자 검색 결과</h4>
-    <ul>
-      <!-- 검색 후 JS 로 여기에 <li>를 채워 넣으시면 됩니다 -->
-      <li><strong>홍길동</strong> (여, 30세, 1995/05/12) — 보험: 건강보험</li>
-      <li><strong>김철수</strong> (남, 40세, 1980/02/20) — 보험: 자가부담</li>
-    </ul>
-  </div>
-
-  <!-- (B) 헤더 -->
-  <h3>환자 리스트</h3>
-  <div class="status-label">대기 / 진행 중</div>
-
-  <!-- (C) 방별 카드들 -->
- <!-- 진료실1 -->
-  <details open class="room">
-    <summary>진료실 1 <span class="count">3</span></summary>
-    <ul>
-      <li>전민규 (남,26세,2000/08/04) <span class="badge waiting">대기</span></li>
-      <li>홍길동 (여,30세,1995/05/12) <span class="badge waiting">대기</span></li>
-      <li>김철수 (남,40세,1980/02/20) <span class="badge waiting">대기</span></li>
-    </ul>
-  </details>
-
-  <!-- 진료실2 -->
-  <details open class="room">
-    <summary>진료실 2 <span class="count">2</span></summary>
-    <ul>
-      <li>이화진 (남,26세,2000/10/10) <span class="badge in-progress">진행중</span></li>
-      <li>박민수 (여,35세,1985/07/15) <span class="badge in-progress">진행중</span></li>
-    </ul>
-  </details>
-
-  <!-- 수납실 -->
-  <details open class="room">
-     <summary>수납실 <span class="count">1</span></summary>
-     <ul>
-       <li>최서연 (여,28세,1997/11/23) <span class="badge waiting">대기</span></li>
-     </ul>
-  </details>
-
-  <!-- 접수실 -->
-  <details open class="room">
-     <summary>접수실 <span class="count">1</span></summary>
-     <ul>
-       <li>장하늘 (남,50세,1973/04/08) <span class="badge waiting">대기</span></li>
-     </ul>
-  </details>
-</section>
-
- <!-- 3) 내원 이력 -->
-<section class="patient-history">
-  <h3>내원 이력</h3>
-
-  <!-- 첫 번째 방문 기록 -->
- <details open class="history-entry">
-    <summary>
-      <div class="history-date">2025-05-15 (오늘)</div>
-      <div class="history-doctor">오진우 선생</div>
-    </summary>
-    <div class="history-content">
-      <p><strong>진단/소견:</strong> 두통, 발열</p>
-      <p><strong>처방 내역:</strong></p>
-      <ul>
-        <li>해열진통제 500mg — 하루 3회</li>
-        <li>진통제 시럽 5ml — 필요 시 추가</li>
-      </ul>
-    </div>
-  </details>
-
-  <!-- 두 번째 방문 기록 -->
- <details class="history-entry">
-    <summary>
-      <div class="history-date">2025-03-15 (두달 전)</div>
-      <div class="history-doctor">이상민 선생</div>
-    </summary>
-    <div class="history-content">
-      <p><strong>진단/소견:</strong> 기침, 인후통</p>
-      <p><strong>처방 내역:</strong></p>
-      <ul>
-        <li>기침약 10ml — 하루 2회</li>
-        <li>가글액 — 식후 가글</li>
-      </ul>
-    </div>
-  </details>
-</section>
+		<!-- 1) 사이드바 -->
+		<aside class="hospital-sidebar">
+			<h2 class="hospital-profile-title">
+				<img src="/icons/profile.jpg" alt="프로필"> <span>내 프로필</span>
+			</h2>
+			<ul class="hospital-menu">
+				<li onclick="loadAndToggleNotification()"><img
+					src="/icons/alert.png" alt=""> 알림</li>
+				<li onclick="goToHome()"><img src="/icons/home.png" alt="">
+					홈</li>
+				<li onclick="goToTreatment()"><img src="/icons/doctor.png"
+					alt="진료"> 진료</li>
+				<li onclick="goToReservation()"><img src="/icons/calendar.png"
+					alt="">예약</li>
+				<li onclick="goToChart()" class="active"><img
+					src="/icons/chart.png" alt="차트"><span>차트</span></li>
+				<li onclick="goToStats()"><img src="/icons/statistics.png"
+					alt="통계"><span>통계</span>
+				<li><img src="/icons/bed.png" alt=""> 입원</li>
+			</ul>
+			<div class="sidebar-footer">
+				<button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
+			</div>
+		</aside>
 
 
-<!-- 4) 메인 진료 기록 -->
-<section class="col treatment-main">
+		<!-- 2) 환자 리스트 -->
+		<section class="patient-list">
+			<!-- (A) 검색창 -->
+			<div class="search">
+				<input type="text" placeholder="환자 검색" id="patient-search-input">
+			</div>
 
-  <!-- ─── 4-1) 헤더 ─── -->
-  <div class="record-header">
-    <div class="record-header-left">
-      2021-09-01 (월) 10:00 ▶ 이은솔
-    </div>
-    <div class="record-header-right">
-      <!-- 우측에 톱니바퀴 아이콘 등 -->
-      <button class="icon-btn">⚙️</button>
-    </div>
-  </div>
+			<!-- (A-1) 검색 결과 패널 -->
+			<div class="search-results" id="search-results"
+				style="display: none;">
+				<h4>환자 검색 결과</h4>
+				<ul>
+					<!-- 검색 후 JS 로 여기에 <li>를 채워 넣으시면 됩니다 -->
+					<li><strong>홍길동</strong> (여, 30세, 1995/05/12) — 보험: 건강보험</li>
+					<li><strong>김철수</strong> (남, 40세, 1980/02/20) — 보험: 자가부담</li>
+				</ul>
+			</div>
 
- <!-- ─── 4-2) 본문 (증상 / 이미지) ─── -->
-<div class="record-notes">
-  <h4>증상 기록</h4>
-  <textarea placeholder="환자 증상 요약 내용을 입력하세요"></textarea>
-  <button class="save-btn">저장</button>
-</div>
+			<!-- (B) 헤더 -->
+			<h3>환자 리스트</h3>
+			<div class="status-label">대기 / 진행 중</div>
 
-<!-- 이미지 영역 제거됨
+			<!-- (C) 방별 카드들 -->
+			<!-- 진료실1 -->
+			<details open class="room">
+				<summary>
+					진료실 1 <span class="count">3</span>
+				</summary>
+				<ul>
+					<li>전민규 (남,26세,2000/08/04) <span class="badge waiting">대기</span></li>
+					<li>홍길동 (여,30세,1995/05/12) <span class="badge waiting">대기</span></li>
+					<li>김철수 (남,40세,1980/02/20) <span class="badge waiting">대기</span></li>
+				</ul>
+			</details>
+
+			<!-- 진료실2 -->
+			<details open class="room">
+				<summary>
+					진료실 2 <span class="count">2</span>
+				</summary>
+				<ul>
+					<li>이화진 (남,26세,2000/10/10) <span class="badge in-progress">진행중</span></li>
+					<li>박민수 (여,35세,1985/07/15) <span class="badge in-progress">진행중</span></li>
+				</ul>
+			</details>
+
+			<!-- 수납실 -->
+			<details open class="room">
+				<summary>
+					수납실 <span class="count">1</span>
+				</summary>
+				<ul>
+					<li>최서연 (여,28세,1997/11/23) <span class="badge waiting">대기</span></li>
+				</ul>
+			</details>
+
+			<!-- 접수실 -->
+			<details open class="room">
+				<summary>
+					접수실 <span class="count">1</span>
+				</summary>
+				<ul>
+					<li>장하늘 (남,50세,1973/04/08) <span class="badge waiting">대기</span></li>
+				</ul>
+			</details>
+		</section>
+
+		<!-- 3) 내원 이력 -->
+		<section class="patient-history">
+			<h3>내원 이력</h3>
+
+			<!-- 첫 번째 방문 기록 -->
+			<details open class="history-entry">
+				<summary>
+					<div class="history-date">2025-05-15 (오늘)</div>
+					<div class="history-doctor">오진우 선생</div>
+				</summary>
+				<div class="history-content">
+					<p>
+						<strong>진단/소견:</strong> 두통, 발열
+					</p>
+					<p>
+						<strong>처방 내역:</strong>
+					</p>
+					<ul>
+						<li>해열진통제 500mg — 하루 3회</li>
+						<li>진통제 시럽 5ml — 필요 시 추가</li>
+					</ul>
+				</div>
+			</details>
+
+			<!-- 두 번째 방문 기록 -->
+			<details class="history-entry">
+				<summary>
+					<div class="history-date">2025-03-15 (두달 전)</div>
+					<div class="history-doctor">이상민 선생</div>
+				</summary>
+				<div class="history-content">
+					<p>
+						<strong>진단/소견:</strong> 기침, 인후통
+					</p>
+					<p>
+						<strong>처방 내역:</strong>
+					</p>
+					<ul>
+						<li>기침약 10ml — 하루 2회</li>
+						<li>가글액 — 식후 가글</li>
+					</ul>
+				</div>
+			</details>
+		</section>
+
+
+		<!-- 4) 메인 진료 기록 -->
+		<section class="col treatment-main">
+
+			<!-- ─── 4-1) 헤더 ─── -->
+			<div class="record-header">
+				<div class="record-header-left">2021-09-01 (월) 10:00 ▶ 이은솔</div>
+				<div class="record-header-right">
+					<!-- 우측에 톱니바퀴 아이콘 등 -->
+					<button class="icon-btn">⚙️</button>
+				</div>
+			</div>
+
+			<!-- ─── 4-2) 본문 (증상 / 이미지) ─── -->
+			<div class="record-notes">
+				<h4>증상 기록</h4>
+				<textarea placeholder="환자 증상 요약 내용을 입력하세요"></textarea>
+				<button class="save-btn">저장</button>
+			</div>
+
+			<!-- 이미지 영역 제거됨
 <div class="record-image">
   <h4>이미지</h4>
   <img src="/images/상처.jpg" alt="환자 이미지">
@@ -158,133 +178,188 @@
 </div>
 -->
 
-<!-- ─── 4-3) 진단 및 처방 ─── -->
-<div class="record-prescription">
-  <h4>진단 및 처방</h4>
-  <div class="prescription-toolbar">
-    <button>예방접종</button>
-    <!-- <button>스마트처방</button> → 삭제됨 -->
-    <button>DUR점검</button>
-    <button class="icon-btn">⚙️</button>
-  </div>
-<div class="prescription-search">
-  <input type="text" id="orderSearchInput" placeholder="오더 검색(ctrl+↑)">
-  <div id="suggestions" class="suggestion-box"></div>
-</div>
-<table class="prescription-table" id="prescriptionTable">
-  <thead>
-    <tr>
-      <th>약품명</th><th>용법/용량</th><th>수량</th><th>비고</th>
-    </tr>
-  </thead>
-  <tbody id="prescriptionTbody">
-    <!-- JS로 검색된 약품이 여기에 삽입됨 -->
-  </tbody>
-</table>
-<div class="prescription-action">
-  <button id="manualAddBtn" class="add-prescription-btn">+ 수기처방 추가</button>
-  <button class="send-btn">보내기 ▶</button>
-</div>
-</div>
+			<!-- ─── 4-3) 진단 및 처방 ─── -->
+			<div class="record-prescription">
+				<h4>진단 및 처방</h4>
 
-</section>
-<!-- 5) 환자 기록 메모 -->
-<aside class="col patient-record">
-  <h3 class="record-title">📝 환자기록</h3>
-  
-  <ul class="record-timeline">
-    <li>
-      <span class="tag yellow">김승환</span>
-      <div class="record-time">09:03 AM</div>
-      <div class="record-msg">발열증상 있으나 귀찮, 가족력: 당뇨 있음<br><small>기록자: 간호사 박은하</small></div>
-    </li>
-    <li>
-      <span class="tag pink">이은솔</span>
-      <div class="record-time">09:05 AM</div>
-      <div class="record-msg">전진서 추가 부작용보고</div>
-    </li>
-    <li>
-      <span class="tag gray">의료진</span>
-      <div class="record-time">10:21 AM</div>
-      <div class="record-msg">식사 직후 복약지시와 다음 방문 때 내과 검사 시행 예정</div>
-    </li>
-  </ul>
+				<!-- 도구 버튼 -->
+				<div class="prescription-toolbar">
+					<button>예방접종</button>
+					<button>DUR점검</button>
+					<button class="icon-btn">⚙️</button>
+				</div>
 
-  <form class="record-form">
-    <textarea placeholder="기록할 내용을 입력하세요"></textarea>
-    <button type="submit">올리기</button>
-  </form>
-</aside>
+				<!-- 검색창 ⬆️ 위로 이동 -->
+				<div class="prescription-search">
+					<input type="text" id="orderSearchInput" placeholder="오더 검색(ctrl+↑)">
+					<div id="suggestions" class="suggestion-box"></div> <!-- 비워두기! -->
 
-  </div>
+				<!-- 진단명 목록 ⬇️ 아래로 -->
+				<div class="diagnosis-list" id="diagnosisList">
+					<div class="diagnosis-items"></div>
+				</div>
+
+				<!-- 약품 테이블 -->
+				<table class="prescription-table" id="prescriptionTable">
+					<thead>
+						<tr>
+							<th>약품명</th>
+							<th>용법/용량</th>
+							<th>수량</th>
+							<th>비고</th>
+						</tr>
+					</thead>
+					<tbody id="prescriptionTbody">
+						<!-- JS로 삽입 -->
+					</tbody>
+				</table>
+
+				<!-- 버튼 -->
+				<div class="prescription-action">
+					<button id="manualAddBtn" class="add-prescription-btn">+
+						수기처방 추가</button>
+					<button class="send-btn">보내기 ▶</button>
+				</div>
+			</div>
+
+		</section>
+		<!-- 5) 환자 기록 메모 -->
+		<aside class="col patient-record">
+			<h3 class="record-title">📝 환자기록</h3>
+
+			<ul class="record-timeline">
+				<li><span class="tag yellow">김승환</span>
+					<div class="record-time">09:03 AM</div>
+					<div class="record-msg">
+						발열증상 있으나 귀찮, 가족력: 당뇨 있음<br>
+						<small>기록자: 간호사 박은하</small>
+					</div></li>
+				<li><span class="tag pink">이은솔</span>
+					<div class="record-time">09:05 AM</div>
+					<div class="record-msg">전진서 추가 부작용보고</div></li>
+				<li><span class="tag gray">의료진</span>
+					<div class="record-time">10:21 AM</div>
+					<div class="record-msg">식사 직후 복약지시와 다음 방문 때 내과 검사 시행 예정</div></li>
+			</ul>
+
+			<form class="record-form">
+				<textarea placeholder="기록할 내용을 입력하세요"></textarea>
+				<button type="submit">올리기</button>
+			</form>
+		</aside>
+
+	</div>
 <script>
-  // 🔍 환자 검색 기능
-  const patientInput = document.getElementById('patient-search-input');
-  const searchResults = document.getElementById('search-results');
-
-  patientInput.addEventListener('keyup', e => {
-    const q = e.target.value.trim();
-    if (!q) return searchResults.style.display = 'none';
-
-    const mock = [
-      { name:'홍길동', info:'(여,30세,1995/05/12) — 보험: 건강보험' },
-      { name:'김철수', info:'(남,40세,1980/02/20) — 보험: 자가부담' },
-      { name:'김철수', info:'(남,26세,1996/03/21) — 보험: 자가부담' }
-    ].filter(p => p.name.includes(q));
-
-    const ul = searchResults.querySelector('ul');
-    ul.innerHTML = mock.length
-      ? mock.map(p => `<li><strong>${p.name}</strong> ${p.info}</li>`).join('')
-      : '<li>검색된 환자가 없습니다.</li>';
-
-    searchResults.style.display = 'block';
-  });
-
-  // 🩺 약품 검색 기능
-  const mockDrugs = [
-    { name: '타이레놀 500mg', dosage: '1일 3회', count: 10 },
-    { name: '아토피성 피부염 연고', dosage: '하루 2회', count: 1 },
-    { name: '감기약 시럽', dosage: '식후 3회', count: 5 }
-  ];
+ function goToHome()        { location.href = '/home'; }
+  function goToChart()       { location.href = '/hospital/chart'; }
+  function goToReservation() { location.href = '/hospital/reservation'; }
+  function goToTreatment()   { location.href = '/hospital/treatment'; }
+  function goToStats()       { location.href = '/hospital/statistics'; }
+  function goLogout()        { location.href = '/logout'; }
 
   const orderInput = document.getElementById('orderSearchInput');
   const suggestions = document.getElementById('suggestions');
+  const diagnosisList = document.querySelector('.diagnosis-items');
   const tbody = document.getElementById('prescriptionTbody');
 
+  let orderData = [];
+
+  // 1. 질병 + 약물 데이터 로드
+  fetch('/api/disease/list')
+    .then(res => res.json())
+    .then(diseaseData => {
+      return fetch('/api/drug/list')
+        .then(res => res.json())
+        .then(drugData => {
+          orderData = [
+            ...diseaseData.map(d => ({
+              type: 'disease',
+              code: d.code,
+              name: d.name,
+              category: d.type
+            })),
+            ...drugData // 이미 {type, name, dosage, count}
+          ];
+        });
+    });
+
+  // 2. 자동완성 이벤트 처리
   orderInput.addEventListener('input', () => {
     const query = orderInput.value.trim().toLowerCase();
     suggestions.innerHTML = '';
     if (!query) return;
 
-    const matched = mockDrugs.filter(drug => drug.name.toLowerCase().includes(query));
-    matched.forEach(drug => {
-      const div = document.createElement('div');
-      div.textContent = drug.name;
-      div.classList.add('suggestion-item');
-      div.onclick = () => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${drug.name}</td>
-          <td contenteditable="true">${drug.dosage}</td>
-          <td contenteditable="true">${drug.count}</td>
-          <td><button class="delete-btn">삭제</button></td>
-        `;
-        tbody.appendChild(tr);
-        orderInput.value = '';
-        suggestions.innerHTML = '';
-      };
-      suggestions.appendChild(div);
-    });
+    const diseases = orderData.filter(item =>
+      item.type === 'disease' && item.name.toLowerCase().includes(query)
+    );
+    const drugs = orderData.filter(item =>
+      item.type === 'drug' && item.name.toLowerCase().includes(query)
+    );
+
+    // 진단명 그룹
+    if (diseases.length > 0) {
+      const diseaseLabel = document.createElement('div');
+      diseaseLabel.textContent = '📁 진단명';
+      diseaseLabel.classList.add('group-label');
+      suggestions.appendChild(diseaseLabel);
+
+      diseases.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('suggestion-item');
+        div.textContent = item.name;
+        div.onclick = () => {
+          const li = document.createElement('div');
+          li.classList.add('diagnosis-item');
+          li.innerHTML = `
+            <span>${item.name}</span>
+            <button class="delete-diagnosis-btn">❌</button>
+          `;
+          li.querySelector('.delete-diagnosis-btn').onclick = () => li.remove();
+          diagnosisList.appendChild(li);
+          orderInput.value = '';
+          suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(div);
+      });
+    }
+
+    // 약물 그룹
+    if (drugs.length > 0) {
+      const drugLabel = document.createElement('div');
+      drugLabel.textContent = '💊 약물';
+      drugLabel.classList.add('group-label');
+      suggestions.appendChild(drugLabel);
+
+      drugs.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('suggestion-item');
+        div.textContent = item.name;
+        div.onclick = () => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.name}</td>
+            <td contenteditable="true">${item.dosage}</td>
+            <td contenteditable="true">${item.count}</td>
+            <td><button class="delete-btn">삭제</button></td>
+          `;
+          tbody.appendChild(tr);
+          orderInput.value = '';
+          suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(div);
+      });
+    }
   });
 
-  document.addEventListener('click', (e) => {
+  // 3. 외부 클릭 시 자동완성 닫기
+  document.addEventListener('click', e => {
     if (!suggestions.contains(e.target) && e.target !== orderInput) {
       suggestions.innerHTML = '';
     }
   });
 
-  // 📝 수기처방 추가 버튼
-  document.querySelector('.add-prescription-btn').addEventListener('click', () => {
+  // 4. 수기 처방 추가
+  document.getElementById('manualAddBtn').addEventListener('click', () => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><input type="text" placeholder="약품명" class="manual-input"></td>
@@ -295,24 +370,15 @@
     tbody.appendChild(tr);
   });
 
-  // ❌ 삭제 버튼 작동
-  tbody.addEventListener('click', (e) => {
+  // 5. 처방 테이블 삭제 기능
+  tbody.addEventListener('click', e => {
     if (e.target.classList.contains('delete-btn')) {
       const tr = e.target.closest('tr');
       if (tr) tr.remove();
     }
   });
-
-  // ▶️ 메뉴 이동 함수 (선택적으로 사용)
-      function goToHome()        { location.href = '/home'; }
-    function goToNotification(){ /* 알림 열기 */ }
-    function goToTreatment()   { location.href = '/hospital/treatment'; }
-    function goToReservation() { location.href = '/hospital/reservation'; }
-    function goToChart()       { location.href = '/hospital/chart'; }
-    function goToStats()       { location.href = '/hospital/statistics'; }
-    function goToAdmission()   { location.href = '/hospital/admission'; }
-    function goLogout()        { location.href = '/logout'; }
 </script>
+
 
 
 

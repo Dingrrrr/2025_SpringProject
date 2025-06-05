@@ -47,7 +47,7 @@
       <!-- 2) 캘린더 패널 -->
       <section class="reservation-calendar-panel">
         <div class="reservation-calendar-header">
-          <h3 id="monthTitle">2025년 5월</h3>
+          <h3 id="monthTitle">2025년 6월</h3>
           <div class="reservation-calendar-nav">
             <button type="button" id="prevBtn">&lt;</button>
             <button type="button" id="todayBtn">오늘</button>
@@ -71,6 +71,11 @@
   </div>
 
 <script>
+function closeNotificationPanel() {
+  const panel = document.getElementById('notificationPanel');
+  if (panel) panel.remove();
+}
+
   // ① 전역 변수 선언
   let currentDate,
       monthEvents = [];
@@ -139,7 +144,7 @@
       const ul = document.createElement('ul');
       byDate[date].forEach(e => {
         const li = document.createElement('li');
-        li.innerHTML = `<strong>${e.name}</strong> – ${e.reason}`;
+        li.innerHTML = `<strong>${e.time}</strong> ${e.name} – ${e.reason}`;
         ul.appendChild(li);
       });
       grp.appendChild(ul);
@@ -148,31 +153,52 @@
   }
 
   // ④ 캘린더 테이블 그리기
-  function renderTableBody(year, month) {
-    const firstDay     = new Date(year, month, 1);
-    const startWeekday = firstDay.getDay();
-    const daysInMonth  = new Date(year, month + 1, 0).getDate();
-    const tbody        = document.querySelector('.reservation-calendar-table tbody');
-    tbody.innerHTML    = '';
+function renderTableBody(year, month) {
+  const firstDay     = new Date(year, month, 1);
+  const startWeekday = firstDay.getDay();
+  const daysInMonth  = new Date(year, month + 1, 0).getDate();
+  const tbody        = document.querySelector('.reservation-calendar-table tbody');
+  const today        = new Date(); // 오늘 날짜 가져오기
+  tbody.innerHTML    = '';
 
-    let day = 1;
-    for (let w = 0; w < 6; w++) {
-      const tr = document.createElement('tr');
-      for (let d = 0; d < 7; d++) {
-        const td = document.createElement('td');
-        if (!(w === 0 && d < startWeekday) && day <= daysInMonth) {
-          // data-date 설정
-          const dd = String(day).padStart(2, '0');
-          td.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${dd}`;
-          td.innerHTML    = `<div class="date-number">${day}</div>`;
-          day++;
+  let day = 1;
+  for (let w = 0; w < 6; w++) {
+    const tr = document.createElement('tr');
+    for (let d = 0; d < 7; d++) {
+      const td = document.createElement('td');
+      if (!(w === 0 && d < startWeekday) && day <= daysInMonth) {
+        const dd = String(day).padStart(2, '0');
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${dd}`;
+        td.dataset.date = dateStr;
+
+        // ✅ 오늘 날짜면 클래스 추가
+        if (
+          year === today.getFullYear() &&
+          month === today.getMonth() &&
+          day === today.getDate()
+        ) {
+          td.classList.add("today-highlight");
         }
-        tr.appendChild(td);
+
+        // 예약 렌더링
+        let html = `<div class="date-number">${day}</div>`;
+        const dayEvents = monthEvents.filter(e => e.date === dateStr);
+        if (dayEvents.length > 0) {
+          dayEvents.forEach(e => {
+            html += `<div class="event-box">${e.name} ${e.time}</div>`;
+          });
+        }
+        td.innerHTML = html;
       }
-      tbody.appendChild(tr);
-      if (day > daysInMonth) break;
+      tr.appendChild(td);
+      if (day <= daysInMonth) day++;
     }
+    tbody.appendChild(tr);
+    if (day > daysInMonth) break;
   }
+}
+
+
 
   // ⑤ 날짜 클릭 시 해당 날짜 예약만 필터
   document.querySelector('.reservation-calendar-table tbody')
