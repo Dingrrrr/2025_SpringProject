@@ -1,5 +1,6 @@
 package com.dita.vo;
 
+
 import java.time.LocalDateTime;
 
 import lombok.Getter;
@@ -14,7 +15,10 @@ public class AppointmentDto {
 	private String rrn;
 	private String phone;
 	private LocalDateTime date;
+	private LocalDateTime originalDate;
 	private String room;
 	private String disease;
 	private String doctor;
+	
 }
+

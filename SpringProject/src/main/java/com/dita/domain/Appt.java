@@ -49,7 +49,7 @@ public class Appt {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status",nullable = false)
-	private Status status = Status.PENDING;
+	private Status status = Status.대기;
 	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)

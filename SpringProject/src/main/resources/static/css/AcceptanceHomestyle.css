@@ -187,7 +187,7 @@
 		
 		/* 예약 칼럼 위치 및 크기 조정 */
 		.reservation-column {
-		    width: 600px;
+		    width: 550px;
 		    height:900px;
 		    top: 70px;
 		    left: 10px;
@@ -195,10 +195,10 @@
 		
 		/* 접수 칼럼 위치 및 크기 조정 */
 		.reception-column {
-		    width: 520px;
-		    height:900px;
+		    width: 573px;
+		    height: 900px;
 		    top: 70px;
-		    left: 630px; /* 예약 칼럼 오른쪽으로 이동 */
+		    left: 580px;
 		}
 		
 		/* 진료 칼럼 위치 및 크기 조정 */
@@ -290,7 +290,6 @@
 	.reservation-item .time {
 	    color: green;
 	    font-weight: bold;
-	    width: 70px;
 	    white-space: nowrap;
 	}
 	

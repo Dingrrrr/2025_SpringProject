@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>진료 관리</title>
+  <!-- 기존 전역 스타일 -->
+  <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
+  <!-- 진료 전용 스타일 -->
+  <link rel="stylesheet" th:href="@{/css/treatment_style.css}">
+</head>
+<body>
+  <div class="hospital-container">
+
+    <!-- 1) 사이드바 (기존) -->
+    <aside class="hospital-sidebar">
+      <h2 class="hospital-profile-title">
+        <img th:src="@{/icons/profile.jpg}" alt="프로필"><span>내 프로필</span>
+      </h2>
+      <ul class="hospital-menu">
+        <li onclick="loadAndToggleNotification()"><img th:src="@{/icons/alert.png}" alt=""> 알림</li>
+        <li onclick="goToHome()"><img th:src="@{/icons/home.png}" alt=""> 홈</li>
+        <li onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt=""> 진료</li>
+        <li onclick="goToReservation()"><img th:src="@{/icons/calendar.png}" alt=""> 예약</li>
+        <li onclick="goToChart()"><img th:src="@{/icons/chart.png}" alt=""> 차트</li>
+        <li class="hospital-active" onclick="goToStats()"><img th:src="@{/icons/statistics.png}" alt=""> 통계</li>
+        <li onclick="goToAdmission()"><img th:src="@{/icons/bed.png}" alt=""> 입원</li>
+      </ul>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="goLogout()">로그아웃</button>
+      </div>
+    </aside>
+
+    <!-- 2) 메인 콘텐츠 -->
+    <section class="treatment-content">
+
+      <!-- 2-1) 상단 검색 + 호출 + 환자 요약 -->
+      <header class="treatment-header">
+        <div class="search-call">
+          <div class="search-box">
+            🔍 <input type="text" placeholder="환자 검색(ctrl+K)">
+          </div>
+          <div class="next-pull">
+            <label>다음 환자 부르기</label>
+            <select>
+              <option>진료실1</option>
+              <option>진료실2</option>
+            </select>
+          </div>
+        </div>
+        <div class="patient-summary">
+          <div class="patient-name">
+            <strong>이환진</strong> (남, 26세, 2000/10/10)  
+            <span class="badge vip">VIP</span>
+          </div>
+          <div class="patient-tags">
+            <span class="badge info">전염성</span>
+            <span class="badge info">신생태근절</span>
+            <span class="badge info">심변학</span>
+          </div>
+          <div class="patient-vitals">
+            <span class="badge">체온: 38</span>
+            <span class="badge">맥박: 120</span>
+            <span class="badge">신장: 60</span>
+            <span class="badge">체중: 70</span>
+            <span class="badge">검사일: 2021-04-01</span>
+            <span class="badge">가족관계: 5세형제</span>
+          </div>
+          <div class="patient-actions">
+            <button class="btn-outline">차트 열기</button>
+            <button class="btn-primary">진행하기</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 2-2) 탭 (대기 / 예약 / 방문) + 카운트 -->
+      <nav class="record-tabs">
+        <ul>
+          <li class="active">대기</li>
+          <li>예약</li>
+          <li>방문</li>
+        </ul>
+        <span class="waiting-count">대기환자 16</span>
+      </nav>
+
+      <!-- 2-3) 카드 컬럼 -->
+      <div class="treatment-columns">
+        <div class="treatment-column">
+          <h3>검사실 <span class="col-count">0</span></h3>
+          <!-- 카드 반복 예시 -->
+          <div class="treatment-card">
+            <div class="card-patient">
+              <span class="card-id">12345678</span> 정호진<br>
+              (남, 24세 · 2000-02-27)
+            </div>
+            <div class="card-status red">접수신청</div>
+          </div>
+        </div>
+
+        <div class="treatment-column">
+          <h3>진료실1 <span class="col-count">3</span></h3>
+          <div class="treatment-card">
+            <div class="card-patient">
+              <span class="card-id">12345679</span> 김승환<br>
+              (남, 20세 · 2003-01-12)
+            </div>
+            <div class="card-excerpt">
+              SMK (카이로15회)<br>
+              …증상 요약 텍스트…
+            </div>
+            <div class="card-status blue">진행중</div>
+          </div>
+          <div class="treatment-card">
+            <div class="card-patient">
+              <span class="card-id">12345680</span> 박민수<br>
+              (남, 22세 · 2001-05-01)
+            </div>
+            <div class="card-status yellow">대기</div>
+          </div>
+        </div>
+
+        <div class="treatment-column">
+          <h3>진료실2 <span class="col-count">2</span></h3>
+          <div class="treatment-card">
+            <div class="card-patient">
+              <span class="card-id">12345681</span> 바나나<br>
+              (여, 20세 · 2004-03-13)
+            </div>
+            <div class="card-status yellow">대기</div>
+          </div>
+        </div>
+
+        <div class="treatment-column">
+          <h3>수납실 <span class="col-count">1</span></h3>
+          <div class="treatment-card">
+            <div class="card-patient">
+              <span class="card-id">12345682</span> 한진용<br>
+              (남, 36세 · 1987-10-24)
+            </div>
+            <div class="card-status yellow">대기</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <script>
+    function loadAndToggleNotification() { /* … */ }
+    function goToHome()        { location.href = '/home'; }
+    function goToTreatment()   { location.href = '/hospital/treatment'; }
+    function goToReservation() { location.href = '/hospital/reservation'; }
+    function goToChart()       { location.href = '/hospital/chart'; }
+    function goToStats()       { location.href = '/hospital/statistics'; }
+    function goToAdmission()   { location.href = '/hospital/admission'; }
+    function goLogout()        { location.href = '/logout'; }
+  </script>
+</body>
+</html>

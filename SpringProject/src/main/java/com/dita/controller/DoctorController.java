@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dita.domain.Grade;
@@ -17,10 +16,10 @@ import com.dita.persistence.UserRepository;
 @RestController
 @RequestMapping("/api")
 public class DoctorController {
+
 	
 	 @Autowired
 	    private UserRepository userRepository;
-
 	    // 모든 의사 목록 조회
 	    @GetMapping("/doctors")
 	    public List<Map<String, String>> getAllDoctors() {
@@ -34,5 +33,4 @@ public class DoctorController {
 	            })
 	            .collect(Collectors.toList());
 	    }
-	
 }

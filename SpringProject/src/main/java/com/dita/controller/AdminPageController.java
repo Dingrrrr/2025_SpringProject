@@ -1,6 +1,7 @@
 package com.dita.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.dita.domain.Grade;
 import com.dita.domain.Sched;
+import com.dita.domain.Ward;
 import com.dita.persistence.AdminMemberRepository;
+import com.dita.persistence.BedRepository;
+import com.dita.persistence.WardRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -20,29 +24,24 @@ import lombok.extern.java.Log;
 @RequestMapping("/admin/")
 public class AdminPageController {
 
+    private final BedRepository bedRepository;
+    private final WardRepository wardRepository;
+
     private final AdminMemberRepository adminMemberRepository;
 
-    @GetMapping("/adminMemberManage")
-    public String showMemberManagePage(Model model) {
-        List<Sched> doctorScheds = adminMemberRepository.findByUserGrade(Grade.의사);
-        List<Sched> nurseScheds = adminMemberRepository.findByUserGrade(Grade.간호사);
-        List<Sched> billingScheds = adminMemberRepository.findByUserGrade(Grade.수납);
-
-        model.addAttribute("doctorScheds", doctorScheds);
-        model.addAttribute("nurseScheds", nurseScheds);
-        model.addAttribute("billingScheds", billingScheds);
-
-        return "admin/adminMemberManage";
-    }
-
-    @GetMapping("/adminCalendarManage")
-    public String showCalendarPage(Model model) {
-        return "admin/adminCalendarManage";
-    }
-
     @GetMapping("/adminRoomManage")
-    public String showRoomPage(Model model) {
-        return "admin/adminRoomManage";
+    public String showBedPage(Model model) {
+        List<Ward> wards = wardRepository.findAll();
+
+        model.addAttribute("wards", wards);
+        model.addAttribute("bedMap", wards.stream()
+            .collect(Collectors.toMap(
+                Ward::getWardId,
+                ward -> bedRepository.findByWard_WardId(ward.getWardId())
+            ))
+        );
+
+        return "admin/adminRoomManage"; 
     }
 
     @GetMapping("/adminTotalManage")
