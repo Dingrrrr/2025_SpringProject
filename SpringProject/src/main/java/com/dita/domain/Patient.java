@@ -30,7 +30,7 @@ public class Patient {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "patient_id", nullable = false)
-	private int patientId;//환자 아이디
+	private Integer patientId;//환자 아이디
 	
 	@Column(name = "patient_name", length = 50, nullable = false)
 	private String patientName;// 환자 이름

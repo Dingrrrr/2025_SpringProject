@@ -78,8 +78,12 @@ public class AdminCalendarController {
     @PostMapping("/create")
     @ResponseBody
     public String createSchedule(@RequestBody SchedDto dto) {
-        User user = userRepository.findById(dto.getUsersId())  // 소문자로!
-            .orElseThrow(() -> new RuntimeException("유저 없음"));
+        if (dto.getUsersId() == null || dto.getUsersId().isBlank()) {
+            throw new IllegalArgumentException("usersId는 반드시 전달되어야 합니다.");
+        }
+
+        User user = userRepository.findById(dto.getUsersId())
+            .orElseThrow(() -> new RuntimeException("해당 유저 없음: " + dto.getUsersId()));
 
         Sched sched = Sched.builder()
             .user(user)
@@ -91,5 +95,5 @@ public class AdminCalendarController {
 
         adminMemberRepository.save(sched);
         return "생성 완료";
-    }	
+    }
 }

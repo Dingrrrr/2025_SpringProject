@@ -30,7 +30,7 @@ public class Notif {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "notif_id", nullable = false)
-	private int notifId; //알림 아이디
+	private Integer notifId; //알림 아이디
 	
 	@ManyToOne
 	@JoinColumn(name ="users_id", nullable= false)

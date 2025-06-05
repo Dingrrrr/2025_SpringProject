@@ -235,4 +235,80 @@ public class NurseChartRepository {
             throw new RuntimeException("차트 상세 조회 실패", e);
         }
     }
+    
+    
+    
+ // NurseChartRepository에 추가할 메서드들
+    public Map<String, Object> getLatestVitalSigns(int patientId) {
+        try {
+            String sql = "SELECT patient_id, bp_systolic, bp_diastolic, pulse_rate, " +
+                        "temperature, respiration_rate, recorded_at, time_period " +
+                        "FROM vital_sign WHERE patient_id = ? " +
+                        "ORDER BY recorded_date DESC, recorded_at DESC LIMIT 1";
+            
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, patientId);
+            
+            if (result.isEmpty()) {
+                return new HashMap<>();
+            }
+            
+            return result.get(0);
+            
+        } catch (Exception e) {
+            log.severe("최신 바이탈 사인 조회 중 오류: " + e.getMessage());
+            throw new RuntimeException("최신 바이탈 사인 조회에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * 환자의 차트용 바이탈 데이터를 조회합니다 (시간대별/주간별).
+     */
+    public Map<String, Object> getVitalChartData(int patientId) {
+        try {
+            log.info("환자 " + patientId + "의 차트 데이터 조회 시작");
+            
+            // 시간대별 최신 데이터 (AVG 대신 각 시간대별 데이터)
+            String timeSql = "SELECT time_period, " +
+                            "bp_systolic as avg_systolic, " +
+                            "bp_diastolic as avg_diastolic, " +
+                            "pulse_rate as avg_pulse, " +
+                            "temperature as avg_temp, " +
+                            "respiration_rate as avg_resp " +
+                            "FROM vital_sign " +
+                            "WHERE patient_id = ? " +
+                            "ORDER BY recorded_date DESC, recorded_at DESC";
+            
+            // 주간별 데이터 (최근 7일)
+            String weeklySql = "SELECT recorded_date as date, " +
+                              "AVG(bp_systolic) as avg_systolic, " +
+                              "AVG(bp_diastolic) as avg_diastolic, " +
+                              "AVG(pulse_rate) as avg_pulse, " +
+                              "AVG(temperature) as avg_temp, " +
+                              "AVG(respiration_rate) as avg_resp " +
+                              "FROM vital_sign " +
+                              "WHERE patient_id = ? " +
+                              "AND recorded_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                              "GROUP BY recorded_date " +
+                              "ORDER BY recorded_date";
+            
+            List<Map<String, Object>> timeData = jdbcTemplate.queryForList(timeSql, patientId);
+            List<Map<String, Object>> weeklyData = jdbcTemplate.queryForList(weeklySql, patientId);
+            
+            log.info("조회된 시간대별 데이터: " + timeData.size() + "개");
+            log.info("조회된 주간별 데이터: " + weeklyData.size() + "개");
+            
+            // 디버깅용 로그
+            timeData.forEach(data -> log.info("시간대별 데이터: " + data.toString()));
+            
+            return Map.of(
+                "timeData", timeData,
+                "weeklyData", weeklyData
+            );
+            
+        } catch (Exception e) {
+            log.severe("바이탈 차트 데이터 조회 중 오류: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("바이탈 차트 데이터 조회에 실패했습니다.", e);
+        }
+    }
 }

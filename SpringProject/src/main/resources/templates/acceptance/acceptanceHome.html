@@ -122,7 +122,7 @@
     <span class="close-btn" onclick="closeCustomerModal()">×</span>
     <h3 style="margin-bottom: 15px;">환자 등록</h3>
     
-    <form id="customerForm" method="post" action="/acceptance/acceptanceHome">
+    <form id="customerForm" method="post" th:action="@{/acceptance/acceptanceHome}">
       <div style="margin-bottom: 10px;">
         <input type="text" placeholder="이름" name="patientName" required style="width: 100%; padding: 8px;">
       </div>
@@ -140,7 +140,7 @@
         <input type="tel" placeholder="전화번호 (예: 010-1234-5678)" name="patientPhone" required style="width: 100%; padding: 8px;">
       </div>
      <div style="margin-bottom: 10px;">
-        <input type="tel" placeholder="증상" name="patientSymptom" required style="width: 100%; padding: 8px;">
+        <input type="text" placeholder="증상" name="patientSymptom" required style="width: 100%; padding: 8px;">
       </div>    
       <div style="margin-bottom: 10px;">
         <select name="patientType" required style="width: 100%; padding: 8px;">
@@ -325,122 +325,70 @@
 </div>
 
 <script>
-// ───────────────────────────────────────────────────────
-// 1) 메뉴 토글(사이드바 하위메뉴 열고 닫기)
-// ───────────────────────────────────────────────────────
-function toggleSubMenu(menuItem) {
-  const allMenuItems = document.querySelectorAll('.menu-item');
-  const allSubmenus  = document.querySelectorAll('.submenu');
+    // ───────────────────────────────────────────────────────
+    // 1) 메뉴 토글(사이드바 하위메뉴 열고 닫기) (생략)
+    function toggleSubMenu(menuItem) { /* … */ }
 
-  // 열린 상태라면 닫기
-  const isActive = menuItem.classList.contains('active');
-  allMenuItems.forEach(item => item.classList.remove('active'));
-  allSubmenus.forEach(sub => sub.style.display = 'none');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.submenu-item').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+    });
 
-  // 닫혀 있던 상태였다면 열기
-  if (!isActive) {
-    menuItem.classList.add('active');
-    const submenu = menuItem.nextElementSibling;
-    if (submenu && submenu.classList.contains('submenu')) {
-      submenu.style.display = 'block';
+    // ───────────────────────────────────────────────────────
+    // 2) 날짜 선택 모달 관련 (생략)
+    let currentDate = new Date();
+
+    function formatDateString(date) { /* … */ }
+    function updateDateDisplay() { /* … */ }
+    function openCalendar() { /* … */ }
+    function closeModal() { /* … */ }
+    function resetToday() { /* … */ }
+    function changeDate(diff) { /* … */ }
+    function applyDate() { /* … */ }
+
+    // ───────────────────────────────────────────────────────
+    // 3) 고객(환자) 등록 모달 열기/닫기
+    function openCustomerModal() {
+      const modal = document.getElementById('customerModal');
+      if (modal) modal.style.display = 'flex';
     }
-  }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.submenu-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.submenu-item')
-              .forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
+    function closeCustomerModal() {
+      const modal = document.getElementById('customerModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 날짜 표시 초기화
+      updateDateDisplay();
+
+      // ‘고객 등록’ 버튼에 클릭 이벤트 연결
+      const customerBtn = document.querySelector('.reservation-actions .action-btn');
+      if (customerBtn) {
+        customerBtn.addEventListener('click', openCustomerModal);
+      }
+
+      // 달력 모달 확인/닫기 버튼 연결 (생략)
+      const applyBtn = document.querySelector('#calendarModal button');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', applyDate);
+      }
     });
-  });
-});
 
-// ───────────────────────────────────────────────────────
-// 2) 날짜 표시 및 모달 제어
-//    - currentDate: 전역에서 관리하는 “현재 선택된 날짜”
-//    - formatDateString(): Date → "YYYY-MM-DD 요일" 형태 문자열 생성
-//    - updateDateDisplay(): #currentDate 요소에 텍스트 반영
-//    - open/close/applyDate(): 모달 열고 닫고 선택된 날짜 적용
-//    - changeDate(diff): currentDate를 하루 전/후로 옮겨서 업데이트
-// ───────────────────────────────────────────────────────
-let currentDate = new Date();
-
-function formatDateString(date) {
-  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-  const yyyy = date.getFullYear();
-  const mm   = String(date.getMonth() + 1).padStart(2, '0');
-  const dd   = String(date.getDate()).padStart(2, '0');
-  const day  = days[date.getDay()];
-  return `${yyyy}-${mm}-${dd} ${day}`;
-}
-
-function updateDateDisplay() {
-  const el = document.getElementById('currentDate');
-  if (el) {
-    el.textContent = formatDateString(currentDate);
-  }
-}
-
-
-// ───────────────────────────────────────────────────────
-// 3) 환자 등록(고객등록) 모달 열기/닫기
-// ───────────────────────────────────────────────────────
-function openCustomerModal() {
-  const modal = document.getElementById('customerModal');
-  if (modal) modal.style.display = 'flex';
-}
-
-function closeCustomerModal() {
-  const modal = document.getElementById('customerModal');
-  if (modal) modal.style.display = 'none';
-}
-
-// ───────────────────────────────────────────────────────
-// 4) DOMContentLoaded 이벤트에서 초기화할 작업들
-//    - 메뉴 하위 메뉴를 클릭했을 때 ‘active’ 클래스를 토글
-//    - 날짜 표시 초기화(updateDateDisplay())
-//    - 환자등록 버튼에 클릭 이벤트 연결
-// ───────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  // a) 메뉴 하위 메뉴 클릭 시 “active” 처리
-  document.querySelectorAll('.submenu-item').forEach(item => {
-    item.addEventListener('click', function () {
-      document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  // b) 날짜 표시 초기화
-  updateDateDisplay();
-
-  // c) ‘고객 등록’(환자 등록) 버튼 연결
-  const customerBtn = document.querySelector('.reservation-actions .action-btn');
-  if (customerBtn) {
-    customerBtn.addEventListener('click', openCustomerModal);
-  }
-
-  // d) 달력 모달 안의 확인/닫기 버튼 연결
-  const applyBtn = document.querySelector('#calendarModal button');
-  if (applyBtn) {
-    applyBtn.addEventListener('click', applyDate);
-  }
-});
-
-// ───────────────────────────────────────────────────────
-// 5) 페이지 어딘가 다른 곳에서 사용할 수 있도록
-//    전역 함수로 노출(release) – onclick 어트리뷰트에서 참조 가능
-//    (예: <button onclick="openCalendar()">)  
-// ───────────────────────────────────────────────────────
-window.toggleSubMenu      = toggleSubMenu;
-window.openCalendar       = openCalendar;
-window.closeModal         = closeModal;
-window.resetToday         = resetToday;
-window.changeDate         = changeDate;
-window.openCustomerModal  = openCustomerModal;
-window.closeCustomerModal = closeCustomerModal;
-</script>
+    // ───────────────────────────────────────────────────────
+    // 4) 전역 함수 노출 (onclick에서 사용)
+    window.toggleSubMenu      = toggleSubMenu;
+    window.openCalendar       = openCalendar;
+    window.closeModal         = closeModal;
+    window.resetToday         = resetToday;
+    window.changeDate         = changeDate;
+    window.openCustomerModal  = openCustomerModal;
+    window.closeCustomerModal = closeCustomerModal;
+  </script>
 
 
 </body>

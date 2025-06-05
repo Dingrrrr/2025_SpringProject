@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>바이탈 기록 대시보드</title>
-       <link rel="stylesheet" href="/css/VitalRecordstyle.css">
+    <link rel="stylesheet" href="/css/VitalRecordstyle.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="sidebar">
         <div class="profile">
             <div class="profile-icon">👤</div>
-            <span>내 프로필</span>
+            <span th:text="${userName}">간호사 이름</span>
         </div>
         
         <a href="NurseHome" class="menu-item">
@@ -34,15 +34,21 @@
             <div class="menu-icon">👥</div>
             <span>투약 및 처치 기록</span>
         </a>
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
 
     <!-- 메인 컨텐츠 -->
     <div class="main-content">
         <!-- 헤더 -->
         <div class="header">
-            <div class="search-bar">
+            <div class="search-bar" style="position: relative;">
                 <input type="text" class="search-input" placeholder="환자 검색" id="patientSearch">
                 <button class="search-btn" onclick="searchPatient()">🔍</button>
+                <!-- 검색 결과 드롭다운 -->
+                <div class="search-dropdown" id="search-dropdown" style="display: none;"></div>
             </div>
             <div class="patient-info" id="patientName">환자를 선택해주세요</div>
             <div class="patient-details" id="patientDetails">환자 정보가 표시됩니다</div>
@@ -72,6 +78,15 @@
             </div>
         </div>
 
+        <!-- 현재 시간대 표시 -->
+        <div style="text-align: center; margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: bold;" id="currentTimePeriod">
+                <span id="timePeriodIcon">⏰</span>
+                <span id="timePeriodText">현재 시간대</span>
+                <span style="margin-left: 10px; font-size: 14px; color: #666;" id="currentTime"></span>
+            </div>
+        </div>
+
         <!-- 대시보드 그리드 -->
         <div class="dashboard-grid">
             <!-- 혈압 추이 -->
@@ -79,9 +94,8 @@
                 <h3>
                     혈압 추이
                     <div class="chart-options">
-                        <span class="chart-option active" onclick="updateBPChart('daily')">일간</span>
-                        <span class="chart-option" onclick="updateBPChart('weekly')">주간</span>
-                        <span class="chart-option" onclick="updateBPChart('monthly')">월간</span>
+                        <span class="chart-option active" onclick="updateBPChart('time')">시간별</span>
+                        <span class="chart-option" onclick="updateBPChart('weekly')">주간별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -91,12 +105,7 @@
 
             <!-- 맥박수 -->
             <div class="chart-card">
-                <h3>
-                    맥박수
-                    <div class="chart-options">
-                        <span class="chart-option" onclick="updatePulseChart('hourly')">시간별</span>
-                    </div>
-                </h3>
+                <h3>맥박수 (시간대별)</h3>
                 <div class="chart-container">
                     <canvas id="pulseRateChart"></canvas>
                 </div>
@@ -107,8 +116,8 @@
                 <h3>
                     체온 및 호흡 분석
                     <div class="chart-options">
-                        <span class="chart-option active" onclick="updateTempRespChart('24hour')">24시간</span>
-                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간</span>
+                        <span class="chart-option active" onclick="updateTempRespChart('time')">시간별</span>
+                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -122,17 +131,597 @@
         // 전역 변수
         let currentPatientId = null;
         let charts = {};
+        let patients = {}; // NurseChart와 동일한 구조
+        let vitalChartData = {};
 
         // Chart.js 기본 설정
         Chart.defaults.font.family = 'Malgun Gothic';
         Chart.defaults.font.size = 12;
 
+        // 현재 시간을 기준으로 시간대 결정 함수
+        function getCurrentTimePeriod() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            if (hour >= 6 && hour < 12) {
+                return '아침';
+            } else if (hour >= 12 && hour < 18) {
+                return '점심';
+            } else if (hour >= 18 && hour < 24) {
+                return '저녁';
+            } else { // 0-5시
+                return '야간';
+            }
+        }
+
+        // 시간대별 색상 반환 함수
+        function getTimePeriodColor(timePeriod) {
+            const colors = {
+                '아침': '#81c784',
+                '점심': '#64b5f6', 
+                '저녁': '#ffb74d',
+                '야간': '#f06292'
+            };
+            return colors[timePeriod] || '#9e9e9e';
+        }
+
+        // 시간대별 아이콘 반환 함수
+        function getTimePeriodIcon(timePeriod) {
+            const icons = {
+                '아침': '🌅',
+                '점심': '☀️',
+                '저녁': '🌆', 
+                '야간': '🌙'
+            };
+            return icons[timePeriod] || '⏰';
+        }
+
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('페이지 로드 완료, 초기화 시작...');
             initializeCharts();
-            // 샘플 데이터로 차트 초기화 (실제로는 DB에서 데이터를 가져옴)
-            loadSampleData();
+            fetchInpatients(); // NurseChart와 동일한 환자 데이터 로드
+            updateCurrentTimePeriod(); // 현재 시간대 표시
+            
+            // 1분마다 현재 시간대 업데이트
+            setInterval(updateCurrentTimePeriod, 60000);
         });
+
+        // 현재 시간대 업데이트 함수
+        function updateCurrentTimePeriod() {
+            const currentPeriod = getCurrentTimePeriod();
+            const now = new Date();
+            
+            document.getElementById('timePeriodIcon').textContent = getTimePeriodIcon(currentPeriod);
+            document.getElementById('timePeriodText').textContent = `현재 시간대: ${currentPeriod}`;
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // 시간대별 색상 적용
+            const timePeriodDiv = document.getElementById('currentTimePeriod');
+            timePeriodDiv.style.color = getTimePeriodColor(currentPeriod);
+        }
+
+        // 입원 환자 목록 가져오기 (NurseChart와 동일)
+        async function fetchInpatients() {
+            try {
+                console.log('입원 환자 데이터 요청 시작...');
+                const response = await fetch('/nurse/api/patients/inpatients');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const patientList = await response.json();
+                console.log('받아온 환자 데이터:', patientList);
+                
+                // 배열을 객체로 변환
+                patients = {};
+                patientList.forEach(patient => {
+                    patients[patient.patient_id] = {
+                        name: patient.patient_name,
+                        gender: patient.patient_gender,
+                        birth: patient.patient_birth,
+                        phone: patient.patient_phone
+                    };
+                });
+                
+                console.log('입원 환자 데이터 로드 완료:', Object.keys(patients).length + '명');
+                
+            } catch (error) {
+                console.error('환자 데이터 로드 실패:', error);
+                console.log('샘플 데이터로 대체합니다.');
+                
+                // 서버 연결 실패 시 샘플 데이터 사용
+                patients = {
+                    1: { name: '김민수', gender: '남', birth: '1990-01-15', phone: '010-1234-5678' },
+                    2: { name: '이영희', gender: '여', birth: '1985-05-20', phone: '010-9876-5432' },
+                    3: { name: '박철수', gender: '남', birth: '1992-12-03', phone: '010-5555-7777' }
+                };
+                console.log('샘플 환자 데이터 로드:', Object.keys(patients).length + '명');
+            }
+        }
+
+        // 환자 검색 기능
+        function searchPatient() {
+            const searchTerm = document.getElementById('patientSearch').value.toLowerCase().trim();
+            console.log('검색어:', searchTerm);
+            console.log('환자 데이터:', patients);
+            
+            if (searchTerm === '') {
+                document.getElementById('search-dropdown').style.display = 'none';
+                return;
+            }
+            
+            // 환자 데이터가 로드되지 않았을 경우 처리
+            if (!patients || Object.keys(patients).length === 0) {
+                console.log('환자 데이터가 없습니다. 다시 로드를 시도합니다.');
+                fetchInpatients().then(() => {
+                    if (Object.keys(patients).length > 0) {
+                        searchPatient(); // 데이터 로드 후 다시 검색
+                    }
+                });
+                return;
+            }
+            
+            // 검색 결과 필터링
+            const searchResults = Object.entries(patients).filter(([id, patient]) => {
+                return patient.name.toLowerCase().includes(searchTerm) ||
+                       patient.gender.toLowerCase().includes(searchTerm) ||
+                       patient.birth.includes(searchTerm) ||
+                       patient.phone.includes(searchTerm);
+            });
+            
+            console.log('검색 결과:', searchResults);
+            displaySearchResults(searchResults);
+        }
+
+        // 검색 결과 표시
+        function displaySearchResults(results) {
+            const dropdown = document.getElementById('search-dropdown');
+            dropdown.innerHTML = '';
+            
+            if (results.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.style.padding = '10px';
+                noResult.style.textAlign = 'center';
+                noResult.style.color = '#666';
+                noResult.textContent = '검색 결과가 없습니다.';
+                dropdown.appendChild(noResult);
+            } else {
+                results.forEach(([id, patient]) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.style.cssText = `
+                        padding: 10px;
+                        cursor: pointer;
+                        border-bottom: 1px solid #eee;
+                        transition: background-color 0.2s;
+                    `;
+                    
+                    resultItem.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 4px;">${patient.name}</div>
+                        <div style="font-size: 12px; color: #666;">성별: ${patient.gender} | 생년월일: ${patient.birth}</div>
+                    `;
+                    
+                    // 호버 효과
+                    resultItem.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#f5f5f5';
+                    });
+                    
+                    resultItem.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+                    
+                    resultItem.addEventListener('click', function() {
+                        selectPatient(id, patient);
+                    });
+                    
+                    dropdown.appendChild(resultItem);
+                });
+            }
+            
+            dropdown.style.cssText = `
+                display: block;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-height: 200px;
+                overflow-y: auto;
+            `;
+        }
+
+        // 환자 선택
+        function selectPatient(patientId, patient) {
+            console.log('선택된 환자 ID:', patientId, '환자 정보:', patient);
+            currentPatientId = patientId; // 여기서 실제 patient_id를 저장
+            updatePatientInfo(patient);
+            document.getElementById('patientSearch').value = '';
+            document.getElementById('search-dropdown').style.display = 'none';
+            
+            // 선택된 환자의 바이탈 데이터 로드 - patientId(숫자)를 전달
+            loadPatientVitalData(patientId);
+        }
+
+        // 환자 정보 업데이트
+        function updatePatientInfo(patient) {
+            document.getElementById('patientName').textContent = patient.name + ' 환자';
+            document.getElementById('patientDetails').textContent = 
+                `성별: ${patient.gender} | 생년월일: ${patient.birth} | 전화번호: ${patient.phone}`;
+        }
+
+        // 환자 선택 시 차트 초기화 및 로드
+        function loadPatientVitalData(patientId) {
+            try {
+                console.log(`환자 ID ${patientId}의 바이탈 데이터 로드 시작 (타입: ${typeof patientId})`);
+                
+                // patientId가 숫자인지 확인
+                const numericPatientId = parseInt(patientId);
+                if (isNaN(numericPatientId)) {
+                    throw new Error(`잘못된 환자 ID: ${patientId}`);
+                }
+                
+                // 차트 초기화 (이전 환자 데이터 제거)
+                initializeChartsData();
+                
+                // 최신 바이탈 사인 조회
+                console.log('최신 바이탈 사인 요청...');
+                fetch(`/nurse/api/vitals/latest/${numericPatientId}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('최신 바이탈 조회 실패');
+                        }
+                    })
+                    .then(latestData => {
+                        console.log('최신 바이탈 데이터:', latestData);
+                        updateVitalSummary(latestData);
+                    })
+                    .catch(error => {
+                        console.error('최신 바이탈 조회 실패:', error);
+                        // 실패 시 기본값으로 초기화
+                        updateVitalSummary({});
+                    });
+
+                // 차트 데이터 조회
+                console.log(`차트 데이터 요청: /nurse/api/vitals/chart-data/${numericPatientId}`);
+                fetch(`/nurse/api/vitals/chart-data/${numericPatientId}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('차트 데이터 조회 실패');
+                        }
+                    })
+                    .then(chartData => {
+                        console.log('차트 데이터 응답:', chartData);
+                        vitalChartData = chartData;
+                        
+                        // 각 차트를 개별적으로 시간별로 초기화
+                        updateBPChartOnly('time');
+                        updateTempRespChartOnly('time');
+                        updatePulseChart(); // 맥박은 항상 시간대별만
+                    })
+                    .catch(error => {
+                        console.error('차트 데이터 조회 실패:', error);
+                        // 실패 시 빈 차트 표시
+                        vitalChartData = { timeData: [], weeklyData: [] };
+                        updateBPChartOnly('time');
+                        updateTempRespChartOnly('time');
+                        updatePulseChart();
+                    });
+                
+            } catch (error) {
+                console.error('바이탈 데이터 로드 실패:', error);
+                // 에러 시 모든 차트 초기화
+                initializeChartsData();
+                updateVitalSummary({});
+            }
+        }
+
+        // 차트 데이터 초기화
+        function initializeChartsData() {
+            updateBPChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
+            updatePulseChartData([0, 0, 0, 0]);
+            updateTempRespChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
+        }
+
+        // 맥박 차트 업데이트 (시간대별만)
+        function updatePulseChart() {
+            if (!vitalChartData || !vitalChartData.timeData) {
+                updatePulseChartData([0, 0, 0, 0]);
+                return;
+            }
+
+            const timeLabels = ['아침', '점심', '저녁', '야간'];
+            const pulseData = [0, 0, 0, 0];
+
+            vitalChartData.timeData.forEach(item => {
+                const index = timeLabels.indexOf(item.time_period);
+                if (index !== -1) {
+                    pulseData[index] = parseFloat(item.avg_pulse || 0);
+                }
+            });
+
+            updatePulseChartData(pulseData);
+        }
+
+        // 최신 바이탈 요약 업데이트
+        function updateVitalSummary(latestVital) {
+            if (latestVital && Object.keys(latestVital).length > 0) {
+                const systolic = latestVital.bp_systolic || 0;
+                const diastolic = latestVital.bp_diastolic || 0;
+                
+                document.getElementById('latestBP').textContent = `${systolic}/${diastolic}`;
+                document.getElementById('latestPulse').textContent = latestVital.pulse_rate || '-';
+                document.getElementById('latestTemp').textContent = latestVital.temperature ? 
+                    parseFloat(latestVital.temperature).toFixed(1) : '-';
+                document.getElementById('latestResp').textContent = latestVital.respiration_rate || '-';
+                
+                // 시간 정보에 시간대 표시 추가
+                let recordTime = '-';
+                let timePeriodInfo = '';
+                
+                if (latestVital.recorded_at) {
+                    const recordDate = new Date(latestVital.recorded_at);
+                    recordTime = recordDate.toLocaleString('ko-KR');
+                    
+                    // 해당 시간의 시간대 계산
+                    const hour = recordDate.getHours();
+                    let period = '';
+                    if (hour >= 6 && hour < 12) period = '아침';
+                    else if (hour >= 12 && hour < 18) period = '점심';
+                    else if (hour >= 18 && hour < 24) period = '저녁';
+                    else period = '야간';
+                    
+                    timePeriodInfo = ` (${getTimePeriodIcon(period)} ${period})`;
+                    recordTime += timePeriodInfo;
+                }
+                
+                document.getElementById('bpTime').innerHTML = recordTime;
+                document.getElementById('pulseTime').innerHTML = recordTime;
+                document.getElementById('tempTime').innerHTML = recordTime;
+                document.getElementById('respTime').innerHTML = recordTime;
+            } else {
+                // 데이터가 없을 때 기본값
+                document.getElementById('latestBP').textContent = '-/-';
+                document.getElementById('latestPulse').textContent = '-';
+                document.getElementById('latestTemp').textContent = '-';
+                document.getElementById('latestResp').textContent = '-';
+                document.getElementById('bpTime').textContent = '데이터 없음';
+                document.getElementById('pulseTime').textContent = '데이터 없음';
+                document.getElementById('tempTime').textContent = '데이터 없음';
+                document.getElementById('respTime').textContent = '데이터 없음';
+            }
+        }
+
+        // 모든 차트 업데이트
+        function updateAllCharts(period) {
+            if (!vitalChartData || !vitalChartData.timeData) {
+                console.log('차트 데이터가 없습니다.');
+                // 데이터가 없을 때 빈 차트 표시
+                updateBPChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
+                updatePulseChartData([0, 0, 0, 0]);
+                updateTempRespChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
+                return;
+            }
+
+            const data = period === 'time' ? vitalChartData.timeData : vitalChartData.weeklyData;
+            console.log(`${period} 데이터 업데이트:`, data);
+            
+            if (period === 'time') {
+                // 시간대별 데이터 처리
+                const timeLabels = ['아침', '점심', '저녁', '야간'];
+                const systolicData = [0, 0, 0, 0];
+                const diastolicData = [0, 0, 0, 0];
+                const pulseData = [0, 0, 0, 0];
+                const tempData = [0, 0, 0, 0];
+                const respData = [0, 0, 0, 0];
+
+                // 실제 DB 데이터를 시간대별로 매핑
+                data.forEach(item => {
+                    const index = timeLabels.indexOf(item.time_period);
+                    if (index !== -1) {
+                        systolicData[index] = parseFloat(item.avg_systolic || 0);
+                        diastolicData[index] = parseFloat(item.avg_diastolic || 0);
+                        pulseData[index] = parseFloat(item.avg_pulse || 0);
+                        tempData[index] = parseFloat(item.avg_temp || 0);
+                        respData[index] = parseFloat(item.avg_resp || 0);
+                    }
+                });
+
+                console.log('시간대별 처리된 데이터:', {
+                    systolic: systolicData,
+                    diastolic: diastolicData,
+                    pulse: pulseData,
+                    temp: tempData,
+                    resp: respData
+                });
+
+                updateBPChartData(timeLabels, systolicData, diastolicData);
+                updatePulseChartData(pulseData);
+                updateTempRespChartData(timeLabels, tempData, respData);
+                
+            } else {
+                // 주간별 데이터 처리
+                const weeklyLabels = data.map(item => {
+                    const date = new Date(item.date);
+                    return ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+                });
+                const systolicData = data.map(item => parseFloat(item.avg_systolic || 0));
+                const diastolicData = data.map(item => parseFloat(item.avg_diastolic || 0));
+                const tempData = data.map(item => parseFloat(item.avg_temp || 0));
+                const respData = data.map(item => parseFloat(item.avg_resp || 0));
+
+                console.log('주간별 처리된 데이터:', {
+                    labels: weeklyLabels,
+                    systolic: systolicData,
+                    diastolic: diastolicData,
+                    temp: tempData,
+                    resp: respData
+                });
+
+                updateBPChartData(weeklyLabels, systolicData, diastolicData);
+                updateTempRespChartData(weeklyLabels, tempData, respData);
+            }
+        }
+
+        // 차트별 데이터 업데이트 함수들
+        function updateBPChartData(labels, systolic, diastolic) {
+            charts.bloodPressure.data.labels = labels;
+            charts.bloodPressure.data.datasets[0].data = systolic;
+            charts.bloodPressure.data.datasets[1].data = diastolic;
+            
+            // Y축 범위 조정 - 최대 200으로 고정
+            charts.bloodPressure.options.scales.y.min = 40;
+            charts.bloodPressure.options.scales.y.max = 200;
+            
+            charts.bloodPressure.update('none'); // 애니메이션 없이 즉시 업데이트
+            console.log('혈압 차트 업데이트 완료:', { labels, systolic, diastolic });
+        }
+
+        function updatePulseChartData(pulseData) {
+            charts.pulseRate.data.datasets[0].data = pulseData;
+            
+            // Y축 범위 조정 - 최대 200으로 고정
+            charts.pulseRate.options.scales.y.min = 0;
+            charts.pulseRate.options.scales.y.max = 200;
+            
+            charts.pulseRate.update('none');
+            console.log('맥박 차트 업데이트 완료:', pulseData);
+        }
+
+        function updateTempRespChartData(labels, tempData, respData) {
+            charts.tempResp.data.labels = labels;
+            charts.tempResp.data.datasets[0].data = tempData;
+            charts.tempResp.data.datasets[1].data = respData;
+            
+            // Y축 범위 조정 - 체온 최대 42, 호흡수 최대 100
+            charts.tempResp.options.scales.y.min = 35;
+            charts.tempResp.options.scales.y.max = 42;
+            charts.tempResp.options.scales.y1.min = 10;
+            charts.tempResp.options.scales.y1.max = 100;
+            
+            charts.tempResp.update('none');
+            console.log('체온/호흡 차트 업데이트 완료:', { labels, tempData, respData });
+        }
+
+        // 혈압 차트 업데이트 (개별 동작)
+        function updateBPChart(period) {
+            setActiveOption(event.target);
+            updateBPChartOnly(period);
+        }
+
+        // 체온/호흡 차트 업데이트 (개별 동작)
+        function updateTempRespChart(period) {
+            setActiveOption(event.target);
+            updateTempRespChartOnly(period);
+        }
+
+        // 혈압 차트만 업데이트
+        function updateBPChartOnly(period) {
+            if (!vitalChartData) {
+                console.log('차트 데이터가 없습니다.');
+                return;
+            }
+
+            if (period === 'time') {
+                // 시간대별 (아침, 점심, 저녁, 야간)
+                const timeLabels = ['아침', '점심', '저녁', '야간'];
+                const systolicData = [0, 0, 0, 0];
+                const diastolicData = [0, 0, 0, 0];
+
+                if (vitalChartData.timeData) {
+                    vitalChartData.timeData.forEach(item => {
+                        const index = timeLabels.indexOf(item.time_period);
+                        if (index !== -1) {
+                            systolicData[index] = parseFloat(item.avg_systolic || 0);
+                            diastolicData[index] = parseFloat(item.avg_diastolic || 0);
+                        }
+                    });
+                }
+
+                updateBPChartData(timeLabels, systolicData, diastolicData);
+                
+            } else if (period === 'weekly') {
+                // 주간별 (월, 화, 수, 목, 금, 토, 일)
+                const weeklyLabels = ['월', '화', '수', '목', '금', '토', '일'];
+                const systolicData = [0, 0, 0, 0, 0, 0, 0];
+                const diastolicData = [0, 0, 0, 0, 0, 0, 0];
+
+                if (vitalChartData.weeklyData) {
+                    vitalChartData.weeklyData.forEach(item => {
+                        const date = new Date(item.date);
+                        const dayIndex = (date.getDay() + 6) % 7; // 월요일을 0으로 만들기 (일요일=0 -> 월요일=0)
+                        systolicData[dayIndex] = parseFloat(item.avg_systolic || 0);
+                        diastolicData[dayIndex] = parseFloat(item.avg_diastolic || 0);
+                    });
+                }
+
+                updateBPChartData(weeklyLabels, systolicData, diastolicData);
+            }
+        }
+
+        // 체온/호흡 차트만 업데이트
+        function updateTempRespChartOnly(period) {
+            if (!vitalChartData) {
+                console.log('차트 데이터가 없습니다.');
+                return;
+            }
+
+            if (period === 'time') {
+                // 시간대별 (아침, 점심, 저녁, 야간)
+                const timeLabels = ['아침', '점심', '저녁', '야간'];
+                const tempData = [0, 0, 0, 0];
+                const respData = [0, 0, 0, 0];
+
+                if (vitalChartData.timeData) {
+                    vitalChartData.timeData.forEach(item => {
+                        const index = timeLabels.indexOf(item.time_period);
+                        if (index !== -1) {
+                            tempData[index] = parseFloat(item.avg_temp || 0);
+                            respData[index] = parseFloat(item.avg_resp || 0);
+                        }
+                    });
+                }
+
+                updateTempRespChartData(timeLabels, tempData, respData);
+                
+            } else if (period === 'weekly') {
+                // 주간별 (월, 화, 수, 목, 금, 토, 일)
+                const weeklyLabels = ['월', '화', '수', '목', '금', '토', '일'];
+                const tempData = [0, 0, 0, 0, 0, 0, 0];
+                const respData = [0, 0, 0, 0, 0, 0, 0];
+
+                if (vitalChartData.weeklyData) {
+                    vitalChartData.weeklyData.forEach(item => {
+                        const date = new Date(item.date);
+                        const dayIndex = (date.getDay() + 6) % 7; // 월요일을 0으로 만들기
+                        tempData[dayIndex] = parseFloat(item.avg_temp || 0);
+                        respData[dayIndex] = parseFloat(item.avg_resp || 0);
+                    });
+                }
+
+                updateTempRespChartData(weeklyLabels, tempData, respData);
+            }
+        }
+
+        // 활성 옵션 설정
+        function setActiveOption(clickedElement) {
+            const parent = clickedElement.parentElement;
+            parent.querySelectorAll('.chart-option').forEach(opt => opt.classList.remove('active'));
+            clickedElement.classList.add('active');
+        }
 
         // 차트 초기화
         function initializeCharts() {
@@ -141,16 +730,16 @@
             charts.bloodPressure = new Chart(bloodPressureCtx, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: ['아침', '점심', '저녁', '야간'],
                     datasets: [{
-                        label: '수축기압 (bp_systolic)',
+                        label: '수축기압',
                         data: [],
                         borderColor: '#2196f3',
                         backgroundColor: 'rgba(33, 150, 243, 0.1)',
                         fill: true,
                         tension: 0.4
                     }, {
-                        label: '이완기압 (bp_diastolic)',
+                        label: '이완기압',
                         data: [],
                         borderColor: '#64b5f6',
                         backgroundColor: 'rgba(100, 181, 246, 0.1)',
@@ -164,8 +753,8 @@
                     scales: {
                         y: {
                             beginAtZero: false,
-                            min: 50,
-                            max: 200
+                            min: 40,
+                            max: 200  // 혈압 최대값 200으로 고정
                         }
                     },
                     plugins: {
@@ -176,14 +765,14 @@
                 }
             });
 
-            // 맥박수 모니터링 차트
+            // 맥박수 차트
             const pulseRateCtx = document.getElementById('pulseRateChart').getContext('2d');
             charts.pulseRate = new Chart(pulseRateCtx, {
                 type: 'bar',
                 data: {
-                    labels: [],
+                    labels: ['아침', '점심', '저녁', '야간'],
                     datasets: [{
-                        label: '맥박수 (pulse_rate)',
+                        label: '맥박수',
                         data: [],
                         backgroundColor: ['#81c784', '#64b5f6', '#ffb74d', '#f06292'],
                         borderRadius: 4
@@ -195,7 +784,8 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 120
+                            min: 0,
+                            max: 200  // 맥박수 최대값 200으로 고정
                         }
                     },
                     plugins: {
@@ -211,16 +801,16 @@
             charts.tempResp = new Chart(tempRespCtx, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: ['아침', '점심', '저녁', '야간'],
                     datasets: [{
-                        label: '체온 (temperature)',
+                        label: '체온 (°C)',
                         data: [],
                         borderColor: '#f44336',
                         backgroundColor: 'rgba(244, 67, 54, 0.1)',
                         yAxisID: 'y',
                         tension: 0.4
                     }, {
-                        label: '호흡수 (respiration_rate)',
+                        label: '호흡수 (/분)',
                         data: [],
                         borderColor: '#4caf50',
                         backgroundColor: 'rgba(76, 175, 80, 0.1)',
@@ -237,7 +827,7 @@
                             display: true,
                             position: 'left',
                             min: 35,
-                            max: 42,
+                            max: 42,  // 체온 최대값 42로 고정
                             title: {
                                 display: true,
                                 text: '체온 (°C)'
@@ -248,7 +838,7 @@
                             display: true,
                             position: 'right',
                             min: 10,
-                            max: 30,
+                            max: 100,  // 호흡수 최대값 100으로 고정
                             title: {
                                 display: true,
                                 text: '호흡수 (/분)'
@@ -267,173 +857,30 @@
             });
         }
 
-        // 환자 검색 함수
-        function searchPatient() {
-            const searchValue = document.getElementById('patientSearch').value;
-            if (searchValue.trim()) {
-                // 실제 DB 연동 시에는 patient_id로 검색
-                loadPatientData(searchValue);
+        // 검색창 외부 클릭시 드롭다운 숨기기
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-bar')) {
+                document.getElementById('search-dropdown').style.display = 'none';
             }
-        }
+        });
 
-        // 환자 데이터 로드 (DB 연동 함수)
-        function loadPatientData(patientQuery) {
-            // 실제 DB 연동 코드 예시:
-            /*
-            fetch('/api/patient/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query: patientQuery })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentPatientId = data.patient.patient_id;
-                    updatePatientInfo(data.patient);
-                    loadVitalRecords(currentPatientId);
-                }
-            });
-            */
-            
-            // 샘플 데이터로 테스트
-            currentPatientId = 'P001';
-            updatePatientInfo({
-                patient_id: 'P001',
-                name: patientQuery,
-                gender: '남',
-                birth_date: '2000-08-04',
-                phone: '010-7462-6853'
-            });
-            loadVitalRecords(currentPatientId);
-        }
-
-        // 환자 정보 업데이트
-        function updatePatientInfo(patient) {
-            document.getElementById('patientName').textContent = patient.name + ' 환자';
-            document.getElementById('patientDetails').textContent = 
-                `성별:${patient.gender} 생년월일:${patient.birth_date} 전화번호:${patient.phone}`;
-        }
-
-        // 바이탈 기록 로드 (DB 연동 함수)
-        function loadVitalRecords(patientId) {
-            // 실제 DB 연동 코드 예시:
-            /*
-            fetch(`/api/vital-records/${patientId}`)
-            .then(response => response.json())
-            .then(data => {
-                updateVitalSummary(data.latest);
-                updateAllCharts(data.records);
-            });
-            */
-            
-            // 샘플 데이터로 테스트
-            loadSampleVitalData();
-        }
-
-        // 최신 바이탈 요약 업데이트
-        function updateVitalSummary(latestVital) {
-            if (latestVital) {
-                document.getElementById('latestBP').textContent = 
-                    `${latestVital.bp_systolic}/${latestVital.bp_diastolic}`;
-                document.getElementById('latestPulse').textContent = latestVital.pulse_rate;
-                document.getElementById('latestTemp').textContent = latestVital.temperature.toFixed(1);
-                document.getElementById('latestResp').textContent = latestVital.respiration_rate;
-                
-                const recordTime = new Date(latestVital.recorded_at).toLocaleString('ko-KR');
-                document.getElementById('bpTime').textContent = recordTime;
-                document.getElementById('pulseTime').textContent = recordTime;
-                document.getElementById('tempTime').textContent = recordTime;
-                document.getElementById('respTime').textContent = recordTime;
+        // 검색 입력 이벤트 - Enter 키 지원 추가
+        document.getElementById('patientSearch').addEventListener('input', function(e) {
+            searchPatient();
+        });
+        
+        document.getElementById('patientSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchPatient();
             }
-        }
-
-        // 혈압 차트 업데이트
-        function updateBPChart(period) {
-            setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
-            // fetch(`/api/vital-records/${currentPatientId}/bp?period=${period}`)
-        }
-
-        // 맥박 차트 업데이트
-        function updatePulseChart(period) {
-            setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
-        }
-
-        // 체온/호흡 차트 업데이트
-        function updateTempRespChart(period) {
-            setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
-        }
-
-        // 활성 옵션 설정
-        function setActiveOption(clickedElement) {
-            const parent = clickedElement.parentElement;
-            parent.querySelectorAll('.chart-option').forEach(opt => opt.classList.remove('active'));
-            clickedElement.classList.add('active');
-        }
-
-        // 샘플 데이터 로드 함수
-        function loadSampleData() {
-            // 샘플 환자 데이터 로드
-            updatePatientInfo({
-                patient_id: 'P001',
-                name: '민규짱',
-                gender: '남',
-                birth_date: '2000-08-04',
-                phone: '010-7462-6853'
-            });
-            
-            loadSampleVitalData();
-        }
-
-        function loadSampleVitalData() {
-            // 최신 바이탈 데이터 샘플
-            const latestVital = {
-                bp_systolic: 125,
-                bp_diastolic: 82,
-                pulse_rate: 78,
-                temperature: 36.7,
-                respiration_rate: 18,
-                recorded_at: new Date().toISOString()
-            };
-            updateVitalSummary(latestVital);
-
-            // 차트 데이터 샘플
-            const sampleData = {
-                labels: ['월', '화', '수', '목', '금', '토', '일'],
-                bloodPressure: {
-                    systolic: [120, 125, 118, 132, 128, 122, 130],
-                    diastolic: [80, 82, 78, 85, 83, 79, 84]
-                },
-                pulseRate: {
-                    labels: ['06:00', '12:00', '18:00', '24:00'],
-                    data: [72, 85, 78, 68]
-                },
-                tempResp: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-                    temperature: [36.5, 36.7, 36.8, 37.1, 36.9, 36.6],
-                    respiration: [16, 18, 17, 20, 19, 17]
-                }
-            };
-
-            // 차트 업데이트
-            charts.bloodPressure.data.labels = sampleData.labels;
-            charts.bloodPressure.data.datasets[0].data = sampleData.bloodPressure.systolic;
-            charts.bloodPressure.data.datasets[1].data = sampleData.bloodPressure.diastolic;
-            charts.bloodPressure.update();
-
-            charts.pulseRate.data.labels = sampleData.pulseRate.labels;
-            charts.pulseRate.data.datasets[0].data = sampleData.pulseRate.data;
-            charts.pulseRate.update();
-
-            charts.tempResp.data.labels = sampleData.tempResp.labels;
-            charts.tempResp.data.datasets[0].data = sampleData.tempResp.temperature;
-            charts.tempResp.data.datasets[1].data = sampleData.tempResp.respiration;
-            charts.tempResp.update();
-        }
+        });
+        
+        // 검색 버튼 클릭 이벤트 수정
+        document.querySelector('.search-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            searchPatient();
+        });
 
         // 메뉴 클릭 이벤트
         document.querySelectorAll('.menu-item').forEach(item => {

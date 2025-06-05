@@ -110,48 +110,14 @@
           <div class="header-col">진료실4</div>
         </div>
 
-    <!-- 시간대별 행들 (30분 단위) -->
-    <div class="schedule-row">
-      <div class="time-col">09:00</div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell green">[이수진]<br>상담</div>
-      <div class="cell"></div>
-    </div>
-
-    <div class="schedule-row">
-      <div class="time-col">09:30</div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell green">[이수진]<br>상담</div>
-      <div class="cell"></div>
-    </div>
-
-    <div class="schedule-row">
-      <div class="time-col">10:00</div>
-      <div class="cell blue">[홍길동]<br>간단 수술</div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-    </div>
-
-    <div class="schedule-row">
-      <div class="time-col">10:30</div>
-      <div class="cell blue">[홍길동]</div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-    </div>
-
-    <div class="schedule-row">
-      <div class="time-col">11:00</div>
-      <div class="cell"></div>
-      <div class="cell pink">[박보검]<br>입원 접수</div>
-      <div class="cell"></div>
-      <div class="cell"></div>
-    </div>
 
     <!-- 나머지 시간대 (빈 상태로) -->
+    <div class="schedule-row"><div class="time-col">09:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    <div class="schedule-row"><div class="time-col">09:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    <div class="schedule-row"><div class="time-col">10:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    <div class="schedule-row"><div class="time-col">10:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    <div class="schedule-row"><div class="time-col">11:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+    <div class="schedule-row"><div class="time-col">11:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
     <div class="schedule-row"><div class="time-col">11:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
     <div class="schedule-row"><div class="time-col">12:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
     <div class="schedule-row"><div class="time-col">12:30</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
@@ -223,12 +189,20 @@
 <div id="reservationModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h2>예약 등록</h2>
-    <form id="reservationForm">
-      <label>이름</label>
-      <input type="text" name="name" required>
+ 	<form id="reservationForm" method="post" action="/acceptance/appointment">
+     <label>이름</label>
+		<input list="patientList" id="patientNameInput" name="name" required />
+		<datalist id="patientList"></datalist>
+      
+      <label>성별</label>
+		<select name="gender" required>
+		  <option value="">선택</option>
+		  <option value="남">남</option>
+		  <option value="여">여</option>
+		</select>
 
-      <label>주민번호</label>
-      <input type="text" name="rrn" placeholder="예: 123456-1234567" required>
+		<label>주민등록번호</label>
+		<input type="text" name="rrn" placeholder="000000-0000000" required>
 
       <label>연락처</label>
       <input type="tel" name="phone" placeholder="010-0000-0000" required>
@@ -237,7 +211,7 @@
       <input type="datetime-local" name="date" required>
 
       <label>진료실</label>
-      <select name="department" required>
+      <select name="room" required>
         <option value="">선택</option>
         <option>진료실1</option>
         <option>진료실2</option>
@@ -247,9 +221,11 @@
       
       <label>병명</label>
 		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
-
-      <label>담당 의사</label>
-      <input type="text" name="doctor" required>
+	
+	<label for="doctorSelect">담당 의사</label>
+	<select id="doctorSelect" name="doctor" required>
+	  <option value="">의사 선택</option>
+	</select>
 
       <div class="modal-buttons">
         <button type="button" class="cancel-btn" onclick="closeModal()">취소</button>
@@ -350,17 +326,15 @@ function closeModal() {
 document.getElementById('reservationForm').addEventListener('submit', function (e) {
   e.preventDefault(); // 새로고침 방지
 
-  // 입력값 가져오기
   const name = this.name.value;
   const date = new Date(this.date.value);
-  const department = this.department.value;
+  const department = this.room.value;
   const disease = this.disease.value;
 
   const hour = String(date.getHours()).padStart(2, '0');
   const minute = String(date.getMinutes()).padStart(2, '0');
   const timeStr = `${hour}:${minute}`;
 
-  // 진료실 인덱스 매핑
   const roomIndex = {
     '진료실1': 1,
     '진료실2': 2,
@@ -374,78 +348,99 @@ document.getElementById('reservationForm').addEventListener('submit', function (
   }
 
   const rows = document.querySelectorAll('.schedule-row');
-  let inserted = false;
+  let targetCell = null;
 
-for (const row of rows) {
-  const timeCol = row.querySelector('.time-col');
-  if (timeCol && timeCol.textContent.trim() === timeStr) {
-    const cells = row.querySelectorAll('.cell');
-    const targetCell = cells[roomIndex - 1];
+  for (const row of rows) {
+    const timeCol = row.querySelector('.time-col');
+    if (timeCol && timeCol.textContent.trim() === timeStr) {
+      const cells = row.querySelectorAll('.cell');
+      const cell = cells[roomIndex - 1];
 
-if (targetCell.innerHTML.trim() !== '') {
-  alert("해당 시간대에 이미 예약이 존재합니다.");
-  return;  // 중복 시 함수 종료
-}
+      if (cell.innerHTML.trim() !== '') {
+        alert("해당 시간대에 이미 예약이 존재합니다.");
+        return;
+      }
 
-    targetCell.classList.add('green');
-    targetCell.innerHTML = `[${name}]<br>${disease}`;
-    targetCell.innerHTML = `[${name}]<br>${disease}`;
-    
-
-    targetCell.dataset.name = name;
-    targetCell.dataset.rrn = this.rrn.value;
-    targetCell.dataset.phone = this.phone.value;
-    targetCell.dataset.date = this.date.value;
-    targetCell.dataset.department = department;
-    targetCell.dataset.disease = disease;
-    targetCell.dataset.doctor = this.doctor.value;
-
-    targetCell.addEventListener('click', function () {
-      document.querySelector('input[name="editName"]').value = this.dataset.name || '';
-      document.querySelector('input[name="editRRN"]').value = this.dataset.rrn || '';
-      document.querySelector('input[name="editPhone"]').value = this.dataset.phone || '';
-      document.querySelector('input[name="editDate"]').value = this.dataset.date || '';
-      document.querySelector('select[name="editDepartment"]').value = this.dataset.department || '';
-      document.querySelector('input[name="editDisease"]').value = this.dataset.disease || '';
-      document.querySelector('input[name="editDoctor"]').value = this.dataset.doctor || '';
-
-      selectedCell = this;
-      document.getElementById('reservationDetailModal').style.display = 'flex';
-    });
-
-    inserted = true;
-    break; // ✅ 처리 완료 후 루프 중단
+      targetCell = cell;
+      break;
+    }
   }
-}
 
+  if (!targetCell) {
+    alert("입력한 시간에 해당하는 셀이 없습니다.");
+    return;
+  }
 
-if (!inserted) {
-  // 아무 셀에도 넣지 못했을 경우만 메시지 표시
-  alert("입력한 시간에 해당하는 셀이 없습니다.");
-} else if (!document.getElementById('reservationModal').style.display.includes('none')) {
-  // 정상 등록되었을 경우만 모달 닫기
-  alert('예약이 저장되었습니다.');
-  closeModal();
-}
+  // ✅ JSON 방식으로 fetch 전송
+  const payload = {
+    name: this.name.value,
+    rrn: this.rrn.value,
+    phone: this.phone.value,
+    gender: this.gender.value,
+    date: this.date.value,
+    room: this.room.value,
+    disease: this.disease.value,
+    doctor: this.doctor.value
+  };
+
+  fetch("/acceptance/appointment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    return response.text().then(msg => {
+      if (!response.ok) throw new Error(msg);
+      return msg;
+    });
+  })
+  .then(result => {
+    // ✅ 여기서 성공한 경우에만 셀에 표시
+    targetCell.classList.add('green');
+    targetCell.innerHTML = `[${payload.name}]<br>${payload.rrn}`;
+    targetCell.dataset.name = payload.name;
+    targetCell.dataset.rrn = payload.rrn;
+    targetCell.dataset.phone = payload.phone;
+    targetCell.dataset.date = payload.date;
+    targetCell.dataset.department = payload.room;
+    targetCell.dataset.disease = payload.disease;
+    targetCell.dataset.doctor = payload.doctor;
+
+    alert(result);
+    closeModal(); // 모달 닫기
+  })
+  .catch(err => {
+    alert("예약 실패: " + err.message); // 예: "존재하지 않는 환자입니다."
+  });
 });
+
 
 
 
 let selectedCell = null;
-// 예약 셀 클릭 시 상세 보기 모달 열기
-document.querySelectorAll('.cell.green').forEach(cell => {
-  cell.addEventListener('click', function () {
-    const [nameLine, diseaseLine] = this.innerHTML.split('<br>');
-
-    document.querySelector('input[name="editName"]').value = nameLine.replace(/\[|\]/g, '');
-    document.querySelector('input[name="editDisease"]').value = diseaseLine || '';
-
-    // 수정 시 다시 넣기 위해 클릭한 셀 저장
-    selectedCell = this;
-
-    document.getElementById('reservationDetailModal').style.display = 'flex';
-  });
+// ✅ 이벤트 위임 (가장 권장 방식)
+document.querySelector('.schedule-table').addEventListener('click', function (e) {
+  const cell = e.target;
+  if (cell.classList.contains('green')) {
+    openReservationDetailModal(cell);
+  }
 });
+
+function openReservationDetailModal(cell) {
+  document.querySelector('input[name="editName"]').value = cell.dataset.name || '';
+  document.querySelector('input[name="editRRN"]').value = cell.dataset.rrn || '';
+  document.querySelector('input[name="editPhone"]').value = cell.dataset.phone || '';
+  document.querySelector('input[name="editDate"]').value = cell.dataset.date || '';
+  document.querySelector('select[name="editDepartment"]').value = cell.dataset.department || '';
+  document.querySelector('input[name="editDisease"]').value = cell.dataset.disease || '';
+  document.querySelector('input[name="editDoctor"]').value = cell.dataset.doctor || '';
+
+  selectedCell = cell;
+  document.getElementById('reservationDetailModal').style.display = 'flex';
+}
+
 
 //수정완료시 셀 내용 반영
 document.getElementById('editReservationForm').addEventListener('submit', function (e) {
@@ -460,6 +455,43 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
   const newDoctor = this.editDoctor.value;
 
   if (!selectedCell) return;
+
+	 const updatePayload = {
+    name: newName,
+    rrn: newRRN,
+    phone: newPhone,
+    gender: selectedCell.dataset.gender || "",
+    date: newDate,
+    originalDate: selectedCell.dataset.date, 
+    room: newDepartment,
+    disease: newDisease,
+    doctor: newDoctor
+  };
+
+fetch("/acceptance/appointment", {
+  method: "PUT",  // ✅ 수정은 PUT으로
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(updatePayload)  // ✅ 올바른 변수명
+})
+.then(response => {
+  return response.text().then(msg => {
+    if (!response.ok) {
+      throw new Error(msg);
+    }
+    return msg;
+  });
+})
+.then(result => {
+  alert(result);  // 성공 메시지 출력
+  // 이후 화면 셀 업데이트 또는 closeDetailModal(); 수행
+})
+.catch(err => {
+  alert("예약 실패: " + err.message);
+});
+
+
 
   // 날짜와 시간 파싱
   const dateObj = new Date(newDate);
@@ -517,7 +549,7 @@ document.getElementById('editReservationForm').addEventListener('submit', functi
 
   // ✅ 새 셀에 예약 정보 등록
   newCell.classList.add('green');
-  newCell.innerHTML = `[${newName}]<br>${newDisease}`;
+  newCell.innerHTML = `[${newName}]<br>${newRRN}`;
   newCell.dataset.name = newName;
   newCell.dataset.rrn = newRRN;
   newCell.dataset.phone = newPhone;
@@ -552,30 +584,55 @@ function cancelReservation() {
   if (!selectedCell) return;
 
   if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
-    // 셀 초기화
-    selectedCell.classList.remove('green');
-    selectedCell.innerHTML = '';
-    selectedCell.removeAttribute('data-name');
-    selectedCell.removeAttribute('data-rrn');
-    selectedCell.removeAttribute('data-phone');
-    selectedCell.removeAttribute('data-date');
-    selectedCell.removeAttribute('data-department');
-    selectedCell.removeAttribute('data-disease');
-    selectedCell.removeAttribute('data-doctor');
+    const date = selectedCell.dataset.date;
+    const rrn = selectedCell.dataset.rrn;
 
-    // 모달 닫기
-    closeDetailModal();
+    fetch("/acceptance/appointment", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        date: date,
+        rrn: rrn
+      })
+    })
+    .then(response => {
+      return response.text().then(msg => {
+        if (!response.ok) throw new Error(msg);
+        return msg;
+      });
+    })
+    .then(result => {
+      alert(result);  // 예: "예약이 삭제되었습니다."
 
-    // 선택 해제
-    selectedCell = null;
+      // ✅ 화면에서도 셀 초기화
+      selectedCell.classList.remove('green');
+      selectedCell.innerHTML = '';
+      selectedCell.removeAttribute('data-name');
+      selectedCell.removeAttribute('data-rrn');
+      selectedCell.removeAttribute('data-phone');
+      selectedCell.removeAttribute('data-date');
+      selectedCell.removeAttribute('data-department');
+      selectedCell.removeAttribute('data-disease');
+      selectedCell.removeAttribute('data-doctor');
+
+      closeDetailModal();
+      selectedCell = null;
+    })
+    .catch(err => {
+      alert("예약 삭제 실패: " + err.message);
+    });
   }
 }
+
 
 function showTab(view) {
   const tabs = document.querySelectorAll('.tab');
   const views = document.querySelectorAll('.schedule-view');
   const dateWrapper = document.querySelector('.top-center-date');
   const weekWrapper = document.querySelector('.top-center-week');
+  const registerBtn = document.querySelector('.register-btn-fixed'); // ✅ 추가
 
   tabs.forEach(tab => tab.classList.remove('active'));
   views.forEach(v => v.classList.remove('active'));
@@ -585,12 +642,14 @@ function showTab(view) {
     document.getElementById('dayView').classList.add('active');
     dateWrapper.style.display = 'flex';
     weekWrapper.style.display = 'none';
+    registerBtn.style.display = 'inline-block';
   } else if (view === 'week') {
     tabs[1].classList.add('active');
     document.getElementById('weekView').classList.add('active');
     dateWrapper.style.display = 'none';
-    weekWrapper.style.display = 'flex'; // ✅ 이 줄 추가!
-    updateWeekDisplay();                // ✅ 이 줄 추가!
+    weekWrapper.style.display = 'flex';
+    updateWeekDisplay();
+    registerBtn.style.display = 'none'; 
   }
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -641,22 +700,6 @@ function applyCalendarDate() {
     updateDateDisplay();
   }
   closeCalendarModal();
-}
-
-function updateWeekDisplay() {
-  // 현재 currentDateObj 기준으로 그 주의 월요일 ~ 금요일 계산
-  const dayOfWeek = currentDateObj.getDay(); // 0(일)~6(토)
-  const monday = new Date(currentDateObj);
-  monday.setDate(currentDateObj.getDate() - ((dayOfWeek + 6) % 7)); // 월요일로 이동
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6); // 일요일로 이동
-
-  const formatDate = (date) => date.toISOString().split('T')[0];
-  const start = formatDate(monday);
-  const end = formatDate(sunday);
-
-  document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
 }
 
 // week에서 달력아이콘
@@ -725,6 +768,175 @@ function updateWeekDisplay() {
 
   document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("doctorSelect");
+
+  fetch("/api/doctors")
+    .then(res => {
+      if (!res.ok) throw new Error("서버 오류: " + res.status);
+      return res.json();
+    })
+    .then(doctors => {
+      if (!Array.isArray(doctors)) throw new Error("데이터 형식 오류");
+
+      doctors.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.usersId;
+        option.textContent = doc.usersName;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => {
+      console.error("의사 목록 로딩 실패", err);
+      alert("의사 목록을 불러오는 데 실패했습니다.");
+    });
+});
+
+// 자동완성 목록 불러오기
+document.getElementById("patientNameInput").addEventListener("input", function () {
+  const name = this.value.trim();
+  if (name === "") return;
+
+  fetch(`/acceptance/searchPatientsByName?name=${encodeURIComponent(name)}`)
+    .then(res => res.json())
+    .then(list => {
+      const datalist = document.getElementById("patientList");
+      datalist.innerHTML = "";
+      list.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = `${p.name} (${p.rrn})`;  // 보여지는 형식
+        opt.dataset.name = p.name;
+        opt.dataset.rrn = p.rrn;
+        opt.dataset.gender = p.gender;
+        opt.dataset.phone = p.phone;
+        datalist.appendChild(opt);
+      });
+    });
+});
+
+// 2. change 시 → 실제 option과 비교 후 자동입력 + 이름 필드 정리
+document.getElementById("patientNameInput").addEventListener("change", function () {
+  const inputVal = this.value.trim();
+  const rrnMatch = inputVal.match(/\(([^)]+)\)/); // 괄호 안 주민번호 추출
+  const rrnOnly = rrnMatch ? rrnMatch[1] : null;
+
+  const options = document.querySelectorAll('#patientList option');
+  for (const opt of options) {
+    if (opt.dataset.rrn === rrnOnly) {
+      // ✅ 이름만 남기기
+      this.value = opt.dataset.name;
+
+      // ✅ 자동입력
+      document.querySelector('select[name="gender"]').value = opt.dataset.gender || "";
+      document.querySelector('input[name="rrn"]').value = opt.dataset.rrn || "";
+      document.querySelector('input[name="phone"]').value = opt.dataset.phone || "";
+      break;
+    }
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("/acceptance/appointments")
+    .then(res => res.json())
+    .then(list => {
+      list.forEach(appt => {
+        const date = new Date(appt.date);
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const timeStr = `${hour}:${minute}`;
+
+        const roomIndex = {
+          '진료실1': 1,
+          '진료실2': 2,
+          '진료실3': 3,
+          '진료실4': 4
+        }[appt.room];
+
+        if (!roomIndex) return;
+
+        const rows = document.querySelectorAll('.schedule-row');
+        for (const row of rows) {
+          const timeCol = row.querySelector('.time-col');
+          if (timeCol && timeCol.textContent.trim() === timeStr) {
+            const cells = row.querySelectorAll('.cell');
+            const cell = cells[roomIndex - 1];
+
+            cell.classList.add('green');
+            cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
+            cell.dataset.name = appt.name;
+            cell.dataset.rrn = appt.rrn;
+            cell.dataset.phone = appt.phone;
+            cell.dataset.date = appt.date;
+            cell.dataset.department = appt.room;
+            cell.dataset.disease = appt.disease;
+            cell.dataset.doctor = appt.doctor;
+            break;
+          }
+        }
+      });
+    });
+});
+
+function loadAppointmentsByDate(dateString) {
+  const targetDate = new Date(dateString);
+
+  // ✅ 1. 기존 예약 셀 초기화
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.classList.remove('green');
+    cell.innerHTML = '';
+    cell.removeAttribute('data-name');
+    cell.removeAttribute('data-rrn');
+    cell.removeAttribute('data-phone');
+    cell.removeAttribute('data-date');
+    cell.removeAttribute('data-department');
+    cell.removeAttribute('data-disease');
+    cell.removeAttribute('data-doctor');
+  });
+
+  // ✅ 2. 해당 날짜 예약 불러오기
+  fetch(`/acceptance/appointments?date=${dateString}`)
+    .then(res => res.json())
+    .then(list => {
+      list.forEach(appt => {
+        const date = new Date(appt.date);
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const timeStr = `${hour}:${minute}`;
+
+        const roomIndex = {
+          '진료실1': 1,
+          '진료실2': 2,
+          '진료실3': 3,
+          '진료실4': 4
+        }[appt.room];
+
+        if (!roomIndex) return;
+
+        const rows = document.querySelectorAll('.schedule-row');
+        for (const row of rows) {
+          const timeCol = row.querySelector('.time-col');
+          if (timeCol && timeCol.textContent.trim() === timeStr) {
+            const cells = row.querySelectorAll('.cell');
+            const cell = cells[roomIndex - 1];
+
+            cell.classList.add('green');
+            cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
+            cell.dataset.name = appt.name;
+            cell.dataset.rrn = appt.rrn;
+            cell.dataset.phone = appt.phone;
+            cell.dataset.date = appt.date;
+            cell.dataset.department = appt.room;
+            cell.dataset.disease = appt.disease;
+            cell.dataset.doctor = appt.doctor;
+            break;
+          }
+        }
+      });
+    });
+}
+
 
 
 </script>

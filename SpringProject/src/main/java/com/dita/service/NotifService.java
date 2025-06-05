@@ -6,6 +6,8 @@ import com.dita.domain.Notif;
 import com.dita.domain.Patient;
 import com.dita.domain.User;
 import com.dita.persistence.*;
+
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -87,4 +89,33 @@ public class NotifService {
     public void sendNightVitalReminder() {
         createVitalReminderNotifications("야간 24시");
     }
+    
+ // 개별 알림 읽음 처리
+    @Transactional
+    public void markAsRead(Integer notifId) {
+        Notif notif = notifRepository.findById(notifId)
+                                     .orElseThrow(() -> new RuntimeException("알림을 찾을 수 없습니다."));
+        if (!notif.isRead()) {
+            notif.setRead(true);
+            notifRepository.save(notif);
+        }
+    }
+
+    // 로그인한 사용자의 모든 알림을 읽음 처리
+    @Transactional
+    public void markAllAsRead(String usersId) {
+        List<Notif> list = notifRepository.findByUser_UsersIdAndIsReadFalse(usersId);
+        for (Notif n : list) {
+            n.setRead(true);
+            notifRepository.save(n);
+        }
+    }
+
+    // 해당 사용자의 모든 알림 조회
+    @Transactional(readOnly = true)
+    public List<Notif> getNotificationsForUser(String usersId) {
+        // 예: 최신순으로 정렬해서 가져오려면 추가 조건을 줄 수 있습니다.
+        return notifRepository.findByUser_UsersIdOrderByCreatedAtDesc(usersId);
+    }
+    
 }

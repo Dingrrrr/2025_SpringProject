@@ -101,6 +101,17 @@ body {
   background-position: center;
 }
 
+.nav-menu li a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: 5px;
+}
+
+.nav-menu li a:hover {
+  background-color: #f0f0f0;
+}
+
 .nav-menu li:nth-child(1)::before {
   background-image: url("/icons/home.png");
 }
@@ -188,11 +199,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
 .left-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.right-controls {
   display: flex;
   gap: 10px;
   align-items: center;
