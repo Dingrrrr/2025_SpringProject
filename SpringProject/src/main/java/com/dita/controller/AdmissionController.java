@@ -5,20 +5,26 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
 
 import com.dita.domain.*;
 import com.dita.persistence.*;
+import com.dita.service.PatientService;
 import com.dita.vo.AdmissionDto;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/Inpatient")
 @RequiredArgsConstructor
+@Slf4j
 public class AdmissionController {
+
+    private final PatientService patientService;
 
     private final AdmissionRepository admissionRepository;
     private final PatientRepository patientRepository;
@@ -162,6 +168,23 @@ public class AdmissionController {
         return ResponseEntity.ok("삭제 완료");
     }
     
+    @GetMapping("/new")
+    public String showAdmissionForm(Model model) {
+        model.addAttribute("patient", new Patient());
+        return "admission/NewPatientForm";  // 예: templates/admission/NewPatientForm.html
+    }
 
+    @PostMapping("/new")
+    public String processAdmission(@ModelAttribute Patient patient) {
+        log.info("새로운 환자 등록 요청: " + patient.getPatientName() 
+                 + ", 상태 = " + patient.getPatientType());
+
+        // ─── 반드시 patientRepository.save()가 아니라 service를 통해 저장 ───
+        patientService.admitPatient(patient);
+
+        // 저장 후에 “입원 환자 목록” 페이지로 리다이렉트
+        return "redirect:/nurse/NurseHome";
+    }
+    
 }
 

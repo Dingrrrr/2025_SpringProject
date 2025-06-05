@@ -45,17 +45,53 @@ public class NursePageController {
     private NurseChartRepository nurseChartRepository;
 
     @GetMapping("/NurseChart")
-    public String showNurseChartPage(Model model) {
+    public String showNurseChartPage(HttpServletRequest request, Model model) {
+    	HttpSession session = request.getSession(false);
+		if (session == null) {
+			return "redirect:/Login/Login";
+		}
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+			return "redirect:/Login/Login";
+		}
+		
+		model.addAttribute("userName", loginUser.getUsersName());
+        model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
         return "nurse/NurseChart";
     }
 
     @GetMapping("/VitalRecord")
-    public String showVitalRecordPage(Model model) {
+    public String showVitalRecordPage(HttpServletRequest request, Model model) {
+    	HttpSession session = request.getSession(false);
+		if (session == null) {
+			return "redirect:/Login/Login";
+		}
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+			return "redirect:/Login/Login";
+		}
+		
+		model.addAttribute("userName", loginUser.getUsersName());
+        model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
         return "nurse/VitalRecord";
     }
 
     @GetMapping("/MedicationRecord")
-    public String showMedicatonRecordPage(Model model) {
+    public String showMedicatonRecordPage(HttpServletRequest request, Model model) {
+    	HttpSession session = request.getSession(false);
+		if (session == null) {
+			return "redirect:/Login/Login";
+		}
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+			return "redirect:/Login/Login";
+		}
+		
+		model.addAttribute("userName", loginUser.getUsersName());
+        model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
         return "nurse/MedicationRecord";
     }
 
