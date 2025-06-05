@@ -30,15 +30,11 @@ public class Notif {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "notif_id", nullable = false)
-	private int notifId; //알림 아이디
+	private Integer notifId; //알림 아이디
 	
 	@ManyToOne
 	@JoinColumn(name ="users_id", nullable= false)
 	private User user;// 유저 아이디
-	
-	@ManyToOne
-	@JoinColumn(name ="appt_id", nullable= false)
-	private Appt appt;// 예약 아이디
 	
 	@Column(length = 50, nullable = false)
 	private String type;// 알림 종류

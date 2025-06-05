@@ -13,9 +13,10 @@
   <div id="error" class="error-message">모든 항목을 입력해주세요.</div>
 
   <div class="autocomplete-wrapper">
+  <label for = "drugType">약품명</label>
   <input type="text" id="drugName" placeholder="예: 생리식염수">
   <div id="autocomplete-list"></div>
-</div>
+  </div>
 
 	
   <label for="drugType">종류</label>
@@ -39,17 +40,21 @@
 <script>
   // 약품 추가 시 입력값 유효성 검사 후 부모창에 메시지 전달
 async function submitDrug() {
-  const drugId = parseInt(document.getElementById("manufacturer").dataset.id, 10);
+  const drugIdAttr = document.getElementById("manufacturer").dataset.id;
+  const drugId = drugIdAttr ? parseInt(drugIdAttr, 10) : null;
 
-  const log = {
-    drug: {
-      drugId: drugId
-    },
+  const request = {
+    drugId,
+    name: getValue("drugName"),
+    code: getValue("manufacturer"),
     location: getValue("location"),
-    quantity: parseInt(getValue("stock"), 10)
+    type: getValue("drugType"), // "LIQUID", "INJECTION" 등 정확히 일치해야 함
+    quantity: parseInt(getValue("stock"), 10),
+    changeType: "IN"
   };
 
-  if (!drugId || !log.location || isNaN(log.quantity) || log.quantity <= 0) {
+  // 간단한 유효성 검사
+  if (!request.name || !request.code || !request.location || isNaN(request.quantity) || request.quantity <= 0) {
     showError("모든 항목을 정확히 입력해주세요.");
     return;
   }
@@ -58,7 +63,7 @@ async function submitDrug() {
     const res = await fetch("/api/inventory/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(log)
+      body: JSON.stringify(request)
     });
 
     if (res.ok) {
@@ -73,6 +78,7 @@ async function submitDrug() {
     showError("서버 통신 오류가 발생했습니다.");
   }
 }
+
 
   // 값 가져오기 유틸
   function getValue(id) {

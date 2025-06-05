@@ -2,6 +2,7 @@ package com.dita.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import jakarta.persistence.CollectionTable;
@@ -40,19 +41,18 @@ public class Sched {
 	private User user;// 직원 ID
 	
 	@Column(name = "start_time", nullable = false)
-	private LocalDateTime startTime;// 근무 시작 시각(출근)
+	private LocalTime startTime;// 근무 시작 시각(출근)
 	
 	@Column(name = "end_time", nullable = false)
-	private LocalDateTime endTime;//근무 종료 시각(퇴근)
+	private LocalTime endTime;//근무 종료 시각(퇴근)
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private Type type;// 스케줄 유형
 	
-	@ElementCollection(targetClass = DayOfWeek.class)
-	@Enumerated(EnumType.STRING)
-	@CollectionTable(name = "sched_work_days", joinColumns = @JoinColumn(name = "schedule_id"))
-	@Column(name = "day_of_week")
-	private List<DayOfWeek> workDays;
+	@ElementCollection
+	@CollectionTable(name = "sched_workdays", joinColumns = @JoinColumn(name = "schedule_id"))
+	@Column(name = "work_day")
+	private List<String> workDays;
 
 }

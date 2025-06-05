@@ -123,6 +123,7 @@
 		  width: 100%;
 		  min-width: 900px; /* 필요시 최소 크기 */
 		  margin-top: 10px;
+
 		}
 		
 		/* 탭 */
@@ -351,10 +352,20 @@
 		  color: white;
 		}
 				
-.schedule-view {
-  display: none;
-}
-
-.schedule-view.active {
-  display: block;
-}
+		.schedule-view {
+		  display: none;
+		}
+		
+		.schedule-view.active {
+		  display: block;
+		}
+		
+		.green  { background-color: #a8e6cf; }
+		.blue   { background-color: #d0e1f9; }
+		.orange { background-color: #ffd3b6; }
+		.purple { background-color: #e0bbff; }
+		.red    { background-color: #ff8b94; }
+		.teal   { background-color: #b2f7ef; }
+		
+		
+		
