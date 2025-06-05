@@ -20,7 +20,7 @@ public class DrugCsvLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-    	InputStream is = getClass().getClassLoader().getResourceAsStream("templates/Drug/DrugData.csv");
+        InputStream is = getClass().getClassLoader().getResourceAsStream("templates/Drug/DrugData.csv");
         if (is == null) {
             System.err.println("❌ DrugData.csv not found in resources/Drug/");
             return;
@@ -32,13 +32,20 @@ public class DrugCsvLoader implements CommandLineRunner {
 
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",", -1);
-                if (parts.length < 5) continue;
+                if (parts.length < 6) continue;
 
                 String drugCode = parts[0].trim();
                 String drugName = parts[1].trim();
                 String mainIngredient = parts[2].trim().isEmpty() ? "미상" : parts[2].trim();
                 String categoryRaw = parts[3].trim();
                 String formTypeRaw = parts[4].trim();
+
+                int price = 1000;  // 기본값 설정
+                try {
+                    price = Integer.parseInt(parts[5].trim());
+                } catch (NumberFormatException e) {
+                    System.err.println("❗가격 형식 오류: " + parts[5].trim() + " → 기본값 1000 적용");
+                }
 
                 try {
                     Drug drug = Drug.builder()
@@ -47,10 +54,11 @@ public class DrugCsvLoader implements CommandLineRunner {
                             .mainIngredient(mainIngredient)
                             .category(parseCategory(categoryRaw))
                             .formType(parseFormType(formTypeRaw))
+                            .price(price)  // ✅ 가격 필드 추가
                             .build();
 
                     drugCsvService.saveIfNotExists(drug);
-                    System.out.println(" 저장 성공: " + drugCode);
+                    System.out.println("✅ 저장 성공: " + drugCode);
 
                 } catch (IllegalArgumentException e) {
                     System.err.println("❌ Enum 매핑 실패 → drugCode: " + drugCode +
