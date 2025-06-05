@@ -79,9 +79,8 @@
                 <h3>
                     혈압 추이
                     <div class="chart-options">
-                        <span class="chart-option active" onclick="updateBPChart('daily')">일간</span>
-                        <span class="chart-option" onclick="updateBPChart('weekly')">주간</span>
-                        <span class="chart-option" onclick="updateBPChart('monthly')">월간</span>
+                        <span class="chart-option active" onclick="updateBPChart('time')">시간별</span>
+                        <span class="chart-option" onclick="updateBPChart('weekly')">주간별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -92,10 +91,7 @@
             <!-- 맥박수 -->
             <div class="chart-card">
                 <h3>
-                    맥박수
-                    <div class="chart-options">
-                        <span class="chart-option" onclick="updatePulseChart('hourly')">시간별</span>
-                    </div>
+                    맥박수 (시간대별)
                 </h3>
                 <div class="chart-container">
                     <canvas id="pulseRateChart"></canvas>
@@ -107,8 +103,8 @@
                 <h3>
                     체온 및 호흡 분석
                     <div class="chart-options">
-                        <span class="chart-option active" onclick="updateTempRespChart('24hour')">24시간</span>
-                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간</span>
+                        <span class="chart-option active" onclick="updateTempRespChart('time')">시간별</span>
+                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -176,12 +172,12 @@
                 }
             });
 
-            // 맥박수 모니터링 차트
+            // 맥박수 모니터링 차트 (시간대별 고정)
             const pulseRateCtx = document.getElementById('pulseRateChart').getContext('2d');
             charts.pulseRate = new Chart(pulseRateCtx, {
                 type: 'bar',
                 data: {
-                    labels: [],
+                    labels: ['아침', '점심', '저녁', '야간'],
                     datasets: [{
                         label: '맥박수 (pulse_rate)',
                         data: [],
@@ -352,20 +348,31 @@
         // 혈압 차트 업데이트
         function updateBPChart(period) {
             setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
-            // fetch(`/api/vital-records/${currentPatientId}/bp?period=${period}`)
-        }
-
-        // 맥박 차트 업데이트
-        function updatePulseChart(period) {
-            setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
+            if (period === 'time') {
+                // 시간별 (아침, 점심, 저녁, 야간)
+                charts.bloodPressure.data.labels = ['아침', '점심', '저녁', '야간'];
+                // 실제로는 DB에서 시간대별 데이터를 가져옴
+            } else if (period === 'weekly') {
+                // 주간별
+                charts.bloodPressure.data.labels = ['월', '화', '수', '목', '금', '토', '일'];
+                // 실제로는 DB에서 주간별 데이터를 가져옴
+            }
+            charts.bloodPressure.update();
         }
 
         // 체온/호흡 차트 업데이트
         function updateTempRespChart(period) {
             setActiveOption(event.target);
-            // 실제로는 period에 따라 DB에서 다른 데이터를 가져옴
+            if (period === 'time') {
+                // 시간별 (아침, 점심, 저녁, 야간)
+                charts.tempResp.data.labels = ['아침', '점심', '저녁', '야간'];
+                // 실제로는 DB에서 시간대별 데이터를 가져옴
+            } else if (period === 'weekly') {
+                // 주간별
+                charts.tempResp.data.labels = ['월', '화', '수', '목', '금', '토', '일'];
+                // 실제로는 DB에서 주간별 데이터를 가져옴
+            }
+            charts.tempResp.update();
         }
 
         // 활성 옵션 설정
@@ -401,37 +408,41 @@
             };
             updateVitalSummary(latestVital);
 
-            // 차트 데이터 샘플
+            // 차트 데이터 샘플 (시간대별 기본)
             const sampleData = {
-                labels: ['월', '화', '수', '목', '금', '토', '일'],
                 bloodPressure: {
-                    systolic: [120, 125, 118, 132, 128, 122, 130],
-                    diastolic: [80, 82, 78, 85, 83, 79, 84]
+                    timeLabels: ['아침', '점심', '저녁', '야간'],
+                    timeSystolic: [120, 125, 118, 132],
+                    timeDiastolic: [80, 82, 78, 85],
+                    weeklyLabels: ['월', '화', '수', '목', '금', '토', '일'],
+                    weeklySystolic: [120, 125, 118, 132, 128, 122, 130],
+                    weeklyDiastolic: [80, 82, 78, 85, 83, 79, 84]
                 },
                 pulseRate: {
-                    labels: ['06:00', '12:00', '18:00', '24:00'],
-                    data: [72, 85, 78, 68]
+                    timeData: [72, 85, 78, 68] // 아침, 점심, 저녁, 야간
                 },
                 tempResp: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-                    temperature: [36.5, 36.7, 36.8, 37.1, 36.9, 36.6],
-                    respiration: [16, 18, 17, 20, 19, 17]
+                    timeLabels: ['아침', '점심', '저녁', '야간'],
+                    timeTemperature: [36.5, 36.8, 37.1, 36.6],
+                    timeRespiration: [16, 17, 20, 17],
+                    weeklyLabels: ['월', '화', '수', '목', '금', '토', '일'],
+                    weeklyTemperature: [36.5, 36.7, 36.8, 37.1, 36.9, 36.6, 36.4],
+                    weeklyRespiration: [16, 18, 17, 20, 19, 17, 15]
                 }
             };
 
-            // 차트 업데이트
-            charts.bloodPressure.data.labels = sampleData.labels;
-            charts.bloodPressure.data.datasets[0].data = sampleData.bloodPressure.systolic;
-            charts.bloodPressure.data.datasets[1].data = sampleData.bloodPressure.diastolic;
+            // 차트 업데이트 (기본값: 시간별)
+            charts.bloodPressure.data.labels = sampleData.bloodPressure.timeLabels;
+            charts.bloodPressure.data.datasets[0].data = sampleData.bloodPressure.timeSystolic;
+            charts.bloodPressure.data.datasets[1].data = sampleData.bloodPressure.timeDiastolic;
             charts.bloodPressure.update();
 
-            charts.pulseRate.data.labels = sampleData.pulseRate.labels;
-            charts.pulseRate.data.datasets[0].data = sampleData.pulseRate.data;
+            charts.pulseRate.data.datasets[0].data = sampleData.pulseRate.timeData;
             charts.pulseRate.update();
 
-            charts.tempResp.data.labels = sampleData.tempResp.labels;
-            charts.tempResp.data.datasets[0].data = sampleData.tempResp.temperature;
-            charts.tempResp.data.datasets[1].data = sampleData.tempResp.respiration;
+            charts.tempResp.data.labels = sampleData.tempResp.timeLabels;
+            charts.tempResp.data.datasets[0].data = sampleData.tempResp.timeTemperature;
+            charts.tempResp.data.datasets[1].data = sampleData.tempResp.timeRespiration;
             charts.tempResp.update();
         }
 
