@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang = "ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -667,19 +667,43 @@ function updateDateDisplay() {
 }
 
 function changeDate(days) {
-  currentDateObj.setDate(currentDateObj.getDate() + days);
-  updateDateDisplay();
+	  // 1) currentDateObj( Date )를 days(정수)만큼 이동
+	  currentDateObj.setDate(currentDateObj.getDate() + days);
 
-  const isWeekActive = document.getElementById('weekView').classList.contains('active');
-  if (isWeekActive) {
-    updateWeekDisplay();
-  }
-}
+	  // 2) 화면 상단에 날짜 텍스트를 갱신
+	  updateDateDisplay();
+
+	  // 3) 현재 View가 Week 모드인지 체크
+	  const isWeekActive = document.getElementById('weekView').classList.contains('active');
+	  if (isWeekActive) {
+	    // Week 뷰라면 주간 범위만 다시 계산
+	    updateWeekDisplay();
+	  } else {
+	    // Day 뷰라면, 'YYYY-MM-DD' 문자열 만들어서 서버 데이터 다시 불러오기
+	    const yyyy = currentDateObj.getFullYear();
+	    const mm   = String(currentDateObj.getMonth() + 1).padStart(2, '0');
+	    const dd   = String(currentDateObj.getDate()).padStart(2, '0');
+	    const dateString = `${yyyy}-${mm}-${dd}`;
+
+	    // 핵심: 바뀐 날짜로 서버에서 예약 데이터를 다시 로드
+	    loadAppointmentsByDate(dateString);
+	  }
+	}
 
 // 초기 날짜 표시
 document.addEventListener('DOMContentLoaded', function () {
+  // 1) 화면 상단에 오늘 날짜(또는 currentDateObj에 담긴 날짜) 텍스트 표시
   updateDateDisplay();
-  updateWeekDisplay(); 
+  // 2) Week 모드 초기화 (기본은 Day 모드라면 굳이 안 불러도 됩니다)
+  updateWeekDisplay();
+
+  // 3) Day 뷰(기본)에서 오늘 날짜 데이터를 서버에서 한번 불러오기
+  const yyyy = currentDateObj.getFullYear();
+  const mm   = String(currentDateObj.getMonth() + 1).padStart(2, '0');
+  const dd   = String(currentDateObj.getDate()).padStart(2, '0');
+  const todayString = `${yyyy}-${mm}-${dd}`;
+
+  loadAppointmentsByDate(todayString);
 });
 
 document.querySelector('.date-icon').addEventListener('click', function () {
@@ -696,8 +720,20 @@ function closeCalendarModal() {
 function applyCalendarDate() {
   const selectedDate = document.getElementById('calendarDateInput').value;
   if (selectedDate) {
+    // 1) currentDateObj 업데이트
     currentDateObj = new Date(selectedDate);
+
+    // 2) 화면 상단 텍스트 갱신
     updateDateDisplay();
+
+    // 3) Day 뷰일 때는 바로 loadAppointmentsByDate 호출
+    const yyyy = currentDateObj.getFullYear();
+    const mm   = String(currentDateObj.getMonth() + 1).padStart(2, '0');
+    const dd   = String(currentDateObj.getDate()).padStart(2, '0');
+    const dateString = `${yyyy}-${mm}-${dd}`;
+
+    // 변경된 날짜의 예약을 서버에서 다시 불러오기
+    loadAppointmentsByDate(dateString);
   }
   closeCalendarModal();
 }
@@ -837,108 +873,74 @@ document.getElementById("patientNameInput").addEventListener("change", function 
   }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  fetch("/acceptance/appointments")
-    .then(res => res.json())
-    .then(list => {
-      list.forEach(appt => {
-        const date = new Date(appt.date);
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        const timeStr = `${hour}:${minute}`;
-
-        const roomIndex = {
-          '진료실1': 1,
-          '진료실2': 2,
-          '진료실3': 3,
-          '진료실4': 4
-        }[appt.room];
-
-        if (!roomIndex) return;
-
-        const rows = document.querySelectorAll('.schedule-row');
-        for (const row of rows) {
-          const timeCol = row.querySelector('.time-col');
-          if (timeCol && timeCol.textContent.trim() === timeStr) {
-            const cells = row.querySelectorAll('.cell');
-            const cell = cells[roomIndex - 1];
-
-            cell.classList.add('green');
-            cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
-            cell.dataset.name = appt.name;
-            cell.dataset.rrn = appt.rrn;
-            cell.dataset.phone = appt.phone;
-            cell.dataset.date = appt.date;
-            cell.dataset.department = appt.room;
-            cell.dataset.disease = appt.disease;
-            cell.dataset.doctor = appt.doctor;
-            break;
-          }
-        }
-      });
-    });
-});
-
 function loadAppointmentsByDate(dateString) {
-  const targetDate = new Date(dateString);
+	  // 1) 화면에 이미 그려진 모든 "green 셀"을 지우고 초기화
+	  document.querySelectorAll('.cell').forEach(cell => {
+	    cell.classList.remove('green');
+	    cell.innerHTML = '';
+	    cell.removeAttribute('data-name');
+	    cell.removeAttribute('data-rrn');
+	    cell.removeAttribute('data-phone');
+	    cell.removeAttribute('data-date');
+	    cell.removeAttribute('data-department');
+	    cell.removeAttribute('data-disease');
+	    cell.removeAttribute('data-doctor');
+	  });
 
-  // ✅ 1. 기존 예약 셀 초기화
-  document.querySelectorAll('.cell').forEach(cell => {
-    cell.classList.remove('green');
-    cell.innerHTML = '';
-    cell.removeAttribute('data-name');
-    cell.removeAttribute('data-rrn');
-    cell.removeAttribute('data-phone');
-    cell.removeAttribute('data-date');
-    cell.removeAttribute('data-department');
-    cell.removeAttribute('data-disease');
-    cell.removeAttribute('data-doctor');
-  });
+	  // 2) 서버에서 해당 날짜(dateString)의 예약 리스트를 가져옴
+	  fetch(`/acceptance/appointments?date=${dateString}`)
+	    .then(res => {
+	      if (!res.ok) {
+	        throw new Error("서버 응답 오류: " + res.status);
+	      }
+	      return res.json();
+	    })
+	    .then(list => {
+	      // JSON 리스트를 순회하면서, 각 예약을 schedule-row에 뿌림
+	      list.forEach(appt => {
+	        const date = new Date(appt.date); // appt.date: "2025-06-05T13:00:00" 등
+	        const hour = String(date.getHours()).padStart(2, '0');
+	        const minute = String(date.getMinutes()).padStart(2, '0');
+	        const timeStr = `${hour}:${minute}`;
 
-  // ✅ 2. 해당 날짜 예약 불러오기
-  fetch(`/acceptance/appointments?date=${dateString}`)
-    .then(res => res.json())
-    .then(list => {
-      list.forEach(appt => {
-        const date = new Date(appt.date);
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        const timeStr = `${hour}:${minute}`;
+	        // 몇 번째 column(진료실)인지 계산
+	        const roomIndex = {
+	          '진료실1': 1,
+	          '진료실2': 2,
+	          '진료실3': 3,
+	          '진료실4': 4
+	        }[appt.room];
 
-        const roomIndex = {
-          '진료실1': 1,
-          '진료실2': 2,
-          '진료실3': 3,
-          '진료실4': 4
-        }[appt.room];
+	        if (!roomIndex) return;
 
-        if (!roomIndex) return;
+	        // 화면에 있는 모든 <div class="schedule-row"> 순회
+	        const rows = document.querySelectorAll('.schedule-row');
+	        for (const row of rows) {
+	          const timeCol = row.querySelector('.time-col');
+	          if (timeCol && timeCol.textContent.trim() === timeStr) {
+	            const cells = row.querySelectorAll('.cell');
+	            const cell = cells[roomIndex - 1];
 
-        const rows = document.querySelectorAll('.schedule-row');
-        for (const row of rows) {
-          const timeCol = row.querySelector('.time-col');
-          if (timeCol && timeCol.textContent.trim() === timeStr) {
-            const cells = row.querySelectorAll('.cell');
-            const cell = cells[roomIndex - 1];
-
-            cell.classList.add('green');
-            cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
-            cell.dataset.name = appt.name;
-            cell.dataset.rrn = appt.rrn;
-            cell.dataset.phone = appt.phone;
-            cell.dataset.date = appt.date;
-            cell.dataset.department = appt.room;
-            cell.dataset.disease = appt.disease;
-            cell.dataset.doctor = appt.doctor;
-            break;
-          }
-        }
-      });
-    });
-}
-
-
-
+	            // 예약이 있는 셀 표시: 녹색으로 바꾸고, 데이터 속성에 예약정보 저장
+	            cell.classList.add('green');
+	            cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`; 
+	            cell.dataset.name       = appt.name;
+	            cell.dataset.rrn        = appt.rrn;
+	            cell.dataset.phone      = appt.phone;
+	            cell.dataset.date       = appt.date;       // 실제 날짜·시간
+	            cell.dataset.department = appt.room;       // “진료실1” 등
+	            cell.dataset.disease    = appt.disease;
+	            cell.dataset.doctor     = appt.doctor;
+	            break; 
+	          }
+	        }
+	      });
+	    })
+	    .catch(err => {
+	      console.error("예약 불러오기 실패:", err);
+	      alert("예약 목록을 가져오는 데 실패했습니다.");
+	    });
+	}
 </script>
 
 

@@ -61,7 +61,6 @@ public class AcceptPageController {
 	public AcceptPageController(PatientRepository repo, UserRepository userRepository, ApptRepository apptRepository,ApptRepository arepo) {
 
 		this.repo = repo;
-
 		this.userRepository = userRepository;
 		this.apptRepository = apptRepository;
 		this.arepo = arepo;
@@ -108,8 +107,18 @@ public class AcceptPageController {
 	        return "acceptance/acceptanceCondition"; 
 		}
 		@GetMapping("/AcceptanceReceipt")
-	    public String showAcceptanceReceiptPage(Model model) {
-			// 필요 시 model에 데이터 추가 가능
+	    public String showAcceptanceReceiptPage(@RequestParam(name="date", required = false)
+		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model) {
+			if(targetDate == null) {
+				targetDate = LocalDate.now();
+			}
+			model.addAttribute("targetDate", targetDate);
+			
+			LocalDateTime startOfDay = targetDate.atStartOfDay();
+	        LocalDateTime endOfDay = targetDate.plusDays(1).atStartOfDay();
+	        List<Appt> appts = arepo.findByScheduledAtBetween(startOfDay, endOfDay);
+	        model.addAttribute("appts", appts);
+			
 	        return "acceptance/AcceptanceReceipt"; 
 
 	    }
@@ -208,24 +217,6 @@ public class AcceptPageController {
 		    return matches;
 		}
 		
-		@GetMapping("/appointments")
-		@ResponseBody
-		public List<AppointmentDto> getAppointments() {
-		    List<Appt> appts = apptRepository.findAll(); // 또는 날짜 기준 필터링
-		    return appts.stream().map(appt -> {
-		        AppointmentDto dto = new AppointmentDto();
-		        dto.setName(appt.getPatient().getPatientName());
-		        dto.setRrn(appt.getPatient().getPatientBirth());
-		        dto.setPhone(appt.getPatient().getPatientPhone());
-		        dto.setDate(appt.getScheduledAt());
-		        dto.setRoom(appt.getRoom());
-		        dto.setDisease(appt.getPatient().getPatientSymptom());
-		        dto.setDoctor(appt.getDoctor().getUsersName());
-		        return dto;
-		    }).collect(Collectors.toList());
-		}
-	
-		
 		@PutMapping("/appointment")
 		@ResponseBody
 		public String updateAppointment(@RequestBody AppointmentDto dto) {
@@ -270,6 +261,38 @@ public class AcceptPageController {
 		    apptRepository.delete(optionalAppt.get());
 		    return ResponseEntity.ok("예약이 삭제되었습니다.");
 		}
+		
+		@GetMapping("/appointments")
+	    @ResponseBody
+	    public ResponseEntity<List<AppointmentDto>> getAppointments(
+	            @RequestParam(name = "date", required = false)
+	            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+	        List<Appt> apptList;
+
+	        if (date != null) {
+	            LocalDateTime startOfDay     = date.atStartOfDay();
+	            LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
+	            apptList = apptRepository.findByScheduledAtBetween(startOfDay, startOfNextDay);
+	        } else {
+	            apptList = apptRepository.findAll();
+	        }
+
+	        // Appt → AppointmentDto 변환
+	        List<AppointmentDto> dtoList = apptList.stream().map(appt -> {
+	            AppointmentDto dto = new AppointmentDto();
+	            dto.setName(appt.getPatient().getPatientName());
+	            dto.setRrn(appt.getPatient().getPatientBirth());
+	            dto.setPhone(appt.getPatient().getPatientPhone());
+	            dto.setDate(appt.getScheduledAt());
+	            dto.setRoom(appt.getRoom());
+	            dto.setDisease(appt.getPatient().getPatientSymptom());
+	            dto.setDoctor(appt.getDoctor().getUsersName());
+	            return dto;
+	        }).collect(Collectors.toList());
+
+	        return ResponseEntity.ok(dtoList);
+	    }
 
 }
 		

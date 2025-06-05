@@ -16,5 +16,3 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
 	
 
 }
-
-
