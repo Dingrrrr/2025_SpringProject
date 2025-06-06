@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 
 import com.dita.domain.Appt;
 
@@ -14,5 +16,8 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
 	List<Appt> findByStatus(Status status);
 	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
 	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
-	//진료배정 상태 조건 추	
+	
+	@Query("SELECT a.status, COUNT(a) FROM Appt a GROUP BY a.status")
+	List<Object[]> countByStatus();
+
 }
