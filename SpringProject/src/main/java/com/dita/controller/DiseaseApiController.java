@@ -1,4 +1,4 @@
-package com.dita.api;
+package com.dita.controller;
 
 import com.dita.domain.Disease;
 import com.dita.persistence.DiseaseRepository;
