@@ -31,7 +31,7 @@
     <div class="main-content">
         <div class="dashboard-grid">
             <div class="chart-card">
-                <h3>월별 외래환자 수</h3>
+                <h3>예약 데이터 통계</h3>
                 <div class="chart-container">
                     <canvas id="monthlyOutpatientChart"></canvas>
                 </div>
@@ -152,8 +152,6 @@
             });
         };
 
-        // 개별 차트 생성
-        createBarChart('monthlyOutpatientChart', ['1월', '2월', '3월', '4월', '5월', '6월'], [320, 400, 390, 410, 380, 370], '외래환자 수');
         createBarChart('visitTypeChart', ['일반', '응급', '입원', '건강검진'], [120, 90, 60, 30], '유형별 환자 수');
         createDoughnutChart('visitPurposeChart', ['진료', '검사', '상담', '기타'], [45, 30, 15, 10], ['#2196f3', '#4caf50', '#ff9800', '#e91e63']);
         createBarChart('dailyOutpatientChart', ['5/1', '5/2', '5/3', '5/4', '5/5'], [60, 75, 70, 90, 85], '일일 외래환자');
@@ -215,6 +213,24 @@
         document.querySelector('.close-chart-modal').addEventListener('click', () => {
           document.getElementById('chartModal').style.display = 'none';
         });
+        
+        const loadMonthlyOutpatientChart = async () => {
+        	  try {
+        	    const res = await fetch("/admin/adminTotalManage/monthly-stats");
+        	    const data = await res.json();
+
+        	    const labels = Object.keys(data);         // ex: ["2024-01", "2024-02"]
+        	    const values = Object.values(data);       // ex: [25, 40, 38, ...]
+
+        	    createBarChart('monthlyOutpatientChart', labels, values, '외래환자 수');
+        	  } catch (error) {
+        	    console.error("월별 외래환자 수 로드 실패:", error);
+        	  }
+        	};
+        	
+        	window.addEventListener('DOMContentLoaded', () => {
+        		  loadMonthlyOutpatientChart(); // ✅ 이 라인 추가
+        		  });
         		
         </script>
     
