@@ -370,23 +370,6 @@
         .then((res) => res.text())
         .then((msg) => alert(msg));
     });
-
-	 // 삭제 시 Ajax 요청
-    document.getElementById('deleteBtn').addEventListener('click', () => {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
-
-      const userId = selectedRow.cells[0].textContent.trim();  // ID는 첫 번째 열
-
-      fetch(`/admin/adminMemberManage/delete/${userId}`, {
-        method: 'DELETE'
-      })
-        .then(response => response.text())
-        .then(msg => {
-          alert(msg);
-          selectedRow.remove();
-          infoModal.style.display = 'none';
-        });
-    });
    
     const infoModal = document.getElementById('infoModal');
 
@@ -471,20 +454,37 @@
 	    });
 	});
 
-    // 삭제
-    deleteBtn.addEventListener("click", () => {
-      const id = document.querySelector("#formFields input[data-key='patientId']").value;
-      if (!confirm("정말 삭제하시겠습니까?")) return;
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+    	  const isPatientTab = document.querySelector('.tab-btn[data-tab="staff"]').classList.contains('active');
 
-      fetch(`/admin/adminMemberManage/patients/delete/${id}`, {
-        method: "DELETE"
-      })
-        .then(res => res.text())
-        .then(msg => {
-          alert(msg);
-          location.reload();
-        });
-    });
+    	  if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    	  if (isPatientTab) {
+    	    // 환자 삭제
+    	    const id = document.querySelector("#formFields input[data-key='patientId']").value;
+    	    fetch(`/admin/adminMemberManage/patients/delete/${id}`, {
+    	      method: "DELETE"
+    	    })
+    	      .then(res => res.text())
+    	      .then(msg => {
+    	        alert(msg);
+    	        location.reload();
+    	      });
+
+    	  } else {
+    	    // 일반 사용자 삭제
+    	    const userId = selectedRow.cells[0].textContent.trim();
+    	    fetch(`/admin/adminMemberManage/delete/${userId}`, {
+    	      method: 'DELETE'
+    	    })
+    	      .then(response => response.text())
+    	      .then(msg => {
+    	        alert(msg);
+    	        selectedRow.remove();
+    	        infoModal.style.display = 'none';
+    	      });
+    	  }
+    	});
 
   </script>
 </body>

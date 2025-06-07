@@ -8,6 +8,7 @@ import com.dita.domain.Sched;
 import com.dita.domain.Type;
 import com.dita.domain.User;
 import com.dita.persistence.AdminMemberRepository;
+import com.dita.persistence.ApptRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.persistence.UserRepository;
 import com.dita.vo.PatientDto;
@@ -33,8 +34,9 @@ public class AdminMemberController {
     private UserRepository userRepository;
     private final AdminMemberRepository adminMemberRepository;
     private final PatientRepository patientRepository;
+    private final ApptRepository apptRepository;
 
-    
+   
     @GetMapping
     public String showUserManage(Model model) {
         var doctors = userRepository.findByGrade(Grade.의사);
@@ -106,9 +108,18 @@ public class AdminMemberController {
 
     // [DELETE] 환자 삭제
     @DeleteMapping("/patients/delete/{id}")
+    @ResponseBody
     public String deletePatient(@PathVariable int id) {
-        patientRepository.deleteById(id);
-        return "환자 정보가 삭제되었습니다.";
+        Optional<Patient> opt = patientRepository.findById(id);
+        if (opt.isPresent()) {
+            Patient patient = opt.get();
+
+            apptRepository.deleteAllByPatient(patient); // 예약 먼저 삭제
+            patientRepository.delete(patient);          // 그 후 환자 삭제
+
+            return "환자 정보가 삭제되었습니다.";
+        }
+        return "삭제 실패: 해당 환자 없음";
     }
 
 } 
