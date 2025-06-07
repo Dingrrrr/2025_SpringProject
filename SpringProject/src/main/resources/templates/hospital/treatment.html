@@ -125,93 +125,92 @@
 
   <script>
   function loadAndToggleNotification() {}
-  function goToHome()        { location.href = '/home'; }
-  function goToTreatment()   { location.href = '/hospital/treatment'; }
-  function goToReservation() { location.href = '/hospital/reservation'; }
-  function goToChart()       { location.href = '/hospital/chart'; }
-  function goToStats()       { location.href = '/hospital/statistics'; }
-  function goToAdmission()   { location.href = '/hospital/admission'; }
-  function goLogout()        { location.href = '/logout'; }
+function goToHome()        { location.href = '/home'; }
+function goToTreatment()   { location.href = '/hospital/treatment'; }
+function goToReservation() { location.href = '/hospital/reservation'; }
+function goToChart()       { location.href = '/hospital/chart'; }
+function goToStats()       { location.href = '/hospital/statistics'; }
+function goToAdmission()   { location.href = '/hospital/admission'; }
+function goLogout()        { location.href = '/logout'; }
 
-  const patientBox = document.getElementById("patientInfoBox");
+const patientBox = document.getElementById("patientInfoBox");
 
-  // ✅ 공통: 환자 정보 카드 렌더링 함수
-  function renderPatientInfo(patient) {
-    const age = patient.patientBirth
-      ? new Date().getFullYear() - parseInt(patient.patientBirth.split('-')[0])
-      : '-';
+// ✅ 렌더링 함수: 환자 + vital 데이터 분리
+function renderPatientInfo(patient, vital) {
+  const age = patient.patientBirth
+    ? new Date().getFullYear() - parseInt(patient.patientBirth.split('-')[0])
+    : '-';
 
-    patientBox.innerHTML = `
-      <div class="summary-left">
-        <div class="patient-name">
-          <strong>${patient.patientName}</strong> (${patient.patientGender}, ${age}세, ${patient.patientBirth})
-        </div>
-        <div class="patient-tags">
-          <span class="badge info">${patient.patientSymptom || '증상 정보 없음'}</span>
-        </div>
-        <div class="patient-vitals">
-          <span class="badge">주소: ${patient.patientAddress}</span>
-          <span class="badge">전화: ${patient.patientPhone}</span>
-          <span class="badge">유형: ${patient.patientType}</span>
-          <span class="badge">체온: ${patient.vital?.temperature ?? '-'}</span>
-          <span class="badge">맥박: ${patient.vital?.pulseRate ?? '-'}</span>
-          <span class="badge">혈압: ${patient.vital?.bpSystolic ?? '-'}/${patient.vital?.bpDiastolic ?? '-'}</span>
-          <span class="badge">호흡수: ${patient.vital?.respirationRate ?? '-'}</span>
-          <span class="badge">기록일: ${patient.vital?.recordedDate ?? '-'}</span>
-          <span class="badge">시간대: ${patient.vital?.timePeriod ?? '-'}</span>
-        </div>
+  patientBox.innerHTML = `
+    <div class="summary-left">
+      <div class="patient-name">
+        <strong>${patient.patientName}</strong> (${patient.patientGender}, ${age}세, ${patient.patientBirth})
       </div>
-      <div class="summary-right">
-        <button class="btn-outline" onclick="goToChart()">차트 열기</button>
-        <button class="btn-primary" onclick="goToTreatment()">진행하기</button>
+      <div class="patient-tags">
+        <span class="badge info">${patient.patientSymptom || '증상 정보 없음'}</span>
       </div>
-    `;
+      <div class="patient-vitals">
+        <span class="badge">주소: ${patient.patientAddress ?? '-'}</span>
+        <span class="badge">전화: ${patient.patientPhone ?? '-'}</span>
+        <span class="badge">유형: ${patient.patientType ?? '-'}</span>
+        <span class="badge">체온: ${vital?.temperature ?? '-'}</span>
+        <span class="badge">맥박: ${vital?.pulseRate ?? '-'}</span>
+        <span class="badge">혈압: ${vital?.bpSystolic ?? '-'}/${vital?.bpDiastolic ?? '-'}</span>
+        <span class="badge">호흡수: ${vital?.respirationRate ?? '-'}</span>
+        <span class="badge">기록일: ${vital?.recordedDate ?? '-'}</span>
+        <span class="badge">시간대: ${vital?.timePeriod ?? '-'}</span>
+      </div>
+    </div>
+    <div class="summary-right">
+      <button class="btn-outline" onclick="goToChart()">차트 열기</button>
+      <button class="btn-primary" onclick="goToTreatment()">진행하기</button>
+    </div>
+  `;
+}
+
+// ✅ 검색 이벤트 등록
+document.getElementById("patientSearch").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const name = e.target.value.trim();
+    if (!name) return;
+
+    fetch(`/api/patients/search?name=${encodeURIComponent(name)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("환자 없음");
+        return res.json();
+      })
+      .then(results => {
+        if (!Array.isArray(results)) throw new Error("결과 형식 오류");
+
+        if (results.length === 1) {
+          renderPatientInfo(results[0].patient, results[0].vital);
+        } else {
+          const selectHTML = `
+            <div style="margin-bottom: 10px; color: gray;">동명이인 ${results.length}명. 환자를 선택하세요:</div>
+            <select id="patientSelect">
+              <option disabled selected>-- 환자 선택 --</option>
+              ${results.map((dto, idx) => `
+                <option value="${idx}">
+                  ${dto.patient.patientName} (${dto.patient.patientGender}, ${dto.patient.patientBirth}, 전화: ${dto.patient.patientPhone})
+                </option>
+              `).join('')}
+            </select>
+          `;
+          patientBox.innerHTML = selectHTML;
+
+          document.getElementById("patientSelect").addEventListener("change", function (ev) {
+            const selected = results[ev.target.value];
+            renderPatientInfo(selected.patient, selected.vital);
+          });
+        }
+      })
+      .catch(() => {
+        patientBox.innerHTML = `<div style="color:red; padding:10px;">등록된 환자를 찾을 수 없습니다.</div>`;
+      });
   }
+});
 
-  // ✅ 환자 검색 이벤트
-  document.getElementById("patientSearch").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const name = e.target.value;
-
-      fetch(`/api/patients/search?name=${encodeURIComponent(name)}`)
-        .then(res => {
-          if (!res.ok) throw new Error("환자 없음");
-          return res.json();
-        })
-        .then(patients => {
-          if (!Array.isArray(patients)) throw new Error("결과 형식 오류");
-
-          if (patients.length === 1) {
-            // ✅ 1명일 경우 바로 출력
-            renderPatientInfo(patients[0]);
-          } else {
-            // ✅ 2명 이상일 경우 select 박스 출력
-            const selectHTML = `
-              <div style="margin-bottom: 10px; color: gray;">동명이인 ${patients.length}명. 환자를 선택하세요:</div>
-              <select id="patientSelect">
-                <option disabled selected>-- 환자 선택 --</option>
-                ${patients.map((p, idx) => `
-                  <option value="${idx}">
-                    ${p.patientName} (${p.patientGender}, ${p.patientBirth}, 전화: ${p.patientPhone})
-                  </option>
-                `).join('')}
-              </select>
-            `;
-            patientBox.innerHTML = selectHTML;
-
-            // ✅ 선택 이벤트 처리
-            document.getElementById("patientSelect").addEventListener("change", function(ev) {
-              const selected = patients[ev.target.value];
-              renderPatientInfo(selected);
-            });
-          }
-        })
-        .catch(() => {
-          patientBox.innerHTML = `<div style="color:red; padding:10px;">등록된 환자를 찾을 수 없습니다.</div>`;
-        });
-    }
-  });
 </script>
 
 </body>
