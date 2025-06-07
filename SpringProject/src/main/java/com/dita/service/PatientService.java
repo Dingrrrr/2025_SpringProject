@@ -47,8 +47,14 @@ public class PatientService {
         return new PatientWithVitalDTO(patient, vital.orElse(null));
     }
     //이름으로 환자를 전체 조회하는 서비스 로직
-    public List<Patient> findAllPatientsByName(String name) {
-        return patientRepository.findAllByPatientName(name);
+    public List<PatientWithVitalDTO> findAllPatientsWithVitalByName(String name) {
+        List<Patient> patients = patientRepository.findAllByPatientName(name);
+
+        return patients.stream().map(p -> {
+            Optional<Vital_sign> vital = vitalRepository
+                .findFirstByPatient_PatientIdOrderByRecordedAtDesc(p.getPatientId());
+            return new PatientWithVitalDTO(p, vital.orElse(null));
+        }).toList();
     }
 
     @Transactional

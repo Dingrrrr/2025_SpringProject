@@ -35,12 +35,10 @@ public class PatientController {
     // → 동명이인이 있을 경우 여러 환자 정보를 JSON 배열로 반환
     @GetMapping("/search")
     public ResponseEntity<?> searchPatientsByName(@RequestParam("name") String name) {
-        List<Patient> patients = patientService.findAllPatientsByName(name);
+        List<PatientWithVitalDTO> patients = patientService.findAllPatientsWithVitalByName(name);
         if (patients.isEmpty()) {
-            // 등록된 환자가 없으면 404 Not Found
             return ResponseEntity.notFound().build();
         }
-        // 동명이인 포함한 전체 리스트 반환
         return ResponseEntity.ok(patients);
     }
     
