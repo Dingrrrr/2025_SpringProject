@@ -2,11 +2,15 @@
 package com.dita.controller;
 
 import com.dita.domain.Grade;
+import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
 import com.dita.domain.Sched;
 import com.dita.domain.Type;
 import com.dita.domain.User;
 import com.dita.persistence.AdminMemberRepository;
+import com.dita.persistence.PatientRepository;
 import com.dita.persistence.UserRepository;
+import com.dita.vo.PatientDto;
 import com.dita.vo.SchedDto;
 import com.dita.vo.UserDto;
 
@@ -16,7 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +32,9 @@ public class AdminMemberController {
     @Autowired
     private UserRepository userRepository;
     private final AdminMemberRepository adminMemberRepository;
+    private final PatientRepository patientRepository;
 
+    
     @GetMapping
     public String showUserManage(Model model) {
         var doctors = userRepository.findByGrade(Grade.의사);
@@ -65,4 +73,42 @@ public class AdminMemberController {
         }
         return "삭제 실패: 해당 사용자 없음";
     }
+    
+    // [GET] 환자 목록
+    @GetMapping("/patients")
+    @ResponseBody
+    public List<PatientDto> getPatients() {
+        return patientRepository.findAll()
+                .stream()
+                .map(PatientDto::new) // Patient → PatientDto
+                .collect(Collectors.toList());
+    }
+    
+    // [POST] 환자 정보 수정
+    @PostMapping("/patients/update")
+    @ResponseBody
+    public String updatePatient(@RequestBody PatientDto dto) {
+        Optional<Patient> opt = patientRepository.findById(dto.getPatientId());
+        if (opt.isPresent()) {
+            Patient patient = opt.get();
+            patient.setPatientName(dto.getName());
+            patient.setPatientGender(dto.getGender());
+            patient.setPatientBirth(dto.getBirth());
+            patient.setPatientPhone(dto.getPhone());
+            patient.setPatientAddress(dto.getAddress());
+            patient.setPatientSymptom(dto.getSymptom());
+            patient.setPatientType(dto.getType());
+            patientRepository.save(patient);
+            return "환자 정보가 수정되었습니다.";
+        }
+        return "수정 실패: 환자 없음";
+    }
+
+    // [DELETE] 환자 삭제
+    @DeleteMapping("/patients/delete/{id}")
+    public String deletePatient(@PathVariable int id) {
+        patientRepository.deleteById(id);
+        return "환자 정보가 삭제되었습니다.";
+    }
+
 } 

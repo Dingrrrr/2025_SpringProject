@@ -3,6 +3,8 @@ package com.dita.domain;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +40,7 @@ public class Appt {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "patient_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Patient patient;// 환자아이디 
 	
 	@ManyToOne
