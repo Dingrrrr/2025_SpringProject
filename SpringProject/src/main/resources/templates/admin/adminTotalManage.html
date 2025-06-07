@@ -30,69 +30,47 @@
 
     <div class="main-content">
         <div class="dashboard-grid">
-            <div class="chart-card">
-                <h3>예약 데이터 통계</h3>
-                <div class="chart-container">
-                    <canvas id="monthlyOutpatientChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>진료 유형별 환자 수</h3>
-                <div class="chart-container">
-                    <canvas id="visitTypeChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>방문 목적 비율</h3>
-                <div class="chart-container">
-                    <canvas id="visitPurposeChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>일자별 외래환자 수</h3>
-                <div class="chart-container">
-                    <canvas id="dailyOutpatientChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>보험 유형 비율</h3>
-                <div class="chart-container">
-                    <canvas id="insuranceTypeChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>지역별 환자 수</h3>
-                <div class="chart-container">
-                    <canvas id="regionChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>수납 상태</h3>
-                <div class="chart-container">
-                    <canvas id="paymentStatusChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>진료과별 환자 수</h3>
-                <div class="chart-container">
-                    <canvas id="departmentChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3>상병 코드 순위</h3>
-                <div class="chart-container">
-                    <canvas id="diagnosisCodeChart"></canvas>
-                </div>
-            </div>
-        </div>
+			
+			<!-- 3. 최근 일주일 외래환자 수 -->
+		  <div class="chart-card">
+		    <h3>최근 일주일 외래환자 수</h3>
+		    <div class="chart-container">
+		      <canvas id="weeklyOutpatientChart"></canvas>
+		    </div>
+		  </div>
+		  
+		  <!-- 2. 월별 외래환자 수 -->
+		  <div class="chart-card">
+		    <h3>월별 예약 데이터 통계</h3>
+		    <div class="chart-container">
+		      <canvas id="monthlyOutpatientChart"></canvas>
+		    </div>
+		  </div>
+		
+		  <!-- 3. 연령대별 환자 수 -->
+		  <div class="chart-card">
+		    <h3>연령대별 환자 수</h3>
+		    <div class="chart-container">
+		      <canvas id="ageGroupChart"></canvas>
+		    </div>
+		  </div>
+		
+		  <!-- 4. 진료 상태별 환자 수 -->
+		  <div class="chart-card">
+		    <h3>당일 진료 상태별 환자 수</h3>
+		    <div class="chart-container">
+		      <canvas id="statusChart"></canvas>
+		    </div>
+		  </div>
+		  
+		  <!-- 5. 입원 현황 -->
+			<div class="chart-card">
+			  <h3>입원 현황</h3>
+			  <div class="chart-container">
+			    <canvas id="bedStatusChart"></canvas>
+			  </div>
+			</div>
+		</div>
     </div>
     
     <div id="chartModal" class="modal">
@@ -151,28 +129,7 @@
                 }
             });
         };
-
-        createBarChart('visitTypeChart', ['일반', '응급', '입원', '건강검진'], [120, 90, 60, 30], '유형별 환자 수');
-        createDoughnutChart('visitPurposeChart', ['진료', '검사', '상담', '기타'], [45, 30, 15, 10], ['#2196f3', '#4caf50', '#ff9800', '#e91e63']);
-        createBarChart('dailyOutpatientChart', ['5/1', '5/2', '5/3', '5/4', '5/5'], [60, 75, 70, 90, 85], '일일 외래환자');
-        createDoughnutChart('insuranceTypeChart', ['건강보험', '의료급여', '자동차보험'], [65, 25, 10], ['#3f51b5', '#009688', '#ff5722']);
-        createBarChart('regionChart', ['서울', '부산', '대구', '광주', '인천'], [130, 90, 70, 60, 80], '지역별 수');
-        createDoughnutChart('paymentStatusChart', ['완납', '미납'], [85, 15], ['#8bc34a', '#ffc107']);
-        createBarChart('departmentChart', ['내과', '외과', '소아과', '정형외과'], [80, 70, 60, 90], '진료과별 환자');
-        createBarChart('diagnosisCodeChart', ['A01', 'B02', 'C03', 'D04', 'E05', 'F06', 'G07', 'H08', 'I09', 'J10'], [15, 12, 10, 9, 8, 7, 6, 5, 4, 3], '상병 코드');
-    
-        const chartDescriptions = {
-        		  monthlyOutpatientChart: '월별 외래환자 수는 병원의 월별 방문량을 보여줍니다.',
-        		  visitTypeChart: '진료 유형별 환자 수는 일반, 응급, 입원 등으로 나뉩니다.',
-        		  visitPurposeChart: '방문 목적은 진료, 검사, 상담 등으로 분류됩니다.',
-        		  dailyOutpatientChart: '일자별 외래환자 수는 최근 며칠간의 환자 방문 통계를 보여줍니다.',
-        		  insuranceTypeChart: '보험 유형은 건강보험, 의료급여, 자동차보험으로 나뉩니다.',
-        		  regionChart: '지역별 환자 분포를 나타냅니다.',
-        		  paymentStatusChart: '수납 상태는 완납/미납으로 구분됩니다.',
-        		  departmentChart: '진료과별 환자 수는 병원의 과목별 통계를 보여줍니다.',
-        		  diagnosisCodeChart: '상병 코드는 가장 많이 기록된 질병 코드의 순위를 보여줍니다.'
-        		};
-
+        
         let currentChartData = null;
         let modalChart = null;
 
@@ -228,9 +185,31 @@
         	  }
         	};
         	
-        	window.addEventListener('DOMContentLoaded', () => {
-        		  loadMonthlyOutpatientChart(); // ✅ 이 라인 추가
-        		  });
+        	const loadChart = async (id, url, type = 'bar', label = '', colors = []) => {
+        		  try {
+        		    const res = await fetch(url);
+        		    const data = await res.json();
+        		    const labels = Object.keys(data);
+        		    const values = Object.values(data);
+
+        		    if (type === 'bar') {
+        		      createBarChart(id, labels, values, label);
+        		    } else if (type === 'doughnut') {
+        		      createDoughnutChart(id, labels, values, colors);
+        		    }
+        		  } catch (e) {
+        		    console.error(`${id} 차트 로딩 실패`, e);
+        		  }
+        		};
+
+        	
+        		window.addEventListener('DOMContentLoaded', () => {
+        			  loadMonthlyOutpatientChart();
+        			  loadChart('ageGroupChart', '/admin/adminTotalManage/age-groups', 'bar', '연령대별 환자 수');
+        			  loadChart('weeklyOutpatientChart', '/admin/adminTotalManage/weekly-outpatients', 'bar', '최근 일주일 외래환자 수');
+        			  loadChart('statusChart', '/admin/adminTotalManage/status-today', 'doughnut', '', ['#4caf50', '#ffc107', '#f44336']);
+        			  loadChart('bedStatusChart', '/admin/adminTotalManage/bed-status', 'doughnut', '', ['#ff7043', '#66bb6a']);
+        		});
         		
         </script>
     
@@ -248,8 +227,8 @@
 	
 	.chart-modal-content {
 	  background-color: #fff;
-	  width: 80%;
-	  height: 80%;
+	  width: 100%;
+	  height: 100%;
 	  margin: 5% auto;
 	  padding: 20px;
 	  border-radius: 8px;
