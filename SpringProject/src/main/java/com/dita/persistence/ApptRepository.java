@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.dita.domain.Appt;
+import com.dita.domain.Patient;
 
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
@@ -49,5 +50,7 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	    ORDER BY ageGroup
     	""", nativeQuery = true)
     	List<Object[]> countByAgeGroup();
-
+    	
+    	// ✅ 환자의 모든 예약 삭제
+        void deleteAllByPatient(Patient patient);
 }
