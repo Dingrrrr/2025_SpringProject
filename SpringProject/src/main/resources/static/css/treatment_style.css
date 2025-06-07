@@ -28,12 +28,25 @@
 }
 .patient-summary {
   display: flex;
+  justify-content: space-between;
+  align-items: center; /* ← 버튼이 너무 위로 안 가도록 균형 */
   flex-wrap: wrap;
-  gap: 12px;
-  background: #fff;
-  padding: 12px;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.summary-left {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 8px;
+}
+
+.summary-right {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
 }
 .patient-summary .patient-name {
   font-size: 1.1rem;
@@ -169,4 +182,17 @@
 }
 .logout-btn:hover {
   background:#e9ecef;
+}
+
+/* 환자검색css */
+.selectable-patient {
+  cursor: pointer;
+  background-color: #f8f9fa;
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.selectable-patient:hover {
+  background-color: #e9ecef;
 }

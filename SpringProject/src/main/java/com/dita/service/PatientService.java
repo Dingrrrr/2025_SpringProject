@@ -4,10 +4,14 @@ import com.dita.domain.Notif;
 import com.dita.domain.Patient;
 import com.dita.domain.PatientType;
 import com.dita.domain.User;
+import com.dita.domain.Vital_sign;
 import com.dita.domain.Grade;
 import com.dita.persistence.NotifRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.persistence.UserRepository;
+import com.dita.persistence.VitalRepository;
+import com.dita.vo.PatientWithVitalDTO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,27 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private final NotifRepository notifRepository;
+    
+    private final VitalRepository vitalRepository;
+    
+    
+    // 환자 이름으로 검색 → 환자 정보와 함께 최근 바이탈 사인 반환
+    public PatientWithVitalDTO findPatientWithVitalByName(String name) {
+
+        // 1. 이름으로 환자 조회 (없으면 예외 발생)
+        Patient patient = patientRepository.findByPatientName(name)
+                .orElseThrow(() -> new RuntimeException("환자 없음"));
+
+        // 2. 해당 환자의 최근 Vital Sign 1건 조회
+        Optional<Vital_sign> vital = vitalRepository.findFirstByPatient_PatientIdOrderByRecordedAtDesc(patient.getPatientId());
+
+        // 3. DTO로 반환
+        return new PatientWithVitalDTO(patient, vital.orElse(null));
+    }
+    //이름으로 환자를 전체 조회하는 서비스 로직
+    public List<Patient> findAllPatientsByName(String name) {
+        return patientRepository.findAllByPatientName(name);
+    }
 
     @Transactional
     public Patient admitPatient(Patient patient) {
