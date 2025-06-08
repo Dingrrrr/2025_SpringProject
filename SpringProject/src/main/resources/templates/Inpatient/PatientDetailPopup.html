@@ -1,120 +1,91 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>환자 상세 정보</title>
   <link rel="stylesheet" href="/css/patientDetail.css">
 </head>
 <body>
-  <h2>환자 정보</h2>
-  <div id="form-area"></div>
+<h2>환자 정보</h2>
+<div class="form-area">
 
-  <div class="button-group">
-    <button id="editBtn">수정</button>
-    <button id="deleteBtn">삭제</button>
-    <button class="cancel" onclick="window.close()">닫기</button>
-  </div>
+  <label>이름</label>
+  <p th:text="${admission.patient.patientName}">이름</p>
 
-  <script>
-    const params = new URLSearchParams(location.search);
-    const patientId = params.get("patientId");
+  <label>성별 / 나이</label>
+  <p>
+    <span th:text="${admission.patient.patientGender}">성별</span> /
+    <span th:text="${admission.patient.age}">나이</span>세
+  </p>
+<form th:action="@{/Inpatient/updateStatus}" method="post" id="statusForm">
+  
+  <label>진단명</label>
+  <input type="text" id="symptomInput" name="symptom"
+         th:value="${admission.patient.patientSymptom ?: '미정'}"
+         />
 
-    if (!patientId || isNaN(patientId)) {
-      alert("유효하지 않은 환자 ID입니다.");
-      window.close();
-    }
+  <label>입원일</label>
+  <input type="date" id="admittedAtInput" name="admittedAt"
+         th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"
+         />
 
-    const $ = id => document.getElementById(id);
-    let currentMode = "view";
-    let data = {};
+  <label>담당의</label>
+  <select name="doctorId" id="doctorSelect">
+    <option th:each="doc : ${doctors}"
+            th:value="${doc.usersId}"
+            th:text="${doc.usersName}"
+            th:selected="${doc.usersId == admission.doctor.usersId}">
+    </option>
+  </select>
 
-    async function loadPatientDetail() {
-      try {
-        const res = await fetch(`/Inpatient/detail?patientId=${patientId}`);
-        if (!res.ok) throw new Error("서버 응답 실패");
-        data = await res.json();
-        renderDetail();
-      } catch (e) {
-       // alert("환자 정보를 불러올 수 없습니다.");
-        window.close();
-      }
-    }
+  <label>상태</label>
+  <select name="status" id="statusSelect" disabled>
+    <option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
+    <option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
+  </select>
 
-    function renderDetail() {
-      const isEdit = currentMode === "edit";
+  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
 
-      $("form-area").innerHTML = `
-        <label>이름</label>
-        <p>${data.name}</p>
+</form>
 
-        <label>성별 / 나이</label>
-        <p>${data.gender} / ${data.age}세</p>
 
-        <label>진단명</label>
-        ${isEdit ? `<input id="inputDiagnosis" value="${data.diagnosis ?? ''}">` : `<p>${data.diagnosis ?? ''}</p>`}
+  
+<div class="button-group">
+  <button id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
 
-        <label>입원일</label>
-        ${isEdit ? `<input id="inputDate" value="${data.date ?? ''}">` : `<p>${data.date ?? ''}</p>`}
+ <form th:action="@{/Inpatient/delete}" method="post">
+  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+  <button type="submit" class="delete">삭제</button> <!-- ✅ 반드시 type="submit" -->
+</form>
 
-        <label>담당의</label>
-        <p>${data.doctor}</p>
 
-        <label>상태</label>
-        ${isEdit ? `
-          <select id="inputStatus">
-            <option value="입원대기" ${data.status === "입원대기" ? "selected" : ""}>입원대기</option>
-            <option value="입원중" ${data.status === "입원중" ? "selected" : ""}>입원중</option>
-            <option value="퇴원" ${data.status === "퇴원" ? "selected" : ""}>퇴원</option>
-          </select>` : `<p>${data.status}</p>`}
-      `;
-    }
+  <button class="cancel" onclick="window.close()">닫기</button>
+</div>
 
-    $("editBtn").addEventListener("click", async () => {
-      if (currentMode === "view") {
-        currentMode = "edit";
-        $("editBtn").innerText = "저장";
-        renderDetail();
-      } else {
-        const updated = {
-          patientId: parseInt(patientId),
-          diagnosis: $("inputDiagnosis")?.value || "",
-          date: $("inputDate")?.value || "",
-          status: $("inputStatus")?.value || ""
-        };
-
-        try {
-          const res = await fetch("/Inpatient/detail", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updated)
-          });
-
-          if (!res.ok) throw new Error("수정 실패");
-
-          alert("수정 완료");
-          currentMode = "view";
-          $("editBtn").innerText = "수정";
-          await loadPatientDetail();
-        } catch (e) {
-          alert("수정에 실패했습니다.");
-        }
-      }
-    });
-
-    $("deleteBtn").addEventListener("click", async () => {
-      if (!confirm("정말 삭제하시겠습니까?")) return;
-
-      try {
-        const res = await fetch(`/Inpatient/delete?patientId=${patientId}`, { method: "DELETE" });
-        if (!res.ok) throw new Error();
-        alert("삭제 완료");
-        window.close();
-      } catch (e) {
-        alert("삭제에 실패했습니다.");
-      }
-    });
-
-    loadPatientDetail();
-  </script>
 </body>
+<script>
+  let isEditMode = false;
+
+ function toggleEdit() {
+  isEditMode = !isEditMode;
+
+  const editBtn = document.getElementById("editBtn");
+  const statusSelect = document.getElementById("statusSelect");
+
+  statusSelect.disabled = !isEditMode;
+// JavaScript 수정
+if (isEditMode) {
+	  editBtn.textContent = "저장";
+	  editBtn.classList.remove("edit");
+	  editBtn.classList.add("save");
+	  statusSelect.disabled = false; 
+	
+	} else {
+	  statusSelect.disabled = false; 
+	  document.getElementById("statusForm").submit();
+	}
+
+}
+</script>
+
 </html>

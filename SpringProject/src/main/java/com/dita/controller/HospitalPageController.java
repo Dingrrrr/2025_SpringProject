@@ -10,17 +10,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.dita.domain.Appt;
-import com.dita.domain.Status;
+
 import com.dita.domain.User;
 import com.dita.persistence.ApptRepository;
+import com.dita.service.NotifService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class HospitalPageController {
+	
+    private final NotifService notifService;
 	private final ApptRepository ApptRepository;
-	public HospitalPageController(ApptRepository apptRepository) {
+	
+	public HospitalPageController(ApptRepository apptRepository, NotifService notifService) {
         this.ApptRepository = apptRepository;
+        this.notifService = notifService;
 	}
 
     // ── 외부 진입점 ──
@@ -43,7 +49,11 @@ public class HospitalPageController {
     }
 
 
-
+    @GetMapping("/hospital/hospital_home")
+    public String showhospital_homePage() {
+    	return "/hospital/hospital_home";
+    }
+    
     @GetMapping("/hospital/notification")
     public String getTodayNotifications(Model model) {
         LocalDate today = LocalDate.now();
@@ -75,14 +85,16 @@ public class HospitalPageController {
     }
 
     @GetMapping("/hospital/chart")
-    public String showChartPage() {
-        // templates/hospital/chart.html
+    public String showChartPage(Model model) throws JsonProcessingException {
+       
         return "hospital/chart";
     }
+
 
     @GetMapping("/hospital/statistics")
     public String showStatisticsPage() {
         // templates/hospital/statistics.html
         return "hospital/statistics";
     }
+    
 }

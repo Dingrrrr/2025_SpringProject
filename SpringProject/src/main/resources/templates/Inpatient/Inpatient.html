@@ -1,133 +1,116 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>입원 관리</title>
   <link rel="stylesheet" href="/css/inpatient.css">
 </head>
 <body>
-  <div class="container">
-    <!-- 사이드바 -->
-    <aside class="sidebar">
-      <div class="profile">
-        <div class="profile-icon">👤</div>
-        <div>
-          <div class="profile-name">홍길동</div>
-          <div class="profile-role">간호사</div>
-        </div>
+<div class="container">
+
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="profile-icon">👤</div>
+      <div>
+        <div class="profile-name">홍길동</div>
+        <div class="profile-role">간호사</div>
       </div>
-      <ul class="menu">
-        <li>진료</li>
-        <li>예약</li>
-        <li>수납</li>
-        <li>재고</li>
-        <li class="active">입원 ▾
-          <ul class="submenu">
-            <li class="selected">입원 관리</li>
-            <li>입원 통계</li>
-          </ul>
-        </li>
-      </ul>
-    </aside>
+    </div>
+    <ul class="menu">
+      <li>진료</li>
+      <li>예약</li>
+      <li>수납</li>
+      <li>재고</li>
+      <li class="active">입원 ▾
+        <ul class="submenu">
+          <li class="selected">입원 관리</li>
+          <li><a href="/Inpatient/Statistics">입원 통계</a></li>
+        </ul>
+      </li>
+    </ul>
+  </aside>
 
-    <!-- 본문 -->
-    <main class="main-content">
-      <header class="page-header">
-        <h1>입원 관리</h1>
-        <button id="addBtn" class="add-btn">+ 환자 입원 추가</button>
-      </header>
+  <!-- 본문 -->
+  <main class="main-content">
+    <header class="page-header">
+      <h1>입원 관리</h1>
+      <button class="add-btn"
+              onclick="window.open('/Inpatient/WaitingList', '입원대기 환자', 'width=700,height=600')">
+        + 환자 입원 추가
+      </button>
+    </header>
 
-      <!-- 병동 탭 -->
-      <div class="ward-tabs" id="wardTabs"></div>
+    <!-- 병동 탭 -->
+    <div class="ward-tabs">
+      <button th:each="ward, stat : ${wards}"
+              th:text="${ward}"
+              th:class="'tab ' + (${stat.index == 0} ? 'active' : '')"
+              th:attr="data-ward=${ward}"
+              onclick="filterByWard(this)">
+      </button>
+    </div>
 
-      <!-- 병실/환자 카드 영역 -->
-      <div class="ward-board"></div>
-    </main>
-  </div>
+    <!-- 병실/환자 카드 -->
+    <div class="ward-board">
+      <div class="bed-card"
+           th:each="admission : ${beds}"
+           th:attr="data-ward=${admission.bed.ward.name}, data-patient-id=${admission.patient.patientId}"
+           onclick="openPopup(this)">
 
-  <script>
-    // 병실 탭 동적 생성
-    function loadWardTabs() {
-      fetch("/api/wards") // 병실 목록 API
-        .then(res => res.json())
-        .then(wards => {
-          const tabContainer = document.getElementById("wardTabs");
-          tabContainer.innerHTML = "";
+        <div class="bed-header">
+          <span th:text="${admission.bed.bedNumber ?: '미정'}">병상번호</span>
+          <span class="status"
+                th:text="${admission.patient.patientType ?: '미정'}"
+                th:classappend="${admission.patient.patientType}">
+          </span>
+        </div>
 
-          wards.forEach((wardName, index) => {
-            const tab = document.createElement("button");
-            tab.className = "tab";
-            tab.innerText = wardName;
-            if (index === 0) tab.classList.add("active");
+        <div class="patient-info">
+          <p>
+            <strong th:text="${admission.patient.patientName}">이름</strong> /
+            <span th:text="${admission.patient.patientGender}">성별</span> /
+            <span th:text="${admission.patient.age}">나이</span>세
+          </p>
+          <p>진단명: <span th:text="${admission.patient.patientSymptom ?: '미정'}">진단</span></p>
+          <p>입원일: <span th:text="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}">날짜</span></p>
+          <p>담당의: <span th:text="${admission.doctor.usersName}">의사</span></p>
+        </div>
 
-            tab.addEventListener("click", () => {
-              document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-              tab.classList.add("active");
-              renderCards(wardName);
-            });
+      </div>
+    </div>
+  </main>
+</div>
 
-            tabContainer.appendChild(tab);
-          });
+<script>
+  function filterByWard(tabElement) {
+    const selectedWard = tabElement.getAttribute("data-ward");
 
-          if (wards.length > 0) {
-            renderCards(wards[0]); // 첫 병실 기본 로딩
-          }
-        });
-    }
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    tabElement.classList.add("active");
 
-    // 병실별 입원 환자 카드 렌더링
-    function renderCards(wardName) {
-      const board = document.querySelector(".ward-board");
-      board.innerHTML = "";
-
-      fetch(`/Inpatient/admitted/${encodeURIComponent(wardName)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.length === 0) {
-            board.innerHTML = "<p>등록된 환자가 없습니다.</p>";
-            return;
-          }
-
-          data.forEach(bed => {
-            const card = document.createElement("div");
-            card.className = "bed-card";
-
-            const status = bed.patientType ?? "미정";
-
-            card.innerHTML = `
-              <div class="bed-header">
-                <span>${bed.room ?? "미정"}</span>
-                <span class="status ${status}">${status}</span>
-              </div>
-              <div class="patient-info">
-                <p><strong>${bed.name}</strong> / ${bed.gender} / ${bed.age}세</p>
-                <p>진단명: ${bed.diagnosis ?? "미정"}</p>
-                <p>입원일: ${bed.date ?? "미정"}</p>
-                <p>담당의: ${bed.doctor}</p>
-              </div>
-            `;
-
-            card.addEventListener("click", () => {
-			  const params = new URLSearchParams(bed);
-			  if (bed.patientId) {
-			    params.append("patientId", bed.patientId);
-			  }
-			  window.open(`/Inpatient/Popup?${params.toString()}`, '환자상세', 'width=420,height=520');
-			});
-
-
-            board.appendChild(card);
-          });
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadWardTabs();
-
-      document.getElementById("addBtn").addEventListener("click", () => {
-        window.open("/Inpatient/WaitingList", "입원대기 환자", "width=700,height=600");
-      });
+    document.querySelectorAll(".bed-card").forEach(card => {
+      const cardWard = card.getAttribute("data-ward");
+      card.style.display = (cardWard === selectedWard) ? "block" : "none";
     });
-  </script>
+  }
+
+function openPopup(el) {
+  const patientId = el.getAttribute("data-patient-id");
+  if (!patientId) {
+    alert("환자 ID가 없습니다.");
+    return;
+  }
+
+  const url = "/Inpatient/Popup?patientId=" + patientId;
+  window.open(url, "환자상세", "width=420,height=520");
+}
+
+
+  window.onload = () => {
+    const firstTab = document.querySelector(".tab");
+    if (firstTab) filterByWard(firstTab);
+  };
+</script>
 </body>
 </html>
