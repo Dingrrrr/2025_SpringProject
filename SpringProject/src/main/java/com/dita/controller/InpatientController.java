@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -66,7 +67,14 @@ public class InpatientController {
         model.addAttribute("doctors", doctors);
         return "Inpatient/PatientWaitingPopup"; 
     }
-
+    
+    //환자 수정
+    @PostMapping("/updateStatus")
+    public String updatePatientStatus(@RequestParam("patientId") int patientId,
+                                      @RequestParam("status") String status) {
+    	admissionSe.updatePatientStatus(patientId, status);
+    	return "redirect:/Inpatient/Popup?patientId=" + patientId;
+    }
     
     // 환자 디테일
     @GetMapping("/Popup")
@@ -77,7 +85,6 @@ public class InpatientController {
         return "Inpatient/PatientDetailPopup";
     }
 
-    
     // 병상 배정 팝업
     @GetMapping("/AssignBedPopup")
     public String showAssignBedPopup(Model model) {

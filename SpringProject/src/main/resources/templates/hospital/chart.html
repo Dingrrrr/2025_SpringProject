@@ -219,7 +219,156 @@
 				<button type="submit">올리기</button>
 			</form>
 		</aside>
-
+		
 	</div>
 </body>
+<script>
+  function goToHome()        { location.href = '/home'; }
+  function goToChart()       { location.href = '/hospital/chart'; }
+  function goToReservation() { location.href = '/hospital/reservation'; }
+  function goToTreatment()   { location.href = '/hospital/treatment'; }
+  function goToStats()       { location.href = '/hospital/statistics'; }
+  function goLogout()        { location.href = '/logout'; }
+
+  const orderInput = document.getElementById('orderSearchInput');
+  const suggestions = document.getElementById('suggestions');
+  const diagnosisList = document.querySelector('.diagnosis-items');
+  const tbody = document.getElementById('prescriptionTbody');
+
+  let orderData = [];
+
+  async function loadOrderData() {
+  try {
+    const diseaseRes = await fetch('/api/disease/list');
+    const diseaseData = await diseaseRes.json();
+    console.log("✅ diseaseData:", diseaseData); // 🔍 확인
+
+    const drugRes = await fetch('/api/drug/list');
+    const drugData = await drugRes.json();
+    console.log("✅ drugData:", drugData); // 🔍 확인
+
+    orderData = [
+      ...diseaseData.map(d => ({
+        type: 'disease',
+        code: d.code,
+        name: d.name,
+        category: d.type
+      })),
+      ...drugData
+    ];
+
+    console.log("✅ orderData 최종:", orderData); // ✅ 여기 찍히는지 확인
+  } catch (err) {
+    console.error('❌ loadOrderData 실패:', err); // 오류가 여기 찍히는지!
+  }
+}
+
+  // ✅ 2. 반드시 실행
+  (async () => {
+    await loadOrderData();
+  })();
+
+  // ✅ 3. 자동완성 이벤트 처리
+  orderInput.addEventListener('input', () => {
+    const query = orderInput.value.trim().toLowerCase();
+    suggestions.innerHTML = '';
+
+    if (!orderData || orderData.length === 0) {
+      const div = document.createElement('div');
+      div.innerHTML = '⏳ 데이터 로딩 중...';
+      div.classList.add('suggestion-item');
+      suggestions.appendChild(div);
+      return;
+    }
+
+    const diseases = orderData.filter(item =>
+      item.type === 'disease' && item.name.toLowerCase().includes(query)
+    );
+    const drugs = orderData.filter(item =>
+      item.type === 'drug' && item.name.toLowerCase().includes(query)
+    );
+
+    // 진단명 그룹
+    if (diseases.length > 0) {
+      const diseaseLabel = document.createElement('div');
+      diseaseLabel.textContent = '📁 진단명';
+      diseaseLabel.classList.add('group-label');
+      suggestions.appendChild(diseaseLabel);
+
+      diseases.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('suggestion-item');
+        div.textContent = item.name;
+        div.onclick = () => {
+          const li = document.createElement('div');
+          li.classList.add('diagnosis-item');
+          li.innerHTML = `
+            <span>${item.name}</span>
+            <button class="delete-diagnosis-btn">❌</button>
+          `;
+          li.querySelector('.delete-diagnosis-btn').onclick = () => li.remove();
+          diagnosisList.appendChild(li);
+          orderInput.value = '';
+          suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(div);
+      });
+    }
+
+    // 약물 그룹
+    if (drugs.length > 0) {
+      const drugLabel = document.createElement('div');
+      drugLabel.textContent = '💊 약물';
+      drugLabel.classList.add('group-label');
+      suggestions.appendChild(drugLabel);
+
+      drugs.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('suggestion-item');
+        div.textContent = item.name;
+        div.onclick = () => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.name}</td>
+            <td contenteditable="true">${item.dosage}</td>
+            <td contenteditable="true">${item.count}</td>
+            <td><button class="delete-btn">삭제</button></td>
+          `;
+          tbody.appendChild(tr);
+          orderInput.value = '';
+          suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(div);
+      });
+    }
+  });
+
+  // 외부 클릭 시 자동완성 닫기
+  document.addEventListener('click', e => {
+    if (!suggestions.contains(e.target) && e.target !== orderInput) {
+      suggestions.innerHTML = '';
+    }
+  });
+
+  // 수기 처방 추가
+  document.getElementById('manualAddBtn').addEventListener('click', () => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" placeholder="약품명" class="manual-input"></td>
+      <td><input type="text" placeholder="용법/용량" class="manual-input"></td>
+      <td><input type="number" placeholder="수량" class="manual-input" style="width: 60px;"></td>
+      <td><button class="delete-btn">삭제</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 처방 테이블 삭제 기능
+  tbody.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-btn')) {
+      const tr = e.target.closest('tr');
+      if (tr) tr.remove();
+    }
+  });
+</script>
+</script>
 </html>

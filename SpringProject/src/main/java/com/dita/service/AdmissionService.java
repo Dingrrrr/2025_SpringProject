@@ -2,6 +2,7 @@ package com.dita.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -90,5 +91,17 @@ public class AdmissionService {
                 .build())
             .collect(Collectors.toList());
     }
+    
+    //입원 수정
+    public void updatePatientStatus(int patientId, String status) {
+        Optional<Admission> admissionOpt = admissionRepo.findByPatientId(patientId);
+        if (admissionOpt.isPresent()) {
+            Admission admission = admissionOpt.get();
+            PatientType type = PatientType.valueOf(status);
+            admission.getPatient().setPatientType(type);
+            patientRepository.save(admission.getPatient());
+        }
+    }
 
+    
 }
