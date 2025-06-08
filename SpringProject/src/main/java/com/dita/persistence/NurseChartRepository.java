@@ -244,14 +244,17 @@ public class NurseChartRepository {
             String sql = "SELECT patient_id, bp_systolic, bp_diastolic, pulse_rate, " +
                         "temperature, respiration_rate, recorded_at, time_period " +
                         "FROM vital_sign WHERE patient_id = ? " +
+                        "AND recorded_date = CURDATE() " +  // 오늘 날짜로 제한 추가
                         "ORDER BY recorded_date DESC, recorded_at DESC LIMIT 1";
             
             List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, patientId);
             
             if (result.isEmpty()) {
+                log.info("환자 " + patientId + "의 오늘 바이탈 데이터 없음");
                 return new HashMap<>();
             }
             
+            log.info("환자 " + patientId + "의 오늘 최신 바이탈 데이터 조회 완료");
             return result.get(0);
             
         } catch (Exception e) {
@@ -267,7 +270,7 @@ public class NurseChartRepository {
         try {
             log.info("환자 " + patientId + "의 차트 데이터 조회 시작");
             
-            // 시간대별 최신 데이터 (AVG 대신 각 시간대별 데이터)
+            // 시간대별 데이터 - 오늘 날짜만 조회
             String timeSql = "SELECT time_period, " +
                             "bp_systolic as avg_systolic, " +
                             "bp_diastolic as avg_diastolic, " +
@@ -276,33 +279,35 @@ public class NurseChartRepository {
                             "respiration_rate as avg_resp " +
                             "FROM vital_sign " +
                             "WHERE patient_id = ? " +
+                            "AND recorded_date = CURDATE() " +  // 오늘 날짜로 제한
                             "ORDER BY recorded_date DESC, recorded_at DESC";
             
-            // 주간별 데이터 (최근 7일)
-            String weeklySql = "SELECT recorded_date as date, " +
-                              "AVG(bp_systolic) as avg_systolic, " +
-                              "AVG(bp_diastolic) as avg_diastolic, " +
-                              "AVG(pulse_rate) as avg_pulse, " +
-                              "AVG(temperature) as avg_temp, " +
-                              "AVG(respiration_rate) as avg_resp " +
-                              "FROM vital_sign " +
-                              "WHERE patient_id = ? " +
-                              "AND recorded_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
-                              "GROUP BY recorded_date " +
-                              "ORDER BY recorded_date";
+            // 일별 평균 데이터 (최근 7일)
+            String dailySql = "SELECT recorded_date as date, " +
+                             "AVG(bp_systolic) as avg_systolic, " +
+                             "AVG(bp_diastolic) as avg_diastolic, " +
+                             "AVG(pulse_rate) as avg_pulse, " +
+                             "AVG(temperature) as avg_temp, " +
+                             "AVG(respiration_rate) as avg_resp " +
+                             "FROM vital_sign " +
+                             "WHERE patient_id = ? " +
+                             "AND recorded_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                             "GROUP BY recorded_date " +
+                             "ORDER BY recorded_date";
             
             List<Map<String, Object>> timeData = jdbcTemplate.queryForList(timeSql, patientId);
-            List<Map<String, Object>> weeklyData = jdbcTemplate.queryForList(weeklySql, patientId);
+            List<Map<String, Object>> dailyData = jdbcTemplate.queryForList(dailySql, patientId);
             
-            log.info("조회된 시간대별 데이터: " + timeData.size() + "개");
-            log.info("조회된 주간별 데이터: " + weeklyData.size() + "개");
+            log.info("조회된 시간대별 데이터: " + timeData.size() + "개 (오늘 날짜만)");
+            log.info("조회된 일별 데이터: " + dailyData.size() + "개");
             
             // 디버깅용 로그
-            timeData.forEach(data -> log.info("시간대별 데이터: " + data.toString()));
+            timeData.forEach(data -> log.info("오늘 시간대별 데이터: " + data.toString()));
+            dailyData.forEach(data -> log.info("일별 데이터: " + data.toString()));
             
             return Map.of(
                 "timeData", timeData,
-                "weeklyData", weeklyData
+                "dailyData", dailyData
             );
             
         } catch (Exception e) {
