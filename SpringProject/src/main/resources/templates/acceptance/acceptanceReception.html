@@ -794,7 +794,15 @@ function applyMonthSelection() {
   closeMonthPickerModal();
 }
 function updateWeekDisplay() {
-  const monday = new Date(currentDateObj);
+  const current = new Date(currentDateObj);
+  const dayOfWeek = current.getDay(); // 0(일) ~ 6(토)
+  const diffToMonday = (dayOfWeek + 6) % 7; // 월(1) -> 0, 일(0) -> 6
+  const monday = new Date(current);
+  monday.setDate(current.getDate() - diffToMonday);
+
+  // ✅ 현재 기준도 월요일로 맞춰주면 이후 이동 시 안정적
+  currentDateObj = new Date(monday);
+
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
@@ -803,6 +811,15 @@ function updateWeekDisplay() {
   const end = formatDate(sunday);
 
   document.getElementById('weekDateRange').textContent = `${start} ~ ${end}`;
+
+  const dates = [];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+
+  loadAppointmentsForWeek(dates);
 }
 
 
@@ -941,6 +958,102 @@ function loadAppointmentsByDate(dateString) {
 	      alert("예약 목록을 가져오는 데 실패했습니다.");
 	    });
 	}
+	
+function loadAppointmentsForWeek(dateList) {
+  document.querySelectorAll('#weekView .cell').forEach(cell => {
+    cell.classList.remove('green');
+    cell.innerHTML = '';
+    cell.removeAttribute('data-name');
+    cell.removeAttribute('data-rrn');
+    cell.removeAttribute('data-phone');
+    cell.removeAttribute('data-date');
+    cell.removeAttribute('data-department');
+    cell.removeAttribute('data-disease');
+    cell.removeAttribute('data-doctor');
+  });
+
+  dateList.forEach((dateStr) => {
+    fetch(`/acceptance/appointments?date=${dateStr}`)
+      .then(res => res.json())
+      .then(list => {
+        list.forEach(appt => {
+          const date = new Date(appt.date);
+          const day = date.getDay(); // 0(일) ~ 6(토)
+          const dayIndex = day - 1;  // 월(1) → 0 ~ 금(5) → 4
+
+          if (dayIndex < 0 || dayIndex > 4) return; // 주말 제외
+
+          const hour = String(date.getHours()).padStart(2, '0');
+          const minute = String(date.getMinutes()).padStart(2, '0');
+          const timeStr = `${hour}:${minute}`;
+
+          const roomIndex = {
+            '진료실1': 0,
+            '진료실2': 1,
+            '진료실3': 2,
+            '진료실4': 3
+          }[appt.room];
+
+          if (roomIndex === undefined) return;
+
+          const rows = document.querySelectorAll('#weekView .schedule-row');
+          for (const row of rows) {
+            const timeCol = row.querySelector('.time-col');
+            if (timeCol && timeCol.textContent.trim() === timeStr) {
+              const cells = row.querySelectorAll('.cell');
+              const targetCell = cells[dayIndex];
+              targetCell.classList.add('green');
+              targetCell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
+              targetCell.dataset.name       = appt.name;
+              targetCell.dataset.rrn        = appt.rrn;
+              targetCell.dataset.phone      = appt.phone;
+              targetCell.dataset.date       = appt.date;
+              targetCell.dataset.department = appt.room;
+              targetCell.dataset.disease    = appt.disease;
+              targetCell.dataset.doctor     = appt.doctor;
+              break;
+            }
+          }
+        });
+      })
+      .catch(err => {
+        console.error("주간 예약 불러오기 실패:", err);
+      });
+  });
+}
+
+	 document.querySelector('#weekView .schedule-table').addEventListener('click', function (e) {
+    const cell = e.target;
+    if (!cell.classList.contains('cell')) return;
+
+    if (cell.classList.contains('green')) {
+      openReservationDetailModal(cell);
+      return;
+    }
+
+    const row = cell.closest('.schedule-row');
+    const time = row.querySelector('.time-col').textContent.trim();
+
+    const colIndex = Array.from(cell.parentNode.children).indexOf(cell); // 요일 인덱스
+    const roomIndex = Array.from(cell.parentNode.children).indexOf(cell); // 열 위치
+    const roomName = ['진료실1', '진료실2', '진료실3', '진료실4'][roomIndex - 1];
+
+    const monday = new Date(currentDateObj);
+    const targetDate = new Date(monday);
+    targetDate.setDate(monday.getDate() + colIndex - 1);
+
+    const [hour, minute] = time.split(':');
+    targetDate.setHours(parseInt(hour));
+    targetDate.setMinutes(parseInt(minute));
+
+    const isoStr = targetDate.toISOString().slice(0, 16);
+    const form = document.getElementById('reservationForm');
+    form.reset();
+    form.date.value = isoStr;
+    form.room.value = roomName;
+
+    document.getElementById('reservationModal').style.display = 'flex';
+  });
 </script>
 
 
