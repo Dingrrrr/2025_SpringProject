@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>입원 대기 환자 목록</title>
-  <link rel="stylesheet" href="/css/patientWaitingPopup.css">
+  <link rel="stylesheet" th:href="@{/css/patientWaitingPopup.css}">
 </head>
 <body>
   <h2>입원 대기 환자</h2>
@@ -16,117 +16,64 @@
         <th>나이</th>
         <th>진단명</th>
         <th>담당의</th>
-        <th>병실</th>
+        <th>병상</th>
         <th>입원</th>
       </tr>
     </thead>
-    <tbody id="waiting-table-body"></tbody>
+    <tbody>
+      <tr th:each="patient : ${patients}">
+        <form th:action="@{/Inpatient/admit}" method="post">
+          <td th:text="${patient.name}">이름</td>
+          <td th:text="${patient.gender}">성별</td>
+          <td th:text="${patient.age}">나이</td>
+          <td th:text="${patient.symptom}">증상</td>
+
+          <td>
+            <select name="doctorId" required>
+			  <option value="">선택</option>
+			  <option th:each="doc : ${doctors}"
+			          th:value="${doc.usersId}"
+			          th:text="${doc.usersName}">의사</option>
+			</select>
+          </td>
+
+           <td>
+			  <span class="bed-info">미선택</span>
+			  <input type="hidden" name="bedId" />
+			  <input type="hidden" name="wardId" />
+			  <button type="button" onclick="openBedPopup(this)">병상 선택</button>
+			</td>
+
+          <td>
+            <input type="hidden" name="patientId" th:value="${patient.patientId}" />
+            <button type="submit">입원</button>
+          </td>
+        </form>
+      </tr>
+    </tbody>
   </table>
-
-  <script>
-    let doctorList = [];
-
-    fetch("/api/doctors")
-
-      .then(res => res.json())
-      .then(doctors => {
-        doctorList = doctors;
-        loadWaitingPatients();
-      });
-
-    function loadWaitingPatients() {
-      fetch("/Inpatient/waiting-patients")
-        .then(res => res.json())
-        .then(waitingPatients => {
-          const tbody = document.getElementById("waiting-table-body");
-          tbody.innerHTML = "";
-
-          waitingPatients.forEach(patient => {
-            const tr = document.createElement("tr");
-
-            const doctorOptions = doctorList.map(doc =>
-              `<option value="${doc.usersId}">${doc.usersName}</option>`
-            ).join("");
-
-            tr.innerHTML = `
-              <td>${patient.name}</td>
-              <td>${patient.gender}</td>
-              <td>${patient.age}</td>
-              <td>${patient.symptom ?? "미정"}</td>
-              <td>
-                <select class="doctor-select">
-                  <option value="">담당의 선택</option>
-                  ${doctorOptions}
-                </select>
-              </td>
-              <td class="bed-cell">
-                <button class="assign-bed">병상 배정</button>
-              </td>
-              <td>
-                <button class="admit">입원</button>
-              </td>
-            `;
-
-            const doctorSelect = tr.querySelector(".doctor-select");
-            const bedCell = tr.querySelector(".bed-cell");
-
-            // 병상 배정 버튼 클릭
-            tr.querySelector(".assign-bed").addEventListener("click", () => {
-              // 현재 클릭한 환자 정보 저장
-              window.lastAssignedRow = tr;
-              window.lastAssignedPatient = patient;
-
-              window.open("/Inpatient/AssignBedPopup", "병상 배정", "width=720,height=600");
-            });
-
-            // 입원 처리 버튼 클릭
-            tr.querySelector(".admit").addEventListener("click", () => {
-              const selectedDoctorId = doctorSelect.value;
-              if (!selectedDoctorId) {
-                alert("담당의를 선택해주세요.");
-                return;
-              }
-              if (!patient.bedId || !patient.wardId) {
-                alert("병상 배정이 필요합니다.");
-                return;
-              }
-
-              const admissionRequest = {
-                patientId: patient.patientId,
-                doctorId: selectedDoctorId,
-                wardId: patient.wardId,
-                bedId: patient.bedId
-              };
-
-              fetch("/Inpatient/admit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(admissionRequest)
-              })
-                .then(res => {
-                  if (!res.ok) throw new Error("입원 실패");
-                  alert("입원 처리 완료");
-                  window.location.reload();
-                })
-                .catch(err => alert(err.message));
-            });
-
-            tbody.appendChild(tr);
-          });
-        });
-    }
-
-    // 병상 배정 팝업 → 병상 정보 전달받음
-    window.receiveBedAssignmentFromPopup = function (bed) {
-      if (!window.lastAssignedRow || !window.lastAssignedPatient) return;
-
-      const bedCell = window.lastAssignedRow.querySelector(".bed-cell");
-      bedCell.innerHTML = `${bed.wardName} / 침대 ${bed.bedNumber}`;
-
-      // 병상 정보 환자 객체에 저장
-      window.lastAssignedPatient.wardId = bed.wardId;
-      window.lastAssignedPatient.bedId = bed.bedId;
-    };
-  </script>
 </body>
+<script>
+  let currentRow = null;
+
+  function openBedPopup(button) {
+    // 현재 선택한 환자 행 저장
+    currentRow = button.closest("tr");
+    window.open('/Inpatient/AssignBedPopup', '병상 선택', 'width=700,height=600');
+  }
+
+  function receiveBedAssignmentFromPopup(bed) {
+    if (!currentRow) return;
+
+    // 선택된 환자 행의 hidden input에 bedId/wardId 삽입
+    currentRow.querySelector('input[name="bedId"]').value = bed.bedId;
+    currentRow.querySelector('input[name="wardId"]').value = bed.wardId;
+
+    // 병상 정보 텍스트 업데이트
+    const display = currentRow.querySelector('.bed-info');
+    if (display) {
+      display.textContent = `${bed.wardName} / 침대 ${bed.bedNumber}`;
+    }
+  }
+</script>
 </html>

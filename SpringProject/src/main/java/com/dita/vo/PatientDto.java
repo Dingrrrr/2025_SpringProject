@@ -2,6 +2,7 @@ package com.dita.vo;
 
 import com.dita.domain.Patient;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PatientDto {
 
     private int patientId;

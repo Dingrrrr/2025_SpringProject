@@ -68,4 +68,9 @@ public class PatientService {
 
         return savedPatient;
     }
+    //환자 입원 대기구분 서비스
+    @Transactional(readOnly = true)
+    public List<Patient> getWaitingPatients() {
+        return patientRepository.findByPatientType(PatientType.입원대기);
+    }
 }
