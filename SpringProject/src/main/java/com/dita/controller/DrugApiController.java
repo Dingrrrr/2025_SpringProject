@@ -1,4 +1,4 @@
-package com.dita.api;
+package com.dita.controller;
 
 
 import com.dita.persistence.DrugRepository;

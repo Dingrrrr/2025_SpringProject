@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>진료 관리</title>
-  <!-- 기존 전역 스타일 -->
   <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
-  <!-- 진료 전용 스타일 -->
   <link rel="stylesheet" th:href="@{/css/treatment_style.css}">
 </head>
 <body>
   <div class="hospital-container">
 
-    <!-- 1) 사이드바 (기존) -->
+    <!-- 사이드바 -->
     <aside class="hospital-sidebar">
       <h2 class="hospital-profile-title">
         <img th:src="@{/icons/profile.jpg}" alt="프로필"><span>내 프로필</span>
@@ -30,14 +28,14 @@
       </div>
     </aside>
 
-    <!-- 2) 메인 콘텐츠 -->
+    <!-- 메인 콘텐츠 -->
     <section class="treatment-content">
 
-      <!-- 2-1) 상단 검색 + 호출 + 환자 요약 -->
+      <!-- 상단 검색 + 환자 요약 -->
       <header class="treatment-header">
         <div class="search-call">
           <div class="search-box">
-            🔍 <input type="text" placeholder="환자 검색(ctrl+K)">
+            <input type="text" id="patientSearch" placeholder="환자 검색(ctrl+K)">
           </div>
           <div class="next-pull">
             <label>다음 환자 부르기</label>
@@ -47,32 +45,14 @@
             </select>
           </div>
         </div>
-        <div class="patient-summary">
-          <div class="patient-name">
-            <strong>이환진</strong> (남, 26세, 2000/10/10)  
-            <span class="badge vip">VIP</span>
-          </div>
-          <div class="patient-tags">
-            <span class="badge info">전염성</span>
-            <span class="badge info">신생태근절</span>
-            <span class="badge info">심변학</span>
-          </div>
-          <div class="patient-vitals">
-            <span class="badge">체온: 38</span>
-            <span class="badge">맥박: 120</span>
-            <span class="badge">신장: 60</span>
-            <span class="badge">체중: 70</span>
-            <span class="badge">검사일: 2021-04-01</span>
-            <span class="badge">가족관계: 5세형제</span>
-          </div>
-          <div class="patient-actions">
-            <button class="btn-outline">차트 열기</button>
-            <button class="btn-primary">진행하기</button>
-          </div>
-        </div>
-      </header>
 
-      <!-- 2-2) 탭 (대기 / 예약 / 방문) + 카운트 -->
+        <!-- 검색 결과 출력 -->
+        <div id="patientInfoBox" class="patient-summary">
+  <div style="padding: 10px; color: gray;">위쪽 검색창에서 환자 이름을 입력하세요</div>
+</div>
+
+
+      <!-- 탭 -->
       <nav class="record-tabs">
         <ul>
           <li class="active">대기</li>
@@ -82,11 +62,10 @@
         <span class="waiting-count">대기환자 16</span>
       </nav>
 
-      <!-- 2-3) 카드 컬럼 -->
+      <!-- 카드 컬럼 -->
       <div class="treatment-columns">
         <div class="treatment-column">
           <h3>검사실 <span class="col-count">0</span></h3>
-          <!-- 카드 반복 예시 -->
           <div class="treatment-card">
             <div class="card-patient">
               <span class="card-id">12345678</span> 정호진<br>
@@ -145,14 +124,94 @@
   </div>
 
   <script>
-    function loadAndToggleNotification() { /* … */ }
-    function goToHome()        { location.href = '/home'; }
-    function goToTreatment()   { location.href = '/hospital/treatment'; }
-    function goToReservation() { location.href = '/hospital/reservation'; }
-    function goToChart()       { location.href = '/hospital/chart'; }
-    function goToStats()       { location.href = '/hospital/statistics'; }
-    function goToAdmission()   { location.href = '/hospital/admission'; }
-    function goLogout()        { location.href = '/logout'; }
-  </script>
+  function loadAndToggleNotification() {}
+function goToHome()        { location.href = '/home'; }
+function goToTreatment()   { location.href = '/hospital/treatment'; }
+function goToReservation() { location.href = '/hospital/reservation'; }
+function goToChart()       { location.href = '/hospital/chart'; }
+function goToStats()       { location.href = '/hospital/statistics'; }
+function goToAdmission()   { location.href = '/hospital/admission'; }
+function goLogout()        { location.href = '/logout'; }
+
+const patientBox = document.getElementById("patientInfoBox");
+
+// ✅ 렌더링 함수: 환자 + vital 데이터 분리
+function renderPatientInfo(patient, vital) {
+  const age = patient.patientBirth
+    ? new Date().getFullYear() - parseInt(patient.patientBirth.split('-')[0])
+    : '-';
+
+  patientBox.innerHTML = `
+    <div class="summary-left">
+      <div class="patient-name">
+        <strong>${patient.patientName}</strong> (${patient.patientGender}, ${age}세, ${patient.patientBirth})
+      </div>
+      <div class="patient-tags">
+        <span class="badge info">${patient.patientSymptom || '증상 정보 없음'}</span>
+      </div>
+      <div class="patient-vitals">
+        <span class="badge">주소: ${patient.patientAddress ?? '-'}</span>
+        <span class="badge">전화: ${patient.patientPhone ?? '-'}</span>
+        <span class="badge">유형: ${patient.patientType ?? '-'}</span>
+        <span class="badge">체온: ${vital?.temperature ?? '-'}</span>
+        <span class="badge">맥박: ${vital?.pulseRate ?? '-'}</span>
+        <span class="badge">혈압: ${vital?.bpSystolic ?? '-'}/${vital?.bpDiastolic ?? '-'}</span>
+        <span class="badge">호흡수: ${vital?.respirationRate ?? '-'}</span>
+        <span class="badge">기록일: ${vital?.recordedDate ?? '-'}</span>
+        <span class="badge">시간대: ${vital?.timePeriod ?? '-'}</span>
+      </div>
+    </div>
+    <div class="summary-right">
+      <button class="btn-outline" onclick="goToChart()">차트 열기</button>
+      <button class="btn-primary" onclick="goToTreatment()">진행하기</button>
+    </div>
+  `;
+}
+
+// ✅ 검색 이벤트 등록
+document.getElementById("patientSearch").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const name = e.target.value.trim();
+    if (!name) return;
+
+    fetch(`/api/patients/search?name=${encodeURIComponent(name)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("환자 없음");
+        return res.json();
+      })
+      .then(results => {
+        if (!Array.isArray(results)) throw new Error("결과 형식 오류");
+
+        if (results.length === 1) {
+          renderPatientInfo(results[0].patient, results[0].vital);
+        } else {
+          const selectHTML = `
+            <div style="margin-bottom: 10px; color: gray;">동명이인 ${results.length}명. 환자를 선택하세요:</div>
+            <select id="patientSelect">
+              <option disabled selected>-- 환자 선택 --</option>
+              ${results.map((dto, idx) => `
+                <option value="${idx}">
+                  ${dto.patient.patientName} (${dto.patient.patientGender}, ${dto.patient.patientBirth}, 전화: ${dto.patient.patientPhone})
+                </option>
+              `).join('')}
+            </select>
+          `;
+          patientBox.innerHTML = selectHTML;
+
+          document.getElementById("patientSelect").addEventListener("change", function (ev) {
+            const selected = results[ev.target.value];
+            renderPatientInfo(selected.patient, selected.vital);
+          });
+        }
+      })
+      .catch(() => {
+        patientBox.innerHTML = `<div style="color:red; padding:10px;">등록된 환자를 찾을 수 없습니다.</div>`;
+      });
+  }
+});
+
+</script>
+
 </body>
 </html>

@@ -183,27 +183,17 @@
 		      <tr>
 		        <th>ID</th>
 		        <th>이름</th>
+		        <th>성별</th>
 		        <th>생년월일</th>
 		        <th>전화번호</th>
-		        <th>입원 여부</th>
+		        <th>주소</th>
+		        <th>증상</th>
+		        <th>상태</th>
 		      </tr>
 		    </thead>
-		    <tbody>
-		      <tr>
-		        <td>sta001</td>
-		        <td>홍인원</td>
-		        <td>1990-02-15</td>
-		        <td>010-3333-4444</td>
-		        <td>O</td>
-		      </tr>
-		      <tr>
-		        <td>sta002</td>
-		        <td>강인원</td>
-		        <td>1985-10-08</td>
-		        <td>010-5555-6666</td>
-		        <td>X</td>
-		      </tr>
-		    </tbody>
+		    <tbody id="patient-body">
+			  <!-- JavaScript로 데이터 채움 -->
+			</tbody>
 		  </table>
 		</div>
     </div>
@@ -340,6 +330,7 @@
         const headers = Array.from(row.closest('table').querySelectorAll('thead th'));
 
         const formFields = headers.map((th, idx) => {
+          if (!cells[idx]) return "";  // 보호 코드 추가
           return `
             <label>${th.textContent}</label><br>
             <input type="text" value="${cells[idx].textContent}" data-idx="${idx}" style="width: 100%; margin-bottom: 10px;">
@@ -379,23 +370,6 @@
         .then((res) => res.text())
         .then((msg) => alert(msg));
     });
-
- // 삭제 시 Ajax 요청
-    document.getElementById('deleteBtn').addEventListener('click', () => {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
-
-      const userId = selectedRow.cells[0].textContent.trim();  // ID는 첫 번째 열
-
-      fetch(`/admin/adminMemberManage/delete/${userId}`, {
-        method: 'DELETE'
-      })
-        .then(response => response.text())
-        .then(msg => {
-          alert(msg);
-          selectedRow.remove();
-          infoModal.style.display = 'none';
-        });
-    });
    
     const infoModal = document.getElementById('infoModal');
 
@@ -403,6 +377,114 @@
       infoModal.style.display = 'none';
       selectedRow = null;
     });
+    
+ 	// 환자 목록 불러오기
+    if (document.getElementById("staff")) {
+      fetch("/admin/adminMemberManage/patients")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("patient-body");
+          tbody.innerHTML = "";
+          data.forEach(patient => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            	  <td>${patient.patientId}</td>
+            	  <td>${patient.patientName}</td>
+            	  <td>${patient.patientGender}</td>
+            	  <td>${patient.patientBirth}</td>
+            	  <td>${patient.patientPhone}</td>
+            	  <td>${patient.patientAddress}</td>
+            	  <td>${patient.patientSymptom}</td>
+            	  <td>${patient.patientType}</td>
+            	`;
+            row.addEventListener("click", () => openPatientModal(row, patient));
+            tbody.appendChild(row);
+          });
+        });
+    }
+
+    // 모달 열기 함수
+    function openPatientModal(row, patient) {
+    	selectedRow = row;
+    	document.getElementById("formFields").innerHTML = `
+    		  <label>ID</label><br><input type="text" value="${patient.patientId}" data-key="patientId" readonly><br>
+    		  <label>이름</label><br><input type="text" value="${patient.patientName}" data-key="patientName"><br>
+    		  <label>성별</label><br><input type="text" value="${patient.patientGender}" data-key="patientGender"><br>
+    		  <label>생년월일</label><br><input type="text" value="${patient.patientBirth}" data-key="patientBirth"><br>
+    		  <label>전화번호</label><br><input type="text" value="${patient.patientPhone}" data-key="patientPhone"><br>
+    		  <label>주소</label><br><input type="text" value="${patient.patientAddress}" data-key="patientAddress"><br>
+    		  <label>증상</label><br><input type="text" value="${patient.patientSymptom}" data-key="patientSymptom"><br>
+    		  <label>상태</label><br><input type="text" value="${patient.patientType}" data-key="patientType"><br>
+    		`;
+    	  infoModal.style.display = "block";
+    }
+    	
+ 	// 날짜 값을 yyyy-MM-dd 형식으로 변환
+    function formatBirthToISO(birthStr) {
+      return birthStr.replace(/\./g, '-'); // "2010.06.03" → "2010-06-03"
+    }
+
+    // 수정 시 Ajax 요청
+    saveBtn.addEventListener("click", () => {
+	  const inputs = document.querySelectorAll("#formFields input");
+	  const patient = {};
+	
+	  inputs.forEach((input) => {
+	    const key = input.getAttribute("data-key");
+	    let value = input.value.trim() || null;
+	
+	    if (key === "patientBirth") {
+	      value = formatBirthToISO(value); // ← 여기 핵심!!
+	    }
+	
+	    patient[key] = value;
+	  });
+	
+	  console.log("patientBirth 최종 값:", patient.patientBirth);
+	
+	  fetch("/admin/adminMemberManage/patients/update", {
+	    method: "POST",
+	    headers: { "Content-Type": "application/json" },
+	    body: JSON.stringify(patient)
+	  })
+	    .then(res => res.text())
+	    .then(msg => {
+	      alert(msg);
+	      location.reload();
+	    });
+	});
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+    	  const isPatientTab = document.querySelector('.tab-btn[data-tab="staff"]').classList.contains('active');
+
+    	  if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    	  if (isPatientTab) {
+    	    // 환자 삭제
+    	    const id = document.querySelector("#formFields input[data-key='patientId']").value;
+    	    fetch(`/admin/adminMemberManage/patients/delete/${id}`, {
+    	      method: "DELETE"
+    	    })
+    	      .then(res => res.text())
+    	      .then(msg => {
+    	        alert(msg);
+    	        location.reload();
+    	      });
+
+    	  } else {
+    	    // 일반 사용자 삭제
+    	    const userId = selectedRow.cells[0].textContent.trim();
+    	    fetch(`/admin/adminMemberManage/delete/${userId}`, {
+    	      method: 'DELETE'
+    	    })
+    	      .then(response => response.text())
+    	      .then(msg => {
+    	        alert(msg);
+    	        selectedRow.remove();
+    	        infoModal.style.display = 'none';
+    	      });
+    	  }
+    	});
 
   </script>
 </body>

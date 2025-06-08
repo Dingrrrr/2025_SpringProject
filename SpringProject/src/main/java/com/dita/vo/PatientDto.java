@@ -1,6 +1,9 @@
 package com.dita.vo;
 
 import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,13 +21,30 @@ import java.time.format.DateTimeFormatter;
 @Builder
 public class PatientDto {
 
-    private int patientId;
+	private int patientId;
+
+    @JsonProperty("patientName")
     private String name;
-    private String gender; // "남" / "여"
-    private int age;       // 만 나이
+
+    @JsonProperty("patientGender")
+    private String gender;
+
+    private int age;
+
+    @JsonProperty("patientBirth")
     private String birth;
+
+    @JsonProperty("patientAddress")
+    private String address;
+
+    @JsonProperty("patientPhone")
     private String phone;
+
+    @JsonProperty("patientSymptom")
     private String symptom;
+
+    @JsonProperty("patientType")
+    private PatientType type;
 
     // Patient 엔티티 → DTO 변환 생성자
     public PatientDto(Patient p) {
@@ -33,8 +53,10 @@ public class PatientDto {
         this.gender = (p.getPatientGender() != null) ? p.getPatientGender().toString() : "미정";
         this.birth = p.getPatientBirth();
         this.age = calculateAge(p.getPatientBirth());
+        this.address = p.getPatientAddress();
         this.phone = p.getPatientPhone();
         this.symptom = p.getPatientSymptom();
+        this.type = p.getPatientType();
     }
 
     // 생년월일로 만 나이 계산
