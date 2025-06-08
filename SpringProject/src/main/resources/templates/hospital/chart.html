@@ -46,11 +46,7 @@
 			<div class="search-results" id="search-results"
 				style="display: none;">
 				<h4>환자 검색 결과</h4>
-				<ul>
-					<!-- 검색 후 JS 로 여기에 <li>를 채워 넣으시면 됩니다 -->
-					<li><strong>홍길동</strong> (여, 30세, 1995/05/12) — 보험: 건강보험</li>
-					<li><strong>김철수</strong> (남, 40세, 1980/02/20) — 보험: 자가부담</li>
-				</ul>
+				
 			</div>
 
 			<!-- (B) 헤더 -->
@@ -61,44 +57,30 @@
 			<!-- 진료실1 -->
 			<details open class="room">
 				<summary>
-					진료실 1 <span class="count">3</span>
+					진료실 1 <span class="count">3</span><!-- 카운트 되게 만들기 -->
 				</summary>
-				<ul>
-					<li>전민규 (남,26세,2000/08/04) <span class="badge waiting">대기</span></li>
-					<li>홍길동 (여,30세,1995/05/12) <span class="badge waiting">대기</span></li>
-					<li>김철수 (남,40세,1980/02/20) <span class="badge waiting">대기</span></li>
-				</ul>
+				
 			</details>
 
 			<!-- 진료실2 -->
 			<details open class="room">
 				<summary>
-					진료실 2 <span class="count">2</span>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
 				</summary>
-				<ul>
-					<li>이화진 (남,26세,2000/10/10) <span class="badge in-progress">진행중</span></li>
-					<li>박민수 (여,35세,1985/07/15) <span class="badge in-progress">진행중</span></li>
-				</ul>
 			</details>
-
-			<!-- 수납실 -->
+			
+			<!-- 진료실3 -->
 			<details open class="room">
 				<summary>
-					수납실 <span class="count">1</span>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
 				</summary>
-				<ul>
-					<li>최서연 (여,28세,1997/11/23) <span class="badge waiting">대기</span></li>
-				</ul>
 			</details>
-
-			<!-- 접수실 -->
+			
+			<!-- 진료실4 -->
 			<details open class="room">
 				<summary>
-					접수실 <span class="count">1</span>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
 				</summary>
-				<ul>
-					<li>장하늘 (남,50세,1973/04/08) <span class="badge waiting">대기</span></li>
-				</ul>
 			</details>
 		</section>
 
@@ -237,8 +219,9 @@
 				<button type="submit">올리기</button>
 			</form>
 		</aside>
-
+		
 	</div>
+</body>
 <script>
   function goToHome()        { location.href = '/home'; }
   function goToChart()       { location.href = '/hospital/chart'; }
@@ -387,9 +370,5 @@
     }
   });
 </script>
-
-
-
-
-</body>
+</script>
 </html>

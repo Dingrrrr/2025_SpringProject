@@ -1,5 +1,7 @@
 package com.dita.persistence;
 
+import java.io.ObjectInputFilter.Status;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -7,14 +9,20 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+
 import com.dita.domain.Appt;
+
 import com.dita.domain.Patient;
+
 
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
-    List<Appt> findByStatus(Appt status);
-    List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
-    Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
+	List<Appt> findByStatus(Status status);
+	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
+	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
+	
+	@Query("SELECT a.status, COUNT(a) FROM Appt a GROUP BY a.status")
+	List<Object[]> countByStatus();
 
     // ✅ 진료 상태별
     @Query("SELECT a.status, COUNT(a) FROM Appt a WHERE DATE(a.scheduledAt) = CURRENT_DATE GROUP BY a.status")
@@ -54,3 +62,4 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	// ✅ 환자의 모든 예약 삭제
         void deleteAllByPatient(Patient patient);
 }
+
