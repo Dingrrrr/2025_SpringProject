@@ -79,12 +79,15 @@
         </div>
 
         <!-- 현재 시간대 표시 -->
-        <div style="text-align: center; margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px;">
-            <div style="font-size: 18px; font-weight: bold;" id="currentTimePeriod">
+        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;" id="currentTimePeriod">
                 <span id="timePeriodIcon">⏰</span>
                 <span id="timePeriodText">현재 시간대</span>
-                <span style="margin-left: 10px; font-size: 14px; color: #666;" id="currentTime"></span>
             </div>
+            <div style="font-size: 16px; color: #333;" id="currentDate">
+                📅 <span id="currentDateText"></span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin-top: 4px;" id="currentTime"></div>
         </div>
 
         <!-- 대시보드 그리드 -->
@@ -95,7 +98,7 @@
                     혈압 추이
                     <div class="chart-options">
                         <span class="chart-option active" onclick="updateBPChart('time')">시간별</span>
-                        <span class="chart-option" onclick="updateBPChart('weekly')">주간별</span>
+                        <span class="chart-option" onclick="updateBPChart('daily')">일별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -117,7 +120,7 @@
                     체온 및 호흡 분석
                     <div class="chart-options">
                         <span class="chart-option active" onclick="updateTempRespChart('time')">시간별</span>
-                        <span class="chart-option" onclick="updateTempRespChart('weekly')">주간별</span>
+                        <span class="chart-option" onclick="updateTempRespChart('daily')">일별</span>
                     </div>
                 </h3>
                 <div class="chart-container">
@@ -194,6 +197,17 @@
             
             document.getElementById('timePeriodIcon').textContent = getTimePeriodIcon(currentPeriod);
             document.getElementById('timePeriodText').textContent = `현재 시간대: ${currentPeriod}`;
+            
+            // 현재 날짜 표시 (년월일)
+            const dateOptions = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDateText').textContent = now.toLocaleDateString('ko-KR', dateOptions);
+            
+            // 현재 시간 표시
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('ko-KR', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -415,7 +429,7 @@
                     .catch(error => {
                         console.error('차트 데이터 조회 실패:', error);
                         // 실패 시 빈 차트 표시
-                        vitalChartData = { timeData: [], weeklyData: [] };
+                        vitalChartData = { timeData: [], dailyData: [] };
                         updateBPChartOnly('time');
                         updateTempRespChartOnly('time');
                         updatePulseChart();
@@ -505,77 +519,6 @@
             }
         }
 
-        // 모든 차트 업데이트
-        function updateAllCharts(period) {
-            if (!vitalChartData || !vitalChartData.timeData) {
-                console.log('차트 데이터가 없습니다.');
-                // 데이터가 없을 때 빈 차트 표시
-                updateBPChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
-                updatePulseChartData([0, 0, 0, 0]);
-                updateTempRespChartData(['아침', '점심', '저녁', '야간'], [0, 0, 0, 0], [0, 0, 0, 0]);
-                return;
-            }
-
-            const data = period === 'time' ? vitalChartData.timeData : vitalChartData.weeklyData;
-            console.log(`${period} 데이터 업데이트:`, data);
-            
-            if (period === 'time') {
-                // 시간대별 데이터 처리
-                const timeLabels = ['아침', '점심', '저녁', '야간'];
-                const systolicData = [0, 0, 0, 0];
-                const diastolicData = [0, 0, 0, 0];
-                const pulseData = [0, 0, 0, 0];
-                const tempData = [0, 0, 0, 0];
-                const respData = [0, 0, 0, 0];
-
-                // 실제 DB 데이터를 시간대별로 매핑
-                data.forEach(item => {
-                    const index = timeLabels.indexOf(item.time_period);
-                    if (index !== -1) {
-                        systolicData[index] = parseFloat(item.avg_systolic || 0);
-                        diastolicData[index] = parseFloat(item.avg_diastolic || 0);
-                        pulseData[index] = parseFloat(item.avg_pulse || 0);
-                        tempData[index] = parseFloat(item.avg_temp || 0);
-                        respData[index] = parseFloat(item.avg_resp || 0);
-                    }
-                });
-
-                console.log('시간대별 처리된 데이터:', {
-                    systolic: systolicData,
-                    diastolic: diastolicData,
-                    pulse: pulseData,
-                    temp: tempData,
-                    resp: respData
-                });
-
-                updateBPChartData(timeLabels, systolicData, diastolicData);
-                updatePulseChartData(pulseData);
-                updateTempRespChartData(timeLabels, tempData, respData);
-                
-            } else {
-                // 주간별 데이터 처리
-                const weeklyLabels = data.map(item => {
-                    const date = new Date(item.date);
-                    return ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
-                });
-                const systolicData = data.map(item => parseFloat(item.avg_systolic || 0));
-                const diastolicData = data.map(item => parseFloat(item.avg_diastolic || 0));
-                const tempData = data.map(item => parseFloat(item.avg_temp || 0));
-                const respData = data.map(item => parseFloat(item.avg_resp || 0));
-
-                console.log('주간별 처리된 데이터:', {
-                    labels: weeklyLabels,
-                    systolic: systolicData,
-                    diastolic: diastolicData,
-                    temp: tempData,
-                    resp: respData
-                });
-
-                updateBPChartData(weeklyLabels, systolicData, diastolicData);
-                updateTempRespChartData(weeklyLabels, tempData, respData);
-            }
-        }
-
         // 차트별 데이터 업데이트 함수들
         function updateBPChartData(labels, systolic, diastolic) {
             charts.bloodPressure.data.labels = labels;
@@ -653,22 +596,33 @@
 
                 updateBPChartData(timeLabels, systolicData, diastolicData);
                 
-            } else if (period === 'weekly') {
-                // 주간별 (월, 화, 수, 목, 금, 토, 일)
-                const weeklyLabels = ['월', '화', '수', '목', '금', '토', '일'];
-                const systolicData = [0, 0, 0, 0, 0, 0, 0];
-                const diastolicData = [0, 0, 0, 0, 0, 0, 0];
+            } else if (period === 'daily') {
+                // 일별 (최근 7일)
+                const dailyLabels = [];
+                const systolicData = [];
+                const diastolicData = [];
 
-                if (vitalChartData.weeklyData) {
-                    vitalChartData.weeklyData.forEach(item => {
+                if (vitalChartData.dailyData && vitalChartData.dailyData.length > 0) {
+                    vitalChartData.dailyData.forEach(item => {
                         const date = new Date(item.date);
-                        const dayIndex = (date.getDay() + 6) % 7; // 월요일을 0으로 만들기 (일요일=0 -> 월요일=0)
-                        systolicData[dayIndex] = parseFloat(item.avg_systolic || 0);
-                        diastolicData[dayIndex] = parseFloat(item.avg_diastolic || 0);
+                        const monthDay = `${date.getMonth() + 1}/${date.getDate()}`;
+                        dailyLabels.push(monthDay);
+                        systolicData.push(parseFloat(item.avg_systolic || 0));
+                        diastolicData.push(parseFloat(item.avg_diastolic || 0));
                     });
+                } else {
+                    // 데이터가 없을 때 최근 7일 날짜만 표시
+                    for (let i = 6; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        const monthDay = `${date.getMonth() + 1}/${date.getDate()}`;
+                        dailyLabels.push(monthDay);
+                        systolicData.push(0);
+                        diastolicData.push(0);
+                    }
                 }
 
-                updateBPChartData(weeklyLabels, systolicData, diastolicData);
+                updateBPChartData(dailyLabels, systolicData, diastolicData);
             }
         }
 
@@ -697,22 +651,33 @@
 
                 updateTempRespChartData(timeLabels, tempData, respData);
                 
-            } else if (period === 'weekly') {
-                // 주간별 (월, 화, 수, 목, 금, 토, 일)
-                const weeklyLabels = ['월', '화', '수', '목', '금', '토', '일'];
-                const tempData = [0, 0, 0, 0, 0, 0, 0];
-                const respData = [0, 0, 0, 0, 0, 0, 0];
+            } else if (period === 'daily') {
+                // 일별 (최근 7일)
+                const dailyLabels = [];
+                const tempData = [];
+                const respData = [];
 
-                if (vitalChartData.weeklyData) {
-                    vitalChartData.weeklyData.forEach(item => {
+                if (vitalChartData.dailyData && vitalChartData.dailyData.length > 0) {
+                    vitalChartData.dailyData.forEach(item => {
                         const date = new Date(item.date);
-                        const dayIndex = (date.getDay() + 6) % 7; // 월요일을 0으로 만들기
-                        tempData[dayIndex] = parseFloat(item.avg_temp || 0);
-                        respData[dayIndex] = parseFloat(item.avg_resp || 0);
+                        const monthDay = `${date.getMonth() + 1}/${date.getDate()}`;
+                        dailyLabels.push(monthDay);
+                        tempData.push(parseFloat(item.avg_temp || 0));
+                        respData.push(parseFloat(item.avg_resp || 0));
                     });
+                } else {
+                    // 데이터가 없을 때 최근 7일 날짜만 표시
+                    for (let i = 6; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        const monthDay = `${date.getMonth() + 1}/${date.getDate()}`;
+                        dailyLabels.push(monthDay);
+                        tempData.push(0);
+                        respData.push(0);
+                    }
                 }
 
-                updateTempRespChartData(weeklyLabels, tempData, respData);
+                updateTempRespChartData(dailyLabels, tempData, respData);
             }
         }
 
