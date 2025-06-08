@@ -1,5 +1,6 @@
 package com.dita.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -92,16 +93,54 @@ public class AdmissionService {
             .collect(Collectors.toList());
     }
     
-    //입원 수정
-    public void updatePatientStatus(int patientId, String status) {
+    public void updatePatientStatus(int patientId, String status, String symptom, String admittedAt, String doctorId) {
         Optional<Admission> admissionOpt = admissionRepo.findByPatientId(patientId);
+
         if (admissionOpt.isPresent()) {
             Admission admission = admissionOpt.get();
-            PatientType type = PatientType.valueOf(status);
-            admission.getPatient().setPatientType(type);
+
+            // 상태 업데이트
+            admission.getPatient().setPatientType(PatientType.valueOf(status));
+
+            // 진단명 업데이트
+            admission.getPatient().setPatientSymptom(symptom);
+
+            // 입원일 업데이트
+            admission.setAdmittedAt(LocalDate.parse(admittedAt).atStartOfDay());
+
+            // 담당의 업데이트
+            User doctor = userRepository.findById(String.valueOf(doctorId))
+                    .orElseThrow(() -> new IllegalArgumentException("의사를 찾을 수 없습니다."));
+
+
             patientRepository.save(admission.getPatient());
+            admissionRepo.save(admission);
         }
     }
+
+    public void deleteAdmission(int patientId) {
+        Optional<Admission> opt = admissionRepo.findByPatientId(patientId);
+
+        if (opt.isPresent()) {
+            Admission admission = opt.get();
+
+            // 1. 환자 상태를 '입원대기'로 변경
+            Patient patient = admission.getPatient();
+            patient.setPatientType(PatientType.입원대기);
+            patientRepository.save(patient);
+
+            // 2. 침대 상태를 '사용가능'으로 변경
+            Bed bed = admission.getBed();
+            if (bed != null) {
+                bed.setBedstatus(StatusBed.사용가능);  // ✅ enum으로 정확히 설정
+                bedRepository.save(bed);
+            }
+
+            // 3. 입원 정보 삭제
+            admissionRepo.delete(admission);
+        }
+    }
+
 
     
 }

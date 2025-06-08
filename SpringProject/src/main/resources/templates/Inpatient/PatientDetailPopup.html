@@ -18,40 +18,50 @@
     <span th:text="${admission.patient.age}">나이</span>세
   </p>
 <form th:action="@{/Inpatient/updateStatus}" method="post" id="statusForm">
+  
   <label>진단명</label>
   <input type="text" id="symptomInput" name="symptom"
-       th:value="${admission.patient.patientSymptom ?: '미정'}"
-       disabled />
+         th:value="${admission.patient.patientSymptom ?: '미정'}"
+         />
 
   <label>입원일</label>
-  <p th:text="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}">입원일</p>
+  <input type="date" id="admittedAtInput" name="admittedAt"
+         th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"
+         />
 
   <label>담당의</label>
-  <p th:text="${admission.doctor.usersName}">의사</p>
-  
+  <select name="doctorId" id="doctorSelect">
+    <option th:each="doc : ${doctors}"
+            th:value="${doc.usersId}"
+            th:text="${doc.usersName}"
+            th:selected="${doc.usersId == admission.doctor.usersId}">
+    </option>
+  </select>
 
-  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
   <label>상태</label>
   <select name="status" id="statusSelect" disabled>
-   <!-- ✔ enum을 문자열로 바꿔서 비교 -->
-	<option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
-	<option value="입원대기" th:selected="${admission.patient.patientType.name() == '입원대기'}">입원대기</option>
-	<option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
+    <option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
+    <option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
   </select>
+
+  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+
 </form>
+
 
   
 <div class="button-group">
   <button id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
 
-  <form th:action="@{/Inpatient/delete}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-    <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
-    <button class="delete" type="submit">삭제</button>
-  </form>
+ <form th:action="@{/Inpatient/delete}" method="post">
+  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+  <button type="submit" class="delete">삭제</button> <!-- ✅ 반드시 type="submit" -->
+</form>
+
 
   <button class="cancel" onclick="window.close()">닫기</button>
 </div>
-</div>
+
 </body>
 <script>
   let isEditMode = false;
@@ -76,7 +86,6 @@ if (isEditMode) {
 	}
 
 }
-
 </script>
 
 </html>

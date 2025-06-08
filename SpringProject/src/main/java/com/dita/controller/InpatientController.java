@@ -44,19 +44,22 @@ public class InpatientController {
     
     @GetMapping("/Inpatient")
     public String showInpatientPage(Model model) {
-        // 📌 병동 테이블에서 모든 병실 이름 가져오기
         List<String> wards = wardRepository.findAll().stream()
                 .map(Ward::getName)
                 .collect(Collectors.toList());
 
-        // 📌 입원 중인 환자 전체 정보 (JOIN FETCH)
-        List<Admission> admissions = admissionRepository.findAllCurrentAdmissionsWithDetails();
+        List<Admission> allAdmissions = admissionRepository.findAllCurrentAdmissionsWithDetails();
 
-        model.addAttribute("wards", wards);       // 병실 탭용
-        model.addAttribute("beds", admissions);   // 환자 카드용
+        // ✅ 여기서 입원중 환자만 필터링
+        List<Admission> filtered = allAdmissions.stream()
+            .filter(a -> a.getPatient().getPatientType() == PatientType.입원중)
+            .collect(Collectors.toList());
 
+        model.addAttribute("wards", wards);
+        model.addAttribute("beds", filtered);
         return "Inpatient/Inpatient";
     }
+
 
     @GetMapping("/PatientWaitingPopup")
     public String showWaitingPatients(Model model) {
@@ -67,21 +70,34 @@ public class InpatientController {
         model.addAttribute("doctors", doctors);
         return "Inpatient/PatientWaitingPopup"; 
     }
-    
-    //환자 수정
+    //수정
     @PostMapping("/updateStatus")
-    public String updatePatientStatus(@RequestParam("patientId") int patientId,
-                                      @RequestParam("status") String status) {
-    	admissionSe.updatePatientStatus(patientId, status);
-    	return "redirect:/Inpatient/Popup?patientId=" + patientId;
+    public String updatePatientStatus(@RequestParam int patientId,
+                                      @RequestParam String status,
+                                      @RequestParam String symptom,
+                                      @RequestParam String admittedAt,
+                                      @RequestParam String doctorId) {
+        admissionSe.updatePatientStatus(patientId, status, symptom, admittedAt, doctorId);
+        return "redirect:/Inpatient/Popup?patientId=" + patientId;
     }
+    
+    //삭제
+    @PostMapping("/delete")
+    public String deleteAdmission(@RequestParam("patientId") int patientId) {
+        admissionSe.deleteAdmission(patientId);
+        return "redirect:/Inpatient/Popup?patientId=" + patientId;
+    }
+
+
     
     // 환자 디테일
     @GetMapping("/Popup")
     public String showPopup(@RequestParam("patientId") int patientId, Model model) {
         Admission admission = admissionRepository.findByPatientId(patientId)
                                     .orElseThrow(() -> new IllegalArgumentException("환자 없음"));
+        List<User> doctors = userRepository.findByGrade(Grade.의사);
         model.addAttribute("admission", admission);
+        model.addAttribute("doctors", doctors);
         return "Inpatient/PatientDetailPopup";
     }
 
