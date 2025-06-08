@@ -1022,38 +1022,19 @@ function loadAppointmentsForWeek(dateList) {
   });
 }
 
-	 document.querySelector('#weekView .schedule-table').addEventListener('click', function (e) {
-    const cell = e.target;
-    if (!cell.classList.contains('cell')) return;
+document.querySelector('#weekView .schedule-table').addEventListener('click', function (e) {
+  const cell = e.target;
 
-    if (cell.classList.contains('green')) {
-      openReservationDetailModal(cell);
-      return;
-    }
+  // 셀 외 영역 클릭 시 무시
+  if (!cell.classList.contains('cell')) return;
 
-    const row = cell.closest('.schedule-row');
-    const time = row.querySelector('.time-col').textContent.trim();
+  // 예약이 있는 셀(green)만 클릭 가능하도록 제한
+  if (cell.classList.contains('green')) {
+    openReservationDetailModal(cell);
+  }
 
-    const colIndex = Array.from(cell.parentNode.children).indexOf(cell); // 요일 인덱스
-    const roomIndex = Array.from(cell.parentNode.children).indexOf(cell); // 열 위치
-    const roomName = ['진료실1', '진료실2', '진료실3', '진료실4'][roomIndex - 1];
-
-    const monday = new Date(currentDateObj);
-    const targetDate = new Date(monday);
-    targetDate.setDate(monday.getDate() + colIndex - 1);
-
-    const [hour, minute] = time.split(':');
-    targetDate.setHours(parseInt(hour));
-    targetDate.setMinutes(parseInt(minute));
-
-    const isoStr = targetDate.toISOString().slice(0, 16);
-    const form = document.getElementById('reservationForm');
-    form.reset();
-    form.date.value = isoStr;
-    form.room.value = roomName;
-
-    document.getElementById('reservationModal').style.display = 'flex';
-  });
+  // 예약이 없는 셀은 아무 동작하지 않음
+});
 </script>
 
 
