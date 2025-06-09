@@ -54,9 +54,6 @@ public class PatientController {
         return "redirect:/Inpatient/waiting-list";
     }
     
-    
-
-
 
  //  [3] [GET] /api/patients/search?name=홍길동
     // → 동명이인이 있을 경우 여러 환자 정보를 JSON 배열로 반환
