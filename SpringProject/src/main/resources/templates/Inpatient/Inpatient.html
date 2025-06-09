@@ -8,28 +8,23 @@
 <body>
 <div class="container">
 
-  <!-- 사이드바 -->
-  <aside class="sidebar">
-    <div class="profile">
-      <div class="profile-icon">👤</div>
-      <div>
-        <div class="profile-name">홍길동</div>
-        <div class="profile-role">간호사</div>
-      </div>
+ <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span th:text="${userName}">수납 이름</span>
+        </div>
+        
+         <a href="" class="menu-item active">
+            <div class="menu-icon">🛏</div>
+            <span>입원</span>
+        </a>
+        
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
-    <ul class="menu">
-      <li>진료</li>
-      <li>예약</li>
-      <li>수납</li>
-      <li>재고</li>
-      <li class="active">입원 ▾
-        <ul class="submenu">
-          <li class="selected">입원 관리</li>
-          <li><a href="/Inpatient/Statistics">입원 통계</a></li>
-        </ul>
-      </li>
-    </ul>
-  </aside>
 
   <!-- 본문 -->
   <main class="main-content">

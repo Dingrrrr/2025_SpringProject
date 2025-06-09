@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>입원 통계</title>
@@ -7,119 +7,111 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <!-- 사이드바 -->
-  <aside class="sidebar">
-    <h3>내 프로필</h3>
-    <ul>
-      <li>홈</li>
-      <li>진료</li>
-      <li>예약</li>
-      <li>수납</li>
-      <li>재고</li>
-      <li class="active">입원
-        <ul>
-          <li>입원 관리</li>
-          <li class="active">입원 통계</li>
-        </ul>
-      </li>
-    </ul>
-  </aside>
-
-  <!-- 메인 -->
-  <main class="main">
-    <div class="stat-header">
-      <h1>입원 통계</h1>
-      <div>
-        <input type="date" id="startDate">
-        ~
-        <input type="date" id="endDate">
-        <button onclick="fetchStats()">조회</button>
-      </div>
+<!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span th:text="${userName}">간호사 이름</span>
+        </div>
+        
+        <a href="NurseHome" class="menu-item">
+            <div class="menu-icon">🔔</div>
+            <span>알림</span>
+        </a>
+                
+        <a href="VitalRecord" class="menu-item">
+            <div class="menu-icon">💜</div>
+            <span>바이탈 기록</span>
+        </a>
+            
+        <a href="NurseChart" class="menu-item">
+            <div class="menu-icon">📋</div>
+            <span>차트</span>
+        </a>
+        
+        <a href="MedicationRecord" class="menu-item active">
+            <div class="menu-icon">👥</div>
+            <span>투약 및 처치 기록</span>
+        </a>
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
 
-    <!-- 대시보드 그리드 -->
-    <div class="dashboard-grid">
-      <div class="card">
-        <h3>환자 상태별 통계</h3>
-        <canvas id="statusChart" width="300" height="300"></canvas>
-      </div>
-      <div class="card">
-        <h3>연령대 분포</h3>
-        <canvas id="ageChart" width="300" height="300"></canvas>
-      </div>
-      <div class="card">
-        <h3>의사별 입원 환자 수</h3>
-        <canvas id="doctorChart" width="300" height="300"></canvas>
-      </div>
+<main class="main">
+  <div class="stat-header">
+    <h1>입원 통계</h1>
+    <div class="date-range">
+      <input type="date" id="startDate">
+      ~
+      <input type="date" id="endDate">
+      <button onclick="fetchStats()">조회</button>
     </div>
-  </main>
+  </div>
 
-  <script>
-    let chartObjects = {}; // 기존 차트 객체 저장
+  <div class="dashboard-grid">
+    <div class="card"><h3>환자 상태별 통계</h3><canvas id="statusChart"></canvas></div>
+    <div class="card"><h3>연령대 분포</h3><canvas id="ageChart"></canvas></div>
+    <div class="card"><h3>의사별 입원 환자 수</h3><canvas id="doctorChart"></canvas></div>
+    <div class="card"><h3>일자별 입원자 수</h3><canvas id="admitChart"></canvas></div>
+    <div class="card"><h3>일자별 퇴원자 수</h3><canvas id="dischargeChart"></canvas></div>
+    <div class="card"><h3>진단명별 입원 환자 수</h3><canvas id="reasonChart"></canvas></div>
+  </div>
+</main>
 
-    function fetchStats() {
-      const startInput = document.getElementById("startDate").value;
-      const endInput = document.getElementById("endDate").value;
+<script th:inline="javascript">
+  let chartObjects = {};
 
-      const today = new Date();
-      const defaultEnd = today.toISOString().split("T")[0];
-      const defaultStart = new Date(today.setDate(today.getDate() - 6)).toISOString().split("T")[0];
+  function drawChart(type, canvasId, title, data) {
+    const ctx = document.getElementById(canvasId).getContext("2d");
+    if (chartObjects[canvasId]) chartObjects[canvasId].destroy();
 
-      const start = startInput || defaultStart;
-      const end = endInput || defaultEnd;
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+    const colors = labels.map((_, i) => `hsl(${i * 50}, 70%, 60%)`);
 
-      fetch('/stats/admission')
-        .then(res => res.json())
-        .then(data => {
-          drawChart("statusChart", "환자 상태별 분포", data["상태별통계"]);
-          drawChart("ageChart", "연령대 분포", data["연령대통계"]);
-          drawChart("doctorChart", "의사별 입원 환자 수", data["의사별환자수"]);
-        })
-        .catch(err => alert("통계 불러오기 실패: " + err));
-    }
-
-   function drawChart(canvasId, title, dataObject) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
-
-  if (chartObjects[canvasId]) {
-    chartObjects[canvasId].destroy();
+    chartObjects[canvasId] = new Chart(ctx, {
+      type: type,
+      data: {
+        labels: labels,
+        datasets: [{
+          label: title,
+          data: values,
+          backgroundColor: colors
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: type !== 'bar' },
+          title: { display: true, text: title }
+        },
+        scales: (type === 'bar' || type === 'line') ? {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        } : {}
+      }
+    });
   }
 
-  const dynamicColors = Object.keys(dataObject).map((_, i) => {
-    const hue = (i * 50) % 360; // 색상 다양화
-    return `hsl(${hue}, 70%, 60%)`;
-  });
+  function fetchStats() {
+    const start = document.getElementById("startDate").value || new Date(Date.now() - 6 * 86400000).toISOString().split("T")[0];
+    const end = document.getElementById("endDate").value || new Date().toISOString().split("T")[0];
 
-  chartObjects[canvasId] = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(dataObject),
-      datasets: [{
-        label: title,
-        data: Object.values(dataObject),
-        backgroundColor: dynamicColors
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: {
-          display: true,
-          text: title
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-}
+    fetch(`/Inpatient/stats/admission?start=${start}&end=${end}`)
+      .then(res => res.json())
+      .then(data => {
+        drawChart("doughnut", "statusChart", "환자 상태별 통계", data["상태별통계"]);
+        drawChart("bar", "ageChart", "연령대 분포", data["연령대통계"]);
+        drawChart("bar", "doctorChart", "의사별 입원 환자 수", data["의사별환자수"]);
+        drawChart("line", "admitChart", "일자별 입원자 수", data["입원추이"]);
+        drawChart("line", "dischargeChart", "일자별 퇴원자 수", data["퇴원추이"]);
+        drawChart("bar", "reasonChart", "진단명별 입원 환자 수", data["진단명통계"]);
+      })
+      .catch(err => alert("통계 불러오기 실패: " + err));
+  }
 
-
-    window.onload = fetchStats;
-  </script>
+  window.onload = fetchStats;
+</script>
 </body>
 </html>

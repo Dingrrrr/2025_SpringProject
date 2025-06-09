@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.dita.domain.*;
 import com.dita.persistence.*;
+import com.dita.service.AdmissionService;
 import com.dita.service.PatientService;
 import com.dita.vo.AdmissionDto;
 
@@ -30,6 +31,7 @@ public class AdmissionController {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private final BedRepository bedRepository;
+    private final AdmissionService admissionService;
     
     //  입원 버튼 처리 (타임리프 form에서 POST 요청)
     @PostMapping("/admit")
@@ -89,5 +91,13 @@ public class AdmissionController {
         return "redirect:/nurse/NurseHome";
     }
     
+    @GetMapping("/stats/admission")
+    @ResponseBody
+    public Map<String, Map<String, Long>> getAdmissionStats(
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end) {
+
+        return admissionService.getAdmissionStatistics(start, end);
+    }
 }
 

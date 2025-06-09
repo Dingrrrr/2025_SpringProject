@@ -21,7 +21,7 @@ public interface AdmissionRepository extends JpaRepository<Admission, Integer> {
     
     //상세
     @Query("SELECT a FROM Admission a WHERE a.patient.patientId = :patientId AND a.dischargeAt IS NULL")
-    Optional<Admission> findByPatientId(@Param("patientId") int patientId);
+    List<Admission> findByPatientId(@Param("patientId") int patientId);
     
  // 병실 이름만 중복 없이 추출
     @Query("SELECT DISTINCT a.bed.ward.name FROM Admission a WHERE a.dischargeAt IS NULL")
@@ -42,8 +42,7 @@ public interface AdmissionRepository extends JpaRepository<Admission, Integer> {
            "JOIN FETCH a.patient " +
            "JOIN FETCH a.bed b " +
            "JOIN FETCH b.ward " +
-           "JOIN FETCH a.doctor " +
-           "WHERE a.dischargeAt IS NULL")
+           "JOIN FETCH a.doctor ")
     List<Admission> findAllWithDetails();
     
     

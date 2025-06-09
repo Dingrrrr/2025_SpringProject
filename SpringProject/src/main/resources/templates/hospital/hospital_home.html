@@ -5,26 +5,57 @@
   <title>메디링크내과</title>
   <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
   <link rel="stylesheet" th:href="@{/css/home_style.css}">
-  <link rel="stylesheet" th:href="@{/css/notification.css}"> <!-- 알림 스타일 -->
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
 </head>
 <body>
   <div class="hospital-container">
     <!-- 사이드바 -->
     <aside class="hospital-sidebar">
       <h2 class="hospital-profile-title">
-        <img th:src="@{/icons/profile.jpg}" alt="프로필"><span>내 프로필</span>
+        <img th:src="@{/icons/profile.jpg}" alt="프로필">
+        <span th:text="${displayName}">의사 이름</span>
       </h2>
       <ul class="hospital-menu">
-        <li onclick="loadAndToggleNotification()"><img th:src="@{/icons/alert.png}" alt=""> 알림</li>
-        <li class="active" onclick="goToHome()"><img th:src="@{/icons/home.png}" alt=""> 홈</li>
-        <li onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt=""> 진료</li>
-        <li onclick="goToReservation()"><img th:src="@{/icons/calendar.png}" alt=""> 예약</li>
-        <li onclick="goToChart()"><img th:src="@{/icons/chart.png}" alt=""> 차트</li>
-        <li onclick="goToStats()"><img th:src="@{/icons/statistics.png}" alt=""> 통계</li>
-        <li onclick="goToAdmission()"><img th:src="@{/icons/bed.png}" alt=""> 입원</li>
+        <!-- 알림은 fetch로 부분 로딩 -->
+        <li onclick="loadAndToggleNotification()">
+          <img th:src="@{/icons/alert.png}" alt=""> 알림
+        </li>
+        <!-- 홈 -->
+        <li>
+	      <a th:href="@{/hospital/hospital_home}">
+	        <img th:src="@{/icons/home.png}" alt=""> 홈
+	      </a>
+	    </li>
+        <!-- 진료 관리 -->
+        <li>
+	      <a th:href="@{/hospital/treatment}">
+	        <img th:src="@{/icons/doctor.png}" alt=""> 진료
+	      </a>
+	    </li>
+        <!-- 예약 관리 -->
+        <li>
+	      <a th:href="@{/hospital/reservation}">
+	        <img th:src="@{/icons/calendar.png}" alt=""> 예약
+	      </a>
+	    </li>
+        <!-- 차트 보기 -->
+        <li>
+	      <a th:href="@{/hospital/chart}">
+	        <img th:src="@{/icons/chart.png}" alt=""> 차트
+	      </a>
+	    </li>
+        <!-- 통계 보기 -->
+        <li>
+	      <a th:href="@{/hospital/statistics}">
+	        <img th:src="@{/icons/statistics.png}" alt=""> 통계
+	      </a>
+	    </li>
       </ul>
       <div class="sidebar-footer">
-        <button class="logout-btn" onclick="goLogout()">로그아웃</button>
+        <button class="logout-btn"
+                th:onclick="|location.href='@{/logout}'|">
+          로그아웃
+        </button>
       </div>
     </aside>
 
@@ -34,63 +65,65 @@
       <section class="home-hero">
         <div class="hero-text">
           <h1>메디링크내과</h1>
-          <p>반갑습니다, <strong th:text="${displayName}">사용자명</strong> 선생님</p>
-          <button class="btn-primary" onclick="goToTreatment()">진료 관리 바로가기</button>
+          <p>
+            반갑습니다, 
+            <strong th:text="${displayName}">사용자명</strong> 선생님
+          </p>
+          <button class="btn-primary"
+                  th:onclick="|location.href='@{/hospital/treatment}'|">
+            진료 관리 바로가기
+          </button>
         </div>
         <div class="hero-image">
-          <img src="/images/hospital.png" alt="클리닉 리셉션 사진">
+          <img th:src="@{/images/hospital.png}" alt="클리닉 리셉션 사진">
         </div>
       </section>
 
       <!-- 2) Quick-link 카드 -->
       <section class="home-quicklinks">
-        <div class="card" onclick="goToReservation()">
-          <img src="/icons/calendar.png" alt="">
-          <span>예약 관리</span>
-        </div>
-        <div class="card" onclick="goToChart()">
-          <img src="/icons/chart.png" alt="">
+        <div class="card" th:onclick="|location.href='@{/hospital/reservation}'|">
+		  <img th:src="@{/icons/calendar_big.png}" alt="">
+		  <span>예약 관리</span>
+		</div>
+        <div class="card"
+             th:onclick="|location.href='@{/hospital/chart}'|">
+          <img th:src="@{/icons/chart_big.png}" alt="">
           <span>차트 보기</span>
         </div>
-        <div class="card" onclick="goToStats()">
-          <img src="/icons/statistics.png" alt="">
+        <div class="card"
+             th:onclick="|location.href='@{/hospital/statistics}'|">
+          <img th:src="@{/icons/statistics_big.png}" alt="">
           <span>통계 보기</span>
+        </div>
+        <div class="card"
+             th:onclick="|location.href='@{/hospital/admission}'|">
+          <img th:src="@{/icons/bed_big.png}" alt="">
+          <span>입원 관리</span>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- ✅ 알림 패널을 동적으로 삽입 -->
+  <!-- 알림 패널 로딩 스크립트 -->
   <script>
     function loadAndToggleNotification() {
       const existing = document.getElementById('notificationPanel');
-
       if (existing) {
         existing.classList.toggle('open');
       } else {
-        fetch('/hospital/notification') // 서버에서 알림 HTML을 렌더링해서 응답
+        fetch('/hospital/notification')
           .then(res => res.text())
           .then(html => {
             const temp = document.createElement('div');
             temp.innerHTML = html;
             const panel = temp.querySelector('.notification-panel');
-            if (panel) {
-              panel.id = 'notificationPanel';
-              panel.classList.add('open');
-              document.body.appendChild(panel);
-            }
+            panel.id = 'notificationPanel';
+            panel.classList.add('open');
+            document.body.appendChild(panel);
           })
           .catch(err => console.error('❌ 알림창 불러오기 실패:', err));
       }
     }
-
-    function goToHome()        { location.href = '/home'; }
-    function goToTreatment()   { location.href = '/hospital/treatment'; }
-    function goToReservation() { location.href = '/hospital/reservation'; }
-    function goToChart()       { location.href = '/hospital/chart'; }
-    function goToStats()       { location.href = '/hospital/statistics'; }
-    function goToAdmission()   { location.href = '/hospital/admission'; }
-    function goLogout()        { location.href = '/logout'; }
   </script>
 </body>
 </html>

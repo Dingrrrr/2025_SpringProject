@@ -39,9 +39,9 @@ public interface NurseChartRepository extends JpaRepository<Vital_sign, Integer>
      * 특정 환자의 특정 날짜 바이탈 사인을 조회합니다.
      */
     @Query(value = "SELECT time_period, temperature, bp_systolic, bp_diastolic, pulse_rate, respiration_rate " +
-                  "FROM vital_sign WHERE patient_id = :patientId AND recorded_date = :recordedDate", nativeQuery = true)
-    List<Map<String, Object>> findVitalSignsByPatientAndDate(@Param("patientId") int patientId, 
-                                                             @Param("recordedDate") String recordedDate);
+            "FROM vital_sign WHERE patient_id = :patientId AND recorded_date = :recordedDate", nativeQuery = true)
+List<Map<String, Object>> findVitalSignsByPatientAndDate(@Param("patientId") int patientId, 
+                                                       @Param("recordedDate") LocalDate recordedDate); // String → LocalDate
     
     /**
      * 환자의 최신 바이탈 사인을 조회합니다 (오늘 날짜).

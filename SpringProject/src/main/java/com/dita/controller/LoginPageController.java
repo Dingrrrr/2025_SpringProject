@@ -54,26 +54,50 @@ public class LoginPageController {
 	}
 	
 	@PostMapping("/Login")
-	public String processLogin(HttpServletRequest request, @RequestParam String usersId, @RequestParam String usersPwd, Model model) {
-		Optional<User> opt = repo.findById(usersId);
-		if (opt.isEmpty()) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		User user = opt.get();
-		if(!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		if(!user.getGrade().equals(Grade.간호사)) {
-			model.addAttribute("loginError", "간호사만 접근 가능합니다.");
-            return "Login/Login";
-		}
-		
-		HttpSession session = request.getSession(true);
-		session.setAttribute("loginUser", user);
-		
-		return "redirect:/nurse/NurseHome";
+	public String processLogin(
+	        HttpServletRequest request,
+	        @RequestParam String usersId,
+	        @RequestParam String usersPwd,
+	        Model model) {
+
+	    // ✅ 0) 관리자 하드코딩 로그인 (DB 조회 없이 우선 처리)
+	    if (usersId.equals("admin") && usersPwd.equals("1234")) {
+	        HttpSession session = request.getSession(true);
+	        User adminUser = new User();
+	        adminUser.setUsersId("admin");
+	        adminUser.setUsersName("관리자");
+	        session.setAttribute("loginUser", adminUser);
+	        return "redirect:/admin/adminMemberManage";
+	    }
+
+	    // 1) 아이디 존재 확인
+	    Optional<User> opt = repo.findById(usersId);
+	    if (opt.isEmpty()) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    User user = opt.get();
+
+	    // 2) 비밀번호 확인
+	    if (!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    // 3) 세션에 로그인 사용자 저장
+	    HttpSession session = request.getSession(true);
+	    session.setAttribute("loginUser", user);
+
+	    // 4) 등급별 분기
+	    if (Grade.의사.equals(user.getGrade())) {
+	        return "redirect:/hospital/hospital_home";
+	    } else if (Grade.간호사.equals(user.getGrade())) {
+	        return "redirect:/nurse/NurseHome";
+	    } else if(Grade.수납.equals(user.getGrade())){
+	    	 return "redirect:/acceptance/acceptanceHome";
+	    }else {
+	        model.addAttribute("loginError", "권한이 없습니다.");
+	        return "Login/Login";
+	    }
 	}
 	
 	@GetMapping("/Logout")

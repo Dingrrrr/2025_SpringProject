@@ -1,4 +1,4 @@
-       @charset "UTF-8";
+@charset "UTF-8";
         * {
             margin: 0;
             padding: 0;
@@ -12,12 +12,16 @@
             height: 100vh;
         }
 
-        /* 사이드바 */
+        /* 사이드바 - 로그아웃 맨 아래 배치 */
         .sidebar {
             width: 250px;
             background-color: white;
             border-right: 1px solid #ddd;
-            padding: 20px 0;
+            padding: 20px 0 0 0; /* 👈 아래쪽 패딩 제거 */
+            display: flex; /* 👈 flex 추가 */
+            flex-direction: column; /* 👈 세로 배치 */
+            height: 100vh; /* 👈 전체 화면 높이 사용 */
+            box-sizing: border-box; /* 👈 패딩 포함하여 크기 계산 */
         }
 
         .sidebar .profile {
@@ -57,6 +61,17 @@
         .sidebar .menu-item.active {
             background-color: #e3f2fd;
             border-right: 3px solid #2196f3;
+        }
+
+        /* 👇 핵심: 로그아웃 메뉴 항목 스타일 */
+        .sidebar .menu-item.logout {
+            margin-top: auto; /* 자동으로 위쪽 여백을 최대화하여 맨 아래로 밀어냄 */
+            background-color: #fafafa; /* 살짝 다른 배경색으로 구분 */
+        }
+
+        .sidebar .menu-item.logout:hover {
+            background-color: #ffebee; /* 로그아웃 전용 호버 색상 */
+            color: #d32f2f;
         }
 
         .sidebar .menu-icon {

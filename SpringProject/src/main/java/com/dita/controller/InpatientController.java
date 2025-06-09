@@ -1,6 +1,6 @@
 package com.dita.controller;
 
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dita.domain.Admission;
 import com.dita.domain.Bed;
@@ -66,10 +65,15 @@ public class InpatientController {
         List<Patient> patients = patientRepository.findByPatientType(PatientType.입원대기);
         List<User> doctors = userRepository.findByGrade(Grade.의사);
 
-        model.addAttribute("patients", patients);
+        List<PatientDto> dtoList = patients.stream()
+            .map(PatientDto::new)
+            .toList();
+
+        model.addAttribute("patients", dtoList);  // ✅ DTO 기준
         model.addAttribute("doctors", doctors);
         return "Inpatient/PatientWaitingPopup"; 
     }
+
     //수정
     @PostMapping("/updateStatus")
     public String updatePatientStatus(@RequestParam int patientId,
@@ -78,14 +82,14 @@ public class InpatientController {
                                       @RequestParam String admittedAt,
                                       @RequestParam String doctorId) {
         admissionSe.updatePatientStatus(patientId, status, symptom, admittedAt, doctorId);
-        return "redirect:/Inpatient/Popup?patientId=" + patientId;
+        return "redirect:/Inpatient/PatientWaitingPopup";  // 또는 /Inpatient/list 등
     }
     
     //삭제
     @PostMapping("/delete")
     public String deleteAdmission(@RequestParam("patientId") int patientId) {
         admissionSe.deleteAdmission(patientId);
-        return "redirect:/Inpatient/Popup?patientId=" + patientId;
+        return "/Inpatient/popupClose";
     }
 
 
@@ -93,8 +97,12 @@ public class InpatientController {
     // 환자 디테일
     @GetMapping("/Popup")
     public String showPopup(@RequestParam("patientId") int patientId, Model model) {
-        Admission admission = admissionRepository.findByPatientId(patientId)
-                                    .orElseThrow(() -> new IllegalArgumentException("환자 없음"));
+    	List<Admission> admissions = admissionRepository.findByPatientId(patientId);
+    	if (admissions.isEmpty()) {
+    	    throw new IllegalArgumentException("환자 없음");
+    	}
+    	Admission admission = admissions.get(0); // 또는 최신 건 기준으로 정렬해서 선택
+
         List<User> doctors = userRepository.findByGrade(Grade.의사);
         model.addAttribute("admission", admission);
         model.addAttribute("doctors", doctors);

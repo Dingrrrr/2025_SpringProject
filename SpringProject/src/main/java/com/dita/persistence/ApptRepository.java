@@ -1,6 +1,5 @@
 package com.dita.persistence;
 
-import java.io.ObjectInputFilter.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,11 +12,14 @@ import org.springframework.data.jpa.repository.Query;
 import com.dita.domain.Appt;
 
 import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
+import com.dita.domain.Status;
 
 
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
 	List<Appt> findByStatus(Status status);
+	List<Appt> findAllByStatusAndPatient_PatientTypeIn(Status status, List<PatientType> types);
 	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
 	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
 	
@@ -62,4 +64,3 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	// ✅ 환자의 모든 예약 삭제
         void deleteAllByPatient(Patient patient);
 }
-
