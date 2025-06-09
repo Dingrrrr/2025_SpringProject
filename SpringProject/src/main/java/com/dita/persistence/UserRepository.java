@@ -14,6 +14,6 @@ import com.dita.domain.Grade;
 
 public interface UserRepository extends JpaRepository<User, String> {
     List<User> findByGrade(Grade grade);
-    Optional<User> findById(String usersid);
+    Optional<User> findById(String usersId);
 }
 

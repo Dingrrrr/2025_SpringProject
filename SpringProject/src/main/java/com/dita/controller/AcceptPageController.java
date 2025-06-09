@@ -380,4 +380,3 @@ public class AcceptPageController {
 		    }
 		}
 
-
