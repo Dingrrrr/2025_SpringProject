@@ -1,9 +1,11 @@
 package com.dita.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -58,10 +60,15 @@ public class Med_rec {
 	
 	@ManyToOne
 	@JoinColumn(name = "drug_id", nullable = false)
-	private Drug drugId;
+	private Drug drugId; //약물
 	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;//작성 일시
 	
+	@OneToMany(mappedBy = "recodeId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Prescription> prescriptions; //해당 진료에 연결된 처방 목록
+
+	
 }
+

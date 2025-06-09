@@ -117,22 +117,25 @@
               <span th:text="${appt.patient.patientBirth}">생년월일</span>
           </div>
           <!-- 상태 badge -->
-          <div class="card-status"
-		     th:classappend="${ 
-		       appt.patient.patientType.name() == '진료대기' 
-		         ? ' yellow' 
-		         : (appt.patient.patientType.name() == '진료중' 
-		             ? ' blue' 
-		             : '') 
-		     }"
-		     th:text="${ 
-		       appt.patient.patientType.name() == '진료대기' 
-		         ? '대기' 
-		         : (appt.patient.patientType.name() == '진료중' 
-		             ? '진료중' 
-		             : '') 
-		     }">
-		  </div>
+         <div class="card-status"
+		  th:classappend="${ appt.patient.patientType.name() == '진료대기' 
+		      ? ' yellow' 
+		      : (appt.patient.patientType.name() == '진료중' 
+		          ? ' blue' 
+		          : (appt.patient.patientType.name() == '수납' 
+		              ? ' gray' 
+		              : '')) 
+		  }"
+		  th:text="${ 
+		    appt.patient.patientType.name() == '진료대기' 
+		      ? '대기' 
+		      : (appt.patient.patientType.name() == '진료중' 
+		          ? '진료중' 
+		          : (appt.patient.patientType.name() == '수납' 
+		              ? '수납' 
+		              : '')) 
+		  }">
+		</div>
         </div>
       </div>
     </div>
