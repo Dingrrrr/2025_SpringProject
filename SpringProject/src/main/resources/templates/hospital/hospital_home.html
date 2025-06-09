@@ -82,23 +82,18 @@
       <!-- 2) Quick-link 카드 -->
       <section class="home-quicklinks">
         <div class="card" th:onclick="|location.href='@{/hospital/reservation}'|">
-		  <img th:src="@{/icons/calendar_big.png}" alt="">
+		  <img th:src="@{/icons/calendar.png}" alt="">
 		  <span>예약 관리</span>
 		</div>
         <div class="card"
              th:onclick="|location.href='@{/hospital/chart}'|">
-          <img th:src="@{/icons/chart_big.png}" alt="">
+          <img th:src="@{/icons/chart.png}" alt="">
           <span>차트 보기</span>
         </div>
         <div class="card"
              th:onclick="|location.href='@{/hospital/statistics}'|">
-          <img th:src="@{/icons/statistics_big.png}" alt="">
+          <img th:src="@{/icons/statistics.png}" alt="">
           <span>통계 보기</span>
-        </div>
-        <div class="card"
-             th:onclick="|location.href='@{/hospital/admission}'|">
-          <img th:src="@{/icons/bed_big.png}" alt="">
-          <span>입원 관리</span>
         </div>
       </section>
     </main>
