@@ -54,26 +54,41 @@ public class LoginPageController {
 	}
 	
 	@PostMapping("/Login")
-	public String processLogin(HttpServletRequest request, @RequestParam String usersId, @RequestParam String usersPwd, Model model) {
-		Optional<User> opt = repo.findById(usersId);
-		if (opt.isEmpty()) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		User user = opt.get();
-		if(!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		if(!user.getGrade().equals(Grade.간호사)) {
-			model.addAttribute("loginError", "간호사만 접근 가능합니다.");
-            return "Login/Login";
-		}
-		
-		HttpSession session = request.getSession(true);
-		session.setAttribute("loginUser", user);
-		
-		return "redirect:/nurse/NurseHome";
+	public String processLogin(HttpServletRequest request,
+	                           @RequestParam String usersId,
+	                           @RequestParam String usersPwd,
+	                           Model model) {
+	    
+	    // (1) 관리자 로그인: 하드코딩된 ID/PW 우선 체크
+	    if (usersId.equals("admin") && usersPwd.equals("1234")) {
+	        HttpSession session = request.getSession(true);
+	        User adminUser = new User();
+	        adminUser.setUsersId("admin");
+	        adminUser.setUsersName("관리자");
+	        session.setAttribute("loginUser", adminUser);
+	        return "redirect:/admin/adminMemberManage";
+	    }
+
+	    // (2) 일반 사용자 로그인 처리
+	    Optional<User> opt = repo.findById(usersId);
+	    if (opt.isEmpty()) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    User user = opt.get();
+	    if (!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    if (!user.getGrade().equals(Grade.간호사)) {
+	        model.addAttribute("loginError", "간호사만 접근 가능합니다.");
+	        return "Login/Login";
+	    }
+
+	    HttpSession session = request.getSession(true);
+	    session.setAttribute("loginUser", user);
+
+	    return "redirect:/nurse/NurseHome";
 	}
 	
 	@GetMapping("/Logout")
