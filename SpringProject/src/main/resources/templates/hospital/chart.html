@@ -74,30 +74,40 @@
 			</div>
 		</section>
 
-		<!-- 내원 이력 영역 (하드코딩된 예시) -->
-		<section class="patient-history" th:if="${medRecords != null and #lists.size(medRecords) > 0}">
-  <h3>내원 이력</h3>
+		<section class="patient-history">
+			<h3>내원 이력</h3>
 
-  <div th:each="rec : ${medRecords}">
-    <details class="history-entry">
-      <summary>
-        <div class="history-date" th:text="${#temporals.format(rec.apptId.scheduledAt, 'yyyy-MM-dd')}">날짜</div>
-        <div class="history-doctor" th:text="${rec.doctor.usersName}">의사 이름</div>
-      </summary>
-      <div class="history-content">
-        <p><strong>진단/소견:</strong> <span th:text="${rec.chiefComplaint}"></span></p>
-        <p><strong>처방 내역:</strong></p>
-        <ul>
-		  <li th:each="p : ${rec.prescriptions}">
-		    <span th:text="${p.drugId.drugName}"></span>
-		    <span th:text="${p.dosage}"></span> — 
-		    <span th:text="${p.frequency}"></span>
-		  </li>
-		</ul>
-      </div>
-    </details>
-  </div>
-</section>
+			<div th:if="${medRecords != null and #lists.size(medRecords) > 0}">
+				<div th:each="rec : ${medRecords}">
+					<details class="history-entry">
+						<summary>
+							<div class="history-date"
+								th:text="${#temporals.format(rec.apptId.scheduledAt, 'yyyy-MM-dd')}">날짜</div>
+							<div class="history-doctor" th:text="${rec.doctor.usersName}">의사
+								이름</div>
+						</summary>
+						<div class="history-content">
+							<p>
+								<strong>진단/소견:</strong> <span th:text="${rec.chiefComplaint}"></span>
+							</p>
+							<p>
+								<strong>처방 내역:</strong>
+							</p>
+							<ul>
+								<li th:each="p : ${rec.prescriptions}"><span
+									th:text="${p.drugId.drugName}"></span> <span
+									th:text="${p.dosage}"></span> — <span th:text="${p.frequency}"></span>
+								</li>
+							</ul>
+						</div>
+					</details>
+				</div>
+			</div>
+
+			<div th:if="${medRecords == null or #lists.size(medRecords) == 0}">
+				<p style="text-align: center; color: gray;">📭 내원 기록이 없습니다</p>
+			</div>
+		</section>
 
 		<!-- 진료기록 입력 영역 (선택된 예약이 있을 때만 노출) -->
 		<!-- ✅ 선택된 예약이 있을 때만 진료 기록 입력 영역을 보여줌 -->

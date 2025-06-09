@@ -285,10 +285,15 @@
 }
 
 /* 의사명 스타일 */
-.patient-history .history-doctor {
-  font-size: 0.9rem;
-  color: #555;
+.history-doctor {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;        /* 줄바꿈 방지 */
+  min-width: 100px;           /* 너무 짧게 잘리지 않게 */
+  display: inline-flex;       /* 텍스트+아이콘 간격을 위해 */
+  align-items: center;
 }
+
 
 /* 오른쪽에 ▼ ▲ 화살표 추가 */
 .patient-history .history-entry > summary::after {
@@ -777,3 +782,16 @@ select {
   font-size: 14px;
 }
 
+.history-entry summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-entry summary .history-date,
+.history-entry summary .history-doctor {
+  font-size: 16px;
+  font-weight: 600;
+  vertical-align: middle;
+  display: inline-block;
+}

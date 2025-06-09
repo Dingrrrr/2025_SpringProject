@@ -66,7 +66,10 @@
       <header class="treatment-header">
         <div class="search-call">
           <div class="search-box">
-            <input type="text" id="patientSearch" placeholder="환자 검색(ctrl+K)">
+            <form th:action="@{/hospital/search}" method="get" style="display: flex; gap: 10px;">
+  <input type="text" name="keyword" placeholder="환자 검색(ctrl+K)" required>
+  <button type="submit">검색</button>
+</form>
           </div>
           <div class="next-pull">
             <label>다음 환자 부르기</label>
@@ -81,7 +84,30 @@
 
         <!-- 검색 결과 출력 -->
         <div id="patientInfoBox" class="patient-summary">
-  <div style="padding: 10px; color: gray;">위쪽 검색창에서 환자 이름을 입력하세요</div>
+  <div th:if="${patientResults == null}" style="padding: 10px; color: gray;">
+    위쪽 검색창에서 환자 이름을 입력하세요
+  </div>
+  
+  <div th:if="${patientResults != null}">
+    <div th:if="${#lists.isEmpty(patientResults)}" style="color: red;">
+      검색 결과가 없습니다.
+    </div>
+    
+    <div th:each="p : ${patientResults}" class="patient-info-card">
+      <strong th:text="${p.patient.patientName}">이름</strong>
+      (<span th:text="${p.patient.patientGender}">성별</span>,
+      <span th:text="${p.patient.age}">0</span>세,
+      <span th:text="${p.patient.patientBirth}">생년월일</span>)
+
+      <div class="tag-list">
+        <span class="tag yellow">체온: <span th:text="${p.vital?.temperature ?: '-'}"></span></span>
+        <span class="tag yellow">맥박: <span th:text="${p.vital?.pulse ?: '-'}"></span></span>
+        <span class="tag yellow">신장: <span th:text="${p.vital?.height ?: '-'}"></span></span>
+        <span class="tag yellow">체중: <span th:text="${p.vital?.weight ?: '-'}"></span></span>
+        <span class="tag yellow">검사일: <span th:text="${#temporals.format(p.vital?.createdAt, 'yyyy-MM-dd') ?: '-'}"></span></span>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -140,9 +166,8 @@
       </div>
     </div>
   </div>
-	<script>
-
-
+<script>
+  
 </script>
 
 </body>
