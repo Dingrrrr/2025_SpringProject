@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,13 +92,12 @@ public class AcceptPageController {
 	    List<Patient> reservations = repo.findAll();
 	    model.addAttribute("reservations", reservations);
 
-	    // 4) 진료대기 환자만 필터링 → 접수 리스트 오른쪽에 표시
-	    List<Patient> waitingPatients = reservations.stream()
-	        .filter(p -> p.getPatientType() == PatientType.진료대기)
-	        .collect(Collectors.toList());
-	    model.addAttribute("waitingPatients", waitingPatients);
+	    // ✅ Appt에 포함된 환자 ID 수집
+	    Set<Integer> apptPatientIds = appts.stream()
+	        .map(appt -> appt.getPatient().getPatientId())
+	        .collect(Collectors.toSet());
 
-	    // ✅ 5) 의사 목록 전달 → 등록 시 doctor 선택용
+	    // 4) 의사 목록
 	    List<User> doctors = userRepository.findByGrade(Grade.의사);
 	    model.addAttribute("doctors", doctors);
 
@@ -105,17 +105,48 @@ public class AcceptPageController {
 	}
 
 		
-		@GetMapping("/acceptanceDoctor")
-	    public String AcceptanceDoctorPage(Model model) {
-			// 필요 시 model에 데이터 추가 가능
-	        return "acceptance/acceptanceDoctor"; 
-	    }
+	@GetMapping("/acceptanceDoctor")
+	public String AcceptanceDoctorPage(Model model) {
+	    LocalDate today = LocalDate.now();
+	    LocalDateTime startOfDay = today.atStartOfDay();
+	    LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+	    model.addAttribute("room1Appts", apptRepository.findByRoomAndScheduledAtToday("진료실1", startOfDay, endOfDay));
+	    model.addAttribute("room2Appts", apptRepository.findByRoomAndScheduledAtToday("진료실2", startOfDay, endOfDay));
+	    model.addAttribute("room3Appts", apptRepository.findByRoomAndScheduledAtToday("진료실3", startOfDay, endOfDay));
+	    model.addAttribute("room4Appts", apptRepository.findByRoomAndScheduledAtToday("진료실4", startOfDay, endOfDay));
+
+	    return "acceptance/acceptanceDoctor";
+	}
+
 	
-		@GetMapping("/acceptanceCondition")
-	    public String AcceptanceConditionPage(Model model) {
-			// 필요 시 model에 데이터 추가 가능
-	        return "acceptance/acceptanceCondition"; 
-		}
+	@GetMapping("/acceptanceCondition")
+	public String AcceptanceConditionPage(Model model) {
+	    LocalDate today = LocalDate.now();
+	    LocalDateTime start = today.atStartOfDay();
+	    LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+	    // ✅ Lazy 강제 초기화 적용
+	    List<Appt> room1Appts = apptRepository.findByRoomAndScheduledAtToday("진료실1", start, end);
+	    room1Appts.forEach(appt -> appt.getPatient().getPatientName()); // 👈 핵심 한 줄
+	    model.addAttribute("room1Appts", room1Appts);
+
+	    List<Appt> room2Appts = apptRepository.findByRoomAndScheduledAtToday("진료실2", start, end);
+	    room2Appts.forEach(appt -> appt.getPatient().getPatientName());
+	    model.addAttribute("room2Appts", room2Appts);
+
+	    List<Appt> room3Appts = apptRepository.findByRoomAndScheduledAtToday("진료실3", start, end);
+	    room3Appts.forEach(appt -> appt.getPatient().getPatientName());
+	    model.addAttribute("room3Appts", room3Appts);
+
+	    List<Appt> room4Appts = apptRepository.findByRoomAndScheduledAtToday("진료실4", start, end);
+	    room4Appts.forEach(appt -> appt.getPatient().getPatientName());
+	    model.addAttribute("room4Appts", room4Appts);
+
+	    return "acceptance/acceptanceCondition";
+	}
+
+
 		@GetMapping("/AcceptanceReceipt")
 	    public String showAcceptanceReceiptPage(@RequestParam(name="date", required = false)
 		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model) {
@@ -369,14 +400,41 @@ public class AcceptPageController {
 		    
 		    @PostMapping("/updatePatientType")
 		    public String updatePatientType(@RequestParam Integer patientId,
-		                                    @RequestParam PatientType patientType) {
+		                                    @RequestParam PatientType patientType,
+		                                    @RequestParam(required = false) String room,
+		                                    @RequestParam(required = false) String visitTime,
+		                                    @RequestParam(required = false) String doctorId) {
 		        Optional<Patient> optional = repo.findById(patientId);
 		        if (optional.isPresent()) {
 		            Patient patient = optional.get();
-		            patient.setPatientType(patientType);  // ❗ 진료상태만 수정
+		            patient.setPatientType(patientType);
 		            repo.save(patient);
+
+		            // 진료대기 상태일 경우 예약 자동 등록
+		            if (patientType == PatientType.진료대기 && room != null && visitTime != null) {
+		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		                LocalTime time = LocalTime.parse(visitTime, formatter);
+		                LocalDateTime scheduledAt = LocalDateTime.of(LocalDate.now(), time);
+
+		                Appt appt = new Appt();
+		                appt.setPatient(patient);
+		                appt.setRoom(room);
+		                appt.setScheduledAt(scheduledAt);
+		                appt.setCreatedAt(LocalDateTime.now());
+		                appt.setStatus(Status.대기);
+
+		                if (doctorId != null && !doctorId.isBlank()) {
+		                    userRepository.findById(doctorId).ifPresent(appt::setDoctor);
+		                }
+
+		                apptRepository.save(appt);
+		            }
 		        }
+
 		        return "redirect:/acceptance/acceptanceHome";
 		    }
+
+		    
+		    
 		}
 
