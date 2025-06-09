@@ -8,8 +8,10 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
@@ -68,32 +70,40 @@ public class AcceptPageController {
 	}
 	
 	//예약 환자들만 검색해서 보여줌
-		@GetMapping("/acceptanceHome")
-		public String showAcceptanceHomePage(
-				@RequestParam(name="date", required = false)
-				@DateTimeFormat(iso = ISO.DATE)
-				LocalDate targetDate,
-				Model model) {
-			
-			// 3) “예약” 상태인 Patient(환자) 목록 조회 → 예약현황
-			List<Patient> reservations = repo.findByPatientType(PatientType.예약);
-		    model.addAttribute("reservations", reservations);
-		    
-		    //날짜
-		    //1) date 파라미터가 없으면 오늘 날짜를 기본값으로 설정
-		    if (targetDate ==null) {
-		    	targetDate = LocalDate.now();
-		    }
-		    
-		    // 2) targetDate 의 00:00:00 과 23:59:59 범위를 LocalDateTime 으로 생성
-		    model.addAttribute("targetDate", targetDate);
-		    
-		    // 4) scheduledAt 이 targetDate 범위(00:00~23:59) 에 속하는 Appt(예약) 목록만 조회 → 접수현황
-		    List<Appt> appts = arepo.findByScheduledAtBetween(targetDate.atStartOfDay(), targetDate.plusDays(1).atStartOfDay());
-		    model.addAttribute("appts", appts);
-		    
-		    return "acceptance/acceptanceHome";
-		}
+	@GetMapping("/acceptanceHome")
+	public String showAcceptanceHomePage(
+	        @RequestParam(name = "date", required = false)
+	        @DateTimeFormat(iso = ISO.DATE) LocalDate targetDate,
+	        Model model) {
+
+	    // 1) 날짜 처리
+	    if (targetDate == null) {
+	        targetDate = LocalDate.now();
+	    }
+	    model.addAttribute("targetDate", targetDate);
+
+	    // 2) Appt 리스트 (접수현황)
+	    List<Appt> appts = arepo.findByScheduledAtBetween(
+	        targetDate.atStartOfDay(), targetDate.plusDays(1).atStartOfDay());
+	    model.addAttribute("appts", appts);
+
+	    // 3) Patient 전체 리스트 → 예약현황
+	    List<Patient> reservations = repo.findAll();
+	    model.addAttribute("reservations", reservations);
+
+	    // 4) 진료대기 환자만 필터링 → 접수 리스트 오른쪽에 표시
+	    List<Patient> waitingPatients = reservations.stream()
+	        .filter(p -> p.getPatientType() == PatientType.진료대기)
+	        .collect(Collectors.toList());
+	    model.addAttribute("waitingPatients", waitingPatients);
+
+	    // ✅ 5) 의사 목록 전달 → 등록 시 doctor 선택용
+	    List<User> doctors = userRepository.findByGrade(Grade.의사);
+	    model.addAttribute("doctors", doctors);
+
+	    return "acceptance/acceptanceHome";
+	}
+
 		
 		@GetMapping("/acceptanceDoctor")
 	    public String AcceptanceDoctorPage(Model model) {
@@ -130,25 +140,64 @@ public class AcceptPageController {
 
 	    }
 		
-		@PostMapping("/acceptanceHome")
-		public String processPatient(@RequestParam String patientName,
-									@RequestParam String patientBirth, @RequestParam String patientPhone,
-									@RequestParam String patientSymptom, @RequestParam String patientGender,
-									@RequestParam PatientType patientType, @RequestParam String patientAddress
-		) {
-			
-				Patient p = new Patient();
-				p.setPatientName(patientName);
-				p.setPatientBirth(patientBirth);
-				p.setPatientPhone(patientPhone);
-				p.setPatientSymptom(patientSymptom);
-				p.setPatientGender(patientGender);
-				p.setPatientType(patientType);
-				p.setPatientAddress(patientAddress);
-			
-				repo.save(p);
-				return "redirect:/acceptance/acceptanceHome";
+		@GetMapping("/api/doctors")
+		@ResponseBody
+		public List<Map<String, String>> getDoctors() {
+		    return userRepository.findByGrade(Grade.의사)
+		        .stream()
+		        .map(user -> {
+		            Map<String, String> map = new HashMap<>();
+		            map.put("usersId", user.getUsersId());
+		            map.put("usersName", user.getUsersName());
+		            return map;
+		        })
+		        .collect(Collectors.toList());
 		}
+		
+		@PostMapping("acceptanceHome")
+		public String registerPatient(@RequestParam String patientName,
+		                              @RequestParam String patientBirth,
+		                              @RequestParam String patientPhone,
+		                              @RequestParam String patientSymptom,
+		                              @RequestParam String patientGender,
+		                              @RequestParam PatientType patientType,
+		                              @RequestParam String patientAddress,
+		                              @RequestParam(required = false) String room,
+		                              @RequestParam(required = false) String visitTime,
+		                              @RequestParam(required = false) String doctorId) {
+
+		    // 1. 환자 정보 저장
+		    Patient patient = new Patient();
+		    patient.setPatientName(patientName);
+		    patient.setPatientBirth(patientBirth);
+		    patient.setPatientPhone(patientPhone);
+		    patient.setPatientSymptom(patientSymptom);
+		    patient.setPatientGender(patientGender);
+		    patient.setPatientType(patientType);
+		    patient.setPatientAddress(patientAddress);
+
+		    repo.save(patient); // 저장
+
+		    // 2. 진료대기일 경우 Appt에도 저장
+		    if (patientType == PatientType.진료대기) {
+		        Appt appt = new Appt();
+		        appt.setPatient(patient);
+		        appt.setRoom(room);
+		        appt.setScheduledAt(LocalDateTime.now());
+		        appt.setCreatedAt(LocalDateTime.now());
+		        appt.setStatus(Status.대기);
+
+		        if (doctorId != null && !doctorId.isBlank()) {
+		            userRepository.findById(doctorId).ifPresent(appt::setDoctor);
+		        }
+
+		        apptRepository.save(appt); // 예약 테이블 저장
+		    }
+
+		    return "redirect:/acceptance/acceptanceHome";
+		}
+
+
 	
 
 		@PostMapping("/appointment")
@@ -295,6 +344,40 @@ public class AcceptPageController {
 	        }).collect(Collectors.toList());
 	        return ResponseEntity.ok(dtoList);
 	    }
-
-}
 		
+
+		    @PostMapping("/acceptance/updatePatient")
+		    public String updatePatient(@ModelAttribute Patient patient, Model model) {
+		        Optional<Patient> optional = repo.findById(patient.getPatientId());
+
+		        if (optional.isPresent()) {
+		            Patient existing = optional.get();
+
+		            existing.setPatientName(patient.getPatientName());
+		            existing.setPatientGender(patient.getPatientGender());
+		            existing.setPatientBirth(patient.getPatientBirth());
+		            existing.setPatientPhone(patient.getPatientPhone());
+		            existing.setPatientSymptom(patient.getPatientSymptom());
+		            existing.setPatientType(patient.getPatientType());
+		            existing.setPatientAddress(patient.getPatientAddress());
+
+		            repo.save(existing);
+		        }
+
+		        return "redirect:/acceptance/acceptanceHome";
+		    }
+		    
+		    @PostMapping("/updatePatientType")
+		    public String updatePatientType(@RequestParam Integer patientId,
+		                                    @RequestParam PatientType patientType) {
+		        Optional<Patient> optional = repo.findById(patientId);
+		        if (optional.isPresent()) {
+		            Patient patient = optional.get();
+		            patient.setPatientType(patientType);  // ❗ 진료상태만 수정
+		            repo.save(patient);
+		        }
+		        return "redirect:/acceptance/acceptanceHome";
+		    }
+		}
+
+
