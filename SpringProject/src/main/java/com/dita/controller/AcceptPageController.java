@@ -140,6 +140,20 @@ public class AcceptPageController {
 
 	    }
 		
+		@GetMapping("/api/doctors")
+		@ResponseBody
+		public List<Map<String, String>> getDoctors() {
+		    return userRepository.findByGrade(Grade.의사)
+		        .stream()
+		        .map(user -> {
+		            Map<String, String> map = new HashMap<>();
+		            map.put("usersId", user.getUsersId());
+		            map.put("usersName", user.getUsersName());
+		            return map;
+		        })
+		        .collect(Collectors.toList());
+		}
+		
 		@PostMapping("acceptanceHome")
 		public String registerPatient(@RequestParam String patientName,
 		                              @RequestParam String patientBirth,
