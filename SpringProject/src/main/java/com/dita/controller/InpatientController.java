@@ -65,10 +65,15 @@ public class InpatientController {
         List<Patient> patients = patientRepository.findByPatientType(PatientType.입원대기);
         List<User> doctors = userRepository.findByGrade(Grade.의사);
 
-        model.addAttribute("patients", patients);
+        List<PatientDto> dtoList = patients.stream()
+            .map(PatientDto::new)
+            .toList();
+
+        model.addAttribute("patients", dtoList);  // ✅ DTO 기준
         model.addAttribute("doctors", doctors);
         return "Inpatient/PatientWaitingPopup"; 
     }
+
     //수정
     @PostMapping("/updateStatus")
     public String updatePatientStatus(@RequestParam int patientId,
@@ -77,7 +82,7 @@ public class InpatientController {
                                       @RequestParam String admittedAt,
                                       @RequestParam String doctorId) {
         admissionSe.updatePatientStatus(patientId, status, symptom, admittedAt, doctorId);
-        return "redirect:/Inpatient/Popup?patientId=" + patientId;
+        return "redirect:/Inpatient/PatientWaitingPopup";  // 또는 /Inpatient/list 등
     }
     
     //삭제
