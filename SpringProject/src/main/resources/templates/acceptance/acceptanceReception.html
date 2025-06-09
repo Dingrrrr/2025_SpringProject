@@ -590,36 +590,22 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAppointmentsForWeek(dates);
   }
 
-    });
-    dateList.forEach(dateStr=>{
-      fetch(`/acceptance/appointments?date=${dateStr}`)
-        .then(r=>r.ok? r.json() : Promise.reject(r.status))
-        .then(list=>{
-          list.forEach(appt=>{
-            const dt = new Date(appt.date);
-            const dayIndex = dt.getDay()-1; // 월=0..금=4
-            if (dayIndex<0||dayIndex>4) return;
-            const t = `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
-            const roomIdx = {'진료실1':0,'진료실2':1,'진료실3':2,'진료실4':3}[appt.room];
-            document.querySelectorAll('#weekView .schedule-row').forEach(row=>{
-              if (row.querySelector('.time-col').textContent.trim()===t) {
-                const cell = row.querySelectorAll('.cell')[dayIndex];
-                cell.classList.add('green');
-                cell.innerHTML = `[${appt.name}]<br>${appt.rrn}`;
-                ['name','rrn','phone','date','department','disease','doctor','status']
-                  .forEach(k=>cell.dataset[k]=appt[k]);
-              }
-            });
-          });
-        }).catch(()=>{});
-    });
+  function loadAppointmentsForWeek(dateList) {
+	  dateList.forEach(dateStr => {
+		fetch(`/acceptance/appointments?date=${dateStr}`)
+		.then(r => r.ok ? r.json() : Promise.reject(r.status))
+		.then(list => {
+		          /* … 셀 채우기 로직 … */
+		})
+		.catch(() => {});
+	});
   }
-
   // 초기 로드
   updateDateDisplay();
   loadAppointmentsByDate(formatLocalDate(new Date()));
-
+  
 });
+  
 	function formatLocalDate(date) {
 	  const yyyy = date.getFullYear();
 	  const mm   = String(date.getMonth()+1).padStart(2,'0');
