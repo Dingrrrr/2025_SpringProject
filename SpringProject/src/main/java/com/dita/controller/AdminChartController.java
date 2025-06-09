@@ -1,11 +1,16 @@
 package com.dita.controller;
 
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dita.persistence.PaymentRepository;
 import com.dita.service.AdminStatService;
 
 @RestController
@@ -38,6 +43,10 @@ public class AdminChartController {
         return statService.getTodayStatusStats();
     }
     
-    
+    @GetMapping("/revenue-monthly")
+    @ResponseBody
+    public Map<String, BigDecimal> getMonthlyRevenue() {
+        return statService.getMonthlyRevenue();
+    }
 
 }

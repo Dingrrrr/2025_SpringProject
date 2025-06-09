@@ -31,7 +31,7 @@
     <div class="main-content">
         <div class="dashboard-grid">
 			
-			<!-- 3. 최근 일주일 외래환자 수 -->
+			<!-- 1. 최근 일주일 외래환자 수 -->
 		  <div class="chart-card">
 		    <h3>최근 일주일 외래환자 수</h3>
 		    <div class="chart-container">
@@ -65,11 +65,20 @@
 		  
 		  <!-- 5. 입원 현황 -->
 			<div class="chart-card">
-			  <h3>입원 현황</h3>
+			  <h3>병실 사용 현황</h3>
 			  <div class="chart-container">
 			    <canvas id="bedStatusChart"></canvas>
 			  </div>
 			</div>
+			
+			<!-- 6. 월별 매출 -->
+			<div class="chart-card">
+			  <h3>월별 매출</h3>
+			  <div class="chart-container">
+			    <canvas id="revenueChart"></canvas>
+			  </div>
+			</div>
+						
 		</div>
     </div>
     
@@ -209,6 +218,7 @@
         			  loadChart('weeklyOutpatientChart', '/admin/adminTotalManage/weekly-outpatients', 'bar', '최근 일주일 외래환자 수');
         			  loadChart('statusChart', '/admin/adminTotalManage/status-today', 'doughnut', '', ['#4caf50', '#ffc107', '#f44336']);
         			  loadChart('bedStatusChart', '/admin/adminTotalManage/bed-status', 'doughnut', '', ['#ff7043', '#66bb6a']);
+        			  loadChart('revenueChart', '/admin/adminTotalManage/revenue-monthly', 'bar', '월별 매출');
         		});
         		
         </script>
