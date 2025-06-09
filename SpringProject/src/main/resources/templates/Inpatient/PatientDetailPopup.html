@@ -17,75 +17,85 @@
     <span th:text="${admission.patient.patientGender}">성별</span> /
     <span th:text="${admission.patient.age}">나이</span>세
   </p>
-<form th:action="@{/Inpatient/updateStatus}" method="post" id="statusForm">
-  
-  <label>진단명</label>
-  <input type="text" id="symptomInput" name="symptom"
-         th:value="${admission.patient.patientSymptom ?: '미정'}"
-         />
 
-  <label>입원일</label>
-  <input type="date" id="admittedAtInput" name="admittedAt"
-         th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"
-         />
+  <form th:action="@{/Inpatient/updateStatus}" method="post" id="statusForm">
 
-  <label>담당의</label>
-  <select name="doctorId" id="doctorSelect">
-    <option th:each="doc : ${doctors}"
-            th:value="${doc.usersId}"
-            th:text="${doc.usersName}"
-            th:selected="${doc.usersId == admission.doctor.usersId}">
-    </option>
-  </select>
+    <label>진단명</label>
+    <input type="text" id="symptomInput"
+           th:value="${admission.patient.patientSymptom ?: '미정'}"
+           readonly />
+	<input type="hidden" name="symptom" th:value="${admission.patient.patientSymptom ?: '미정'}"/>
+    <label>입원일</label>
+    <input type="date" id="admittedAtInput"
+           th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"
+           readonly />
+	<input type="hidden" name="admittedAt" th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"/>
+	
+    <label>담당의</label>
+    <select  id="doctorSelect" disabled>
+      <option th:each="doc : ${doctors}"
+              th:value="${doc.usersId}"
+              th:text="${doc.usersName}"
+              th:selected="${doc.usersId == admission.doctor.usersId}">
+      </option>
+    </select>
+    <!-- 숨겨진 필드로 값 전달 -->
+    <input type="hidden" name="doctorId" th:value="${admission.doctor.usersId}" />
 
-  <label>상태</label>
-  <select name="status" id="statusSelect" disabled>
-    <option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
-    <option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
-  </select>
+    <label>상태</label>
+    <select  id="statusSelect" disabled>
+      <option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
+      <option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
+    </select>
+    <input type="hidden" name="status" id="statusHidden" th:value="${admission.patient.patientType.name()}" />
 
-  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+    <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+  </form>
 
-</form>
+  <div class="button-group">
+    <button id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
 
+    <form th:action="@{/Inpatient/delete}" method="post">
+      <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+      <button type="submit" class="delete">삭제</button>
+    </form>
 
-  
-<div class="button-group">
-  <button id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
+    <button class="cancel" onclick="window.close()">닫기</button>
+  </div>
 
- <form th:action="@{/Inpatient/delete}" method="post">
-  <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
-  <button type="submit" class="delete">삭제</button> <!-- ✅ 반드시 type="submit" -->
-</form>
-
-
-  <button class="cancel" onclick="window.close()">닫기</button>
 </div>
 
-</body>
 <script>
   let isEditMode = false;
 
- function toggleEdit() {
+  function toggleEdit() {
   isEditMode = !isEditMode;
 
   const editBtn = document.getElementById("editBtn");
   const statusSelect = document.getElementById("statusSelect");
+  const symptomInput = document.getElementById("symptomInput");
+  const admittedAtInput = document.getElementById("admittedAtInput");
+  const doctorSelect = document.getElementById("doctorSelect");
 
-  statusSelect.disabled = !isEditMode;
-// JavaScript 수정
-if (isEditMode) {
-	  editBtn.textContent = "저장";
-	  editBtn.classList.remove("edit");
-	  editBtn.classList.add("save");
-	  statusSelect.disabled = false; 
-	
-	} else {
-	  statusSelect.disabled = false; 
-	  document.getElementById("statusForm").submit();
-	}
+  if (isEditMode) {
+    editBtn.textContent = "저장";
+    editBtn.classList.remove("edit");
+    editBtn.classList.add("save");
 
+    statusSelect.disabled = false;
+    symptomInput.removeAttribute("readonly");
+    admittedAtInput.removeAttribute("readonly");
+    doctorSelect.disabled = false;
+  } else {
+    document.getElementById("statusHidden").value = statusSelect.value;
+    document.querySelector('input[name="symptom"]').value = symptomInput.value;
+    document.querySelector('input[name="admittedAt"]').value = admittedAtInput.value;
+    document.querySelector('input[name="doctorId"]').value = doctorSelect.value;
+
+    document.getElementById("statusForm").submit();
+  }
 }
-</script>
 
+</script>
+</body>
 </html>

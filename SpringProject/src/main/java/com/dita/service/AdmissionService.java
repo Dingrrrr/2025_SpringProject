@@ -33,7 +33,7 @@ public class AdmissionService {
     private final BedRepository bedRepository;
     private final UserRepository userRepository;
 
-    // ✅ 1. 입원 중 환자 리스트
+    // 1. 입원 중 환자 리스트
     public List<AdmittedPatientDto> getAdmittedPatients() {
         return admissionRepo.findAll().stream()
             .map(adm -> {
@@ -55,7 +55,7 @@ public class AdmissionService {
             .collect(Collectors.toList());
     }
 
-    // ✅ 2. 입원 처리
+    // 2. 입원 처리
     @Transactional
     public void admit(int patientId, String doctorId, int bedId) {
         Patient patient = patientRepository.findById(patientId)
@@ -80,7 +80,7 @@ public class AdmissionService {
         bedRepository.save(bed);
     }
 
-    // ✅ 3. 입원 대기 환자 리스트
+    // 3. 입원 대기 환자 리스트
     public List<PatientDto> getWaitingPatients() {
         return patientRepository.findByPatientType(PatientType.입원대기).stream()
             .map((Patient p) -> PatientDto.builder()
@@ -93,54 +93,59 @@ public class AdmissionService {
             .collect(Collectors.toList());
     }
     
+    //5. 수정
     public void updatePatientStatus(int patientId, String status, String symptom, String admittedAt, String doctorId) {
-        Optional<Admission> admissionOpt = admissionRepo.findByPatientId(patientId);
+        List<Admission> admissions = admissionRepo.findByPatientId(patientId);
 
-        if (admissionOpt.isPresent()) {
-            Admission admission = admissionOpt.get();
+        if (!admissions.isEmpty()) {
+            Admission admission = admissions.get(0); // or 가장 최신 로직
 
-            // 상태 업데이트
             admission.getPatient().setPatientType(PatientType.valueOf(status));
 
-            // 진단명 업데이트
-            admission.getPatient().setPatientSymptom(symptom);
+            if ("퇴원".equals(status)) {
+                Bed bed = admission.getBed();
+                if (bed != null) {
+                    bed.setBedstatus(StatusBed.사용가능);
+                    bedRepository.save(bed);
+                    admission.setBed(null);
+                }
+            }
 
-            // 입원일 업데이트
+            admission.getPatient().setPatientSymptom(symptom);
             admission.setAdmittedAt(LocalDate.parse(admittedAt).atStartOfDay());
 
-            // 담당의 업데이트
-            User doctor = userRepository.findById(String.valueOf(doctorId))
-                    .orElseThrow(() -> new IllegalArgumentException("의사를 찾을 수 없습니다."));
-
+            User doctor = userRepository.findById(doctorId)
+                .orElseThrow(() -> new IllegalArgumentException("의사를 찾을 수 없습니다."));
+            admission.setDoctor(doctor);
 
             patientRepository.save(admission.getPatient());
             admissionRepo.save(admission);
         }
     }
 
+    
+    //4. 삭제
     public void deleteAdmission(int patientId) {
-        Optional<Admission> opt = admissionRepo.findByPatientId(patientId);
+        List<Admission> admissions = admissionRepo.findByPatientId(patientId);
 
-        if (opt.isPresent()) {
-            Admission admission = opt.get();
+        if (!admissions.isEmpty()) {
+            Admission admission = admissions.get(0); // 기준 필요 시 최신만 선택
 
-            // 1. 환자 상태를 '입원대기'로 변경
             Patient patient = admission.getPatient();
             patient.setPatientType(PatientType.입원대기);
             patientRepository.save(patient);
 
-            // 2. 침대 상태를 '사용가능'으로 변경
             Bed bed = admission.getBed();
             if (bed != null) {
-                bed.setBedstatus(StatusBed.사용가능);  // ✅ enum으로 정확히 설정
+                bed.setBedstatus(StatusBed.사용가능);
                 bedRepository.save(bed);
             }
 
-            // 3. 입원 정보 삭제
             admissionRepo.delete(admission);
         }
     }
 
 
+    
     
 }
