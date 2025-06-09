@@ -9,12 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.dita.domain.Appt;
 import com.dita.domain.Grade;
@@ -22,20 +25,27 @@ import com.dita.domain.PatientType;
 import com.dita.domain.Status;
 import com.dita.domain.User;
 import com.dita.persistence.ApptRepository;
+import com.dita.persistence.DiseaseRepository;
+import com.dita.persistence.DrugRepository;
+import com.dita.persistence.UserRepository;
+import com.dita.service.MedRecService;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 @Controller
 @Log
 @RequestMapping("/hospital")
+@RequiredArgsConstructor
 public class HospitalPageController {
 
-    private final ApptRepository apptRepository;
+    private final UserRepository userRepository;
 
-    public HospitalPageController(ApptRepository apptRepository) {
-        this.apptRepository = apptRepository;
-    }
+    private final ApptRepository apptRepository;
+    private final MedRecService medRecService;
+    private final DrugRepository drugRepository;
+    private final DiseaseRepository diseaseRepository;
 
     /** ── 메인(의사 전용) ── 
      * GET /hospital/hospital_home → templates/hospital/hospital_home.html
@@ -120,45 +130,27 @@ public class HospitalPageController {
         }
         model.addAttribute("displayName", loginUser.getUsersName());
 
-        // 1) 방 목록 선언
-        List<String> rooms = List.of("진료실1","진료실2","진료실3","진료실4");
+        // 1) 방 목록
+        List<String> rooms = List.of("진료실1", "진료실2", "진료실3", "진료실4");
         model.addAttribute("rooms", rooms);
 
-        // 2) 빈 맵 초기화
-        Map<String, Integer> countByRoom = new LinkedHashMap<>();
-        rooms.forEach(r -> countByRoom.put(r, 0));
-
-        // 3) DB에서 확정 상태 예약 가져오기
+        // 2) DB에서 "확정" 상태인 모든 예약 가져오기
         List<Appt> confirmed = apptRepository.findByStatus(Status.확정);
 
-        // 4) 방별로 카운트
-        for (Appt a : confirmed) {
-            String room = a.getRoom();
-            // 방에 미리 키가 세팅되어 있다면
-            if (countByRoom.containsKey(room)) {
-                countByRoom.put(room, countByRoom.get(room) + 1);
-            }
-        }
-        model.addAttribute("countByRoom", countByRoom);
-
-        // 5) (필요하다면) 기다리는/진행중 맵도 넘겨주되, 
-        //    템플릿에서는 countByRoom만 쓰면 됩니다.
-        Map<String,List<Appt>> waitingByRoom   = rooms.stream()
-            .collect(Collectors.toMap(r->r, r->new ArrayList<>(), (a,b)->a, LinkedHashMap::new));
-        Map<String,List<Appt>> inProgressByRoom = rooms.stream()
-            .collect(Collectors.toMap(r->r, r->new ArrayList<>(), (a,b)->a, LinkedHashMap::new));
-        for (Appt a : confirmed) {
-            String room = a.getRoom();
-            if (!waitingByRoom.containsKey(room)) continue;
-            if (a.getPatient().getPatientType()==PatientType.진료대기) {
-                waitingByRoom.get(room).add(a);
-            } else {
-                inProgressByRoom.get(room).add(a);
-            }
-        }
-        model.addAttribute("waitingByRoom", waitingByRoom);
-        model.addAttribute("inProgressByRoom", inProgressByRoom);
-
+        // 3) 방별로 묶어서 맵 생성
+        Map<String, List<Appt>> appointmentsByRoom = rooms.stream()
+            .collect(Collectors.toMap(
+                Function.identity(),                        // key = "진료실1" 등
+                room -> confirmed.stream()                  // value = confirmed 중에서
+                           .filter(a -> room.equals(a.getRoom()))
+                           .collect(Collectors.toList()),
+                (oldList, newList) -> oldList,              // 병합 로직 (중복 키가 없으므로 사용 안 됨)
+                LinkedHashMap::new                          // 순서를 보장할 LinkedHashMap
+            ));
+        model.addAttribute("appointmentsByRoom", appointmentsByRoom);
+        model.addAttribute("diseases", diseaseRepository.findAll());
+        model.addAttribute("drugs",    drugRepository.findAll());
+        model.addAttribute("doctors",  userRepository.findByGrade(Grade.의사));
         return "hospital/chart";
     }
 
@@ -175,4 +167,22 @@ public class HospitalPageController {
         model.addAttribute("displayName", loginUser.getUsersName());
         return "hospital/statistics";
     }
+    
+    @PostMapping("/chart")
+    public String saveChartRecord(
+    		@RequestParam Integer apptId,
+            @RequestParam Integer patientId,
+            @RequestParam String  doctorId,
+            @RequestParam String  chiefComplaint,
+            @RequestParam Long    diseaseId,
+            @RequestParam Integer drugId,
+            @RequestParam String  notes
+    		) {
+    		medRecService.saveRecord(
+            apptId, patientId, doctorId,
+            chiefComplaint, diseaseId, drugId, notes
+        );
+    	return "redirect:/hospital/chart";
+    }
+    
 }

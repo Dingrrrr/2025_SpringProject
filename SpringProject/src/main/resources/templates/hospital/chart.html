@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>진료 관리 화면</title>
@@ -37,52 +37,41 @@
 
 		<!-- 2) 환자 리스트 -->
 		<section class="patient-list">
-			<!-- (A) 검색창 -->
-			<div class="search">
-				<input type="text" placeholder="환자 검색" id="patient-search-input">
-			</div>
-
-			<!-- (A-1) 검색 결과 패널 -->
-			<div class="search-results" id="search-results"
-				style="display: none;">
-				<h4>환자 검색 결과</h4>
-				
-			</div>
-
-			<!-- (B) 헤더 -->
-			<h3>환자 리스트</h3>
-			<div class="status-label">대기 / 진행 중</div>
-
-			<!-- (C) 방별 카드들 -->
-			<!-- 진료실1 -->
-			<details open class="room">
-				<summary>
-					진료실 1 <span class="count">3</span><!-- 카운트 되게 만들기 -->
-				</summary>
-				
-			</details>
-
-			<!-- 진료실2 -->
-			<details open class="room">
-				<summary>
-					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
-				</summary>
-			</details>
-			
-			<!-- 진료실3 -->
-			<details open class="room">
-				<summary>
-					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
-				</summary>
-			</details>
-			
-			<!-- 진료실4 -->
-			<details open class="room">
-				<summary>
-					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
-				</summary>
-			</details>
-		</section>
+	      <h3>환자 리스트</h3>
+	      <div class="status-label">대기 / 진행 중</div>
+	
+	      <!-- 1) 컨트롤러에서 넘긴 appointmentsByRoom 맵을 entry로 순회 -->
+	      <div th:each="entry : ${appointmentsByRoom}">
+	        <details open class="room">
+	          <summary>
+	            <span th:text="${entry.key}">진료실X</span>
+	            <span class="count" th:text="${#lists.size(entry.value)}">0</span>
+	          </summary>
+	
+	          <!-- 2) 해당 방 예약 리스트(entry.value) 반복 -->
+	          <div th:each="appt : ${entry.value}" class="card">
+	            <div class="card-patient">
+	              <strong th:text="${appt.patient.patientName}">홍길동</strong>
+	              <!-- 성별과 나이, 생년월일 -->
+	              [<span th:text="${appt.patient.patientGender}">남</span>]
+	              <span th:text="${appt.patient.age} + '세'">30세</span> ·
+	              <span th:text="${appt.patient.patientBirth}">1990-01-01</span>
+	            </div>
+	            <!-- 3) patientType에 따라 배지 색·문구 분기 -->
+	            <div class="card-status"
+	                 th:classappend="
+	                   ${appt.patient.patientType.name() == '진료대기'} ? ' yellow' :
+	                   (${appt.patient.patientType.name() == '진료중'} ? ' blue' : '')
+	                 "
+	                 th:text="
+	                   ${appt.patient.patientType.name() == '진료대기'} ? '대기' :
+	                   (${appt.patient.patientType.name() == '진료중'} ? '진료중' : '')
+	                 ">
+	            </div>
+	          </div>
+	        </details>
+	      </div>
+	    </section>
 
 		<!-- 3) 내원 이력 -->
 		<section class="patient-history">
@@ -132,88 +121,83 @@
 
 		<!-- 4) 메인 진료 기록 -->
 		<section class="col treatment-main">
-
-			<!-- ─── 4-1) 헤더 ─── -->
-			<div class="record-header">
-				<div class="record-header-left">2021-09-01 (월) 10:00 ▶ 이은솔</div>
-				<div class="record-header-right">
-					<!-- 우측에 톱니바퀴 아이콘 등 -->
-					<button class="icon-btn">⚙️</button>
-				</div>
-			</div>
-
-			<!-- ─── 4-2) 본문 (증상 / 이미지) ─── -->
-			<div class="record-notes">
-				<h4>증상 기록</h4>
-				<textarea placeholder="환자 증상 요약 내용을 입력하세요"></textarea>
-				<button class="save-btn">저장</button>
-			</div>
-
-
-			<!-- ─── 4-3) 진단 및 처방 ─── -->
-			<div class="record-prescription">
-				<h4>진단 및 처방</h4>
-
-				<!-- 도구 버튼 -->
-				<div class="prescription-toolbar">
-					<button>예방접종</button>
-					<button>DUR점검</button>
-					<button class="icon-btn">⚙️</button>
-				</div>
-
-				<!-- 검색창 ⬆️ 위로 이동 -->
-				<div class="prescription-search">
-					<input type="text" id="orderSearchInput" placeholder="오더 검색(ctrl+↑)">
-					<div id="suggestions" class="suggestion-box"></div> <!-- 비워두기! -->
-
-				<!-- 진단명 목록 ⬇️ 아래로 -->
-				<div class="diagnosis-list" id="diagnosisList">
-					<div class="diagnosis-items"></div>
-				</div>
-
-				<!-- 약품 테이블 -->
-				<table class="prescription-table" id="prescriptionTable">
-					<thead>
-						<tr>
-							<th>약품명</th>
-							<th>용법/용량</th>
-							<th>수량</th>
-							<th>비고</th>
-						</tr>
-					</thead>
-					<tbody id="prescriptionTbody">
-						<!-- JS로 삽입 -->
-					</tbody>
-				</table>
-
-				<!-- 버튼 -->
-				<div class="prescription-action">
-					<button id="manualAddBtn" class="add-prescription-btn">+
-						수기처방 추가</button>
-					<button class="send-btn">보내기 ▶</button>
-				</div>
-			</div>
-
-		</section>
+			  <!-- 진료기록 저장 폼 시작 -->
+			  <form th:action="@{/hospital/chart/record}" method="post">
+			  
+			    <!-- 1) 헤더: 기존 그대로 -->
+			    <div class="record-header">
+			      <div class="record-header-left">2021-09-01 (월) 10:00 ▶ 이은솔</div>
+			      <div class="record-header-right">
+			        <button class="icon-btn">⚙️</button>
+			      </div>
+			    </div>
+			
+			    <!-- 2) 주증상 입력 -->
+			    <div class="record-notes">
+			      <h4>증상 기록</h4>
+			      <textarea name="chiefComplaint"
+			                placeholder="환자 증상 요약 내용을 입력하세요"
+			                required
+			                class="notes-textarea"></textarea>
+			    </div>
+			
+			    <!-- 3) 진단명 선택 -->
+			    <div class="record-prescription">
+			      <h4>진단 및 처방</h4>
+			
+			      <!-- 도구 버튼(이전 그대로) -->
+			      <div class="prescription-toolbar">
+			        <button type="button">예방접종</button>
+			        <button type="button">DUR점검</button>
+			        <button class="icon-btn" type="button">⚙️</button>
+			      </div>
+			
+			      <!-- (A) 진단명 select -->
+			      <label>진단명:
+			        <select name="diseaseId" required>
+			          <option th:each="d : ${diseases}"
+			                  th:value="${d.id}"
+			                  th:text="${d.name}">
+			            진단명
+			          </option>
+			        </select>
+			      </label>
+			
+			      <!-- (B) 약물 select -->
+			      <label>처방약:
+			        <select name="drugId" required>
+			          <option th:each="drug : ${drugs}"
+			                  th:value="${drug.id}"
+			                  th:text="${drug.name}">
+			            약물명
+			          </option>
+			        </select>
+			      </label>
+			
+			      <!-- (C) 추가메모 -->
+			      <label>추가 메모:
+			        <textarea name="notes"
+			                  placeholder="추가 메모를 입력하세요"
+			                  class="notes-textarea"></textarea>
+			      </label>
+			    </div>
+			
+			    <!-- 4) 숨김 필드: apptId, patientId, doctorId -->
+			    <input type="hidden" name="apptId"    th:value="${selectedAppt.id}" />
+			    <input type="hidden" name="patientId" th:value="${selectedAppt.patient.id}" />
+			    <input type="hidden" name="doctorId"  th:value="${#httpSession.getAttribute('loginUser').usersId}" />
+			
+			    <!-- 5) 저장 버튼 -->
+			    <div class="prescription-action">
+			      <button type="submit" class="send-btn">저장 ▶</button>
+			    </div>
+			
+			  </form>
+			  <!-- 진료기록 저장 폼 끝 -->
+			</section>
 		<!-- 5) 환자 기록 메모 -->
 		<aside class="col patient-record">
-			<h3 class="record-title">📝 환자기록</h3>
-
-			<ul class="record-timeline">
-				<li><span class="tag yellow">김승환</span>
-					<div class="record-time">09:03 AM</div>
-					<div class="record-msg">
-						발열증상 있으나 귀찮, 가족력: 당뇨 있음<br>
-						<small>기록자: 간호사 박은하</small>
-					</div></li>
-				<li><span class="tag pink">이은솔</span>
-					<div class="record-time">09:05 AM</div>
-					<div class="record-msg">전진서 추가 부작용보고</div></li>
-				<li><span class="tag gray">의료진</span>
-					<div class="record-time">10:21 AM</div>
-					<div class="record-msg">식사 직후 복약지시와 다음 방문 때 내과 검사 시행 예정</div></li>
-			</ul>
-
+			<h3 class="record-title">📝 추가메모</h3>
 			<form class="record-form">
 				<textarea placeholder="기록할 내용을 입력하세요"></textarea>
 				<button type="submit">올리기</button>

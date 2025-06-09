@@ -92,7 +92,9 @@ public class LoginPageController {
 	        return "redirect:/hospital/hospital_home";
 	    } else if (Grade.간호사.equals(user.getGrade())) {
 	        return "redirect:/nurse/NurseHome";
-	    } else {
+	    } else if(Grade.수납.equals(user.getGrade())){
+	    	 return "redirect:/acceptance/acceptanceHome";
+	    }else {
 	        model.addAttribute("loginError", "권한이 없습니다.");
 	        return "Login/Login";
 	    }

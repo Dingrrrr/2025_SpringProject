@@ -68,7 +68,19 @@ public class NurseChartService {
     @Transactional
     public int saveVitalSigns(ChartSaveRequestDto request) {
         try {
-            log.info("바이탈 사인 저장 시작 - 환자ID: " + request.getPatientId());
+            log.info("🔍 바이탈 사인 저장 시작 - 환자ID: " + request.getPatientId());
+            log.info("🔍 요청된 날짜: " + request.getRecordedDate());
+            log.info("🔍 요청 데이터 전체: " + request.getData().toString());
+            
+            // 각 바이탈별 상세 데이터 로그
+            request.getData().forEach((vitalType, timeData) -> {
+                log.info("🔍 " + vitalType + " 데이터:");
+                timeData.forEach((time, value) -> {
+                    if (value != null && !value.trim().isEmpty()) {
+                        log.info("    " + time + ": " + value);
+                    }
+                });
+            });
             
             // 간호사 계정 조회
             List<User> nurses = userRepository.findByGrade(Grade.간호사);
@@ -213,7 +225,24 @@ public class NurseChartService {
      */
     public Map<String, Object> getChartDetail(int patientId, String recordedDate) {
         try {
-            List<Map<String, Object>> vitalSigns = nurseChartRepository.findVitalSignsByPatientAndDate(patientId, recordedDate);
+            log.info("차트 상세 조회 시작 - 환자ID: " + patientId + ", 날짜: " + recordedDate);
+            
+            // 🔄 String을 LocalDate로 변환
+            LocalDate localDate;
+            try {
+                localDate = LocalDate.parse(recordedDate);
+            } catch (Exception e) {
+                log.severe("날짜 파싱 실패: " + recordedDate);
+                throw new RuntimeException("잘못된 날짜 형식입니다: " + recordedDate);
+            }
+            
+            // 🔄 LocalDate 파라미터로 Repository 호출
+            List<Map<String, Object>> vitalSigns = nurseChartRepository.findVitalSignsByPatientAndDate(patientId, localDate);
+            
+            log.info("조회된 바이탈 사인 개수: " + vitalSigns.size());
+            for (Map<String, Object> vital : vitalSigns) {
+                log.info("조회된 데이터: " + vital.toString());
+            }
             
             // 데이터를 프론트엔드 형식으로 변환
             Map<String, Map<String, String>> data = new HashMap<>();
@@ -243,6 +272,8 @@ public class NurseChartService {
                     data.get("호흡수").put(timePeriod, vital.get("respiration_rate").toString());
                 }
             }
+            
+            log.info("변환된 차트 데이터: " + data.toString());
             
             return Map.of("data", data);
             

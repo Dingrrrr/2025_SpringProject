@@ -3,21 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>통계 화면</title>
-  <!-- 공통 스타일 -->
   <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
-  <!-- 통계 전용 스타일 -->
   <link rel="stylesheet" th:href="@{/css/statistics_style.css}">
-  <!-- Flatpickr 날짜 선택기 스타일 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Flatpickr -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="hospital-container">
-
-    <!-- 1) 사이드바 -->
     <aside class="hospital-sidebar">
       <h2 class="hospital-profile-title">
         <img th:src="@{/icons/profile.jpg}" alt="프로필">
@@ -67,296 +60,163 @@
       </div>
     </aside>
 
-    <!-- 2) 통계 본문 -->
     <section class="statistics-container">
-
-      <!-- 헤더: 보기 토글 + 날짜 선택 -->
       <header class="stats-header">
-        <div class="view-toggle">
-          <button id="btnPeriod" class="active">기간별 보기</button>
-          <button id="btnTrend">트렌드별 보기</button>
-        </div>
         <div class="date-range">
           <input type="text" id="statsDate" placeholder="기간을 선택하세요" readonly>
-
         </div>
       </header>
 
-      <!-- 기간별 차트 뷰 -->
       <div id="periodView">
         <main class="stats-grid">
-          <div class="chart-card"><h4>매출 현황</h4><canvas id="chartSales"></canvas></div>
-          <div class="chart-card"><h4>진료 현황</h4><canvas id="chartVisits"></canvas></div>
-          <div class="chart-card"><h4>방문목적별 현황</h4><canvas id="chartPurpose"></canvas></div>
-
-          <div class="chart-card"><h4>담당별 매출 현황</h4><canvas id="chartByDoctor"></canvas></div>
-          <div class="chart-card"><h4>보험정보별 매출</h4><canvas id="chartByInsurance"></canvas></div>
-          <div class="chart-card"><h4>지역별 환자 수</h4><canvas id="chartByRegion"></canvas></div>
-
-          <div class="chart-card"><h4>수납 현황</h4><canvas id="chartPayments"></canvas></div>
-          <div class="chart-card"><h4>진료횟수 대비 매출</h4><canvas id="chartVisitSales"></canvas></div>
-          <div class="chart-card"><h4>상병코드별 현황</h4><canvas id="chartByDisease"></canvas></div>
+          <div class="chart-card">
+            <h4>진료 현황</h4>
+            <canvas id="chartVisits"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>담당별 진료 수 현황</h4>
+            <canvas id="chartByDoctor"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>수납 현황</h4>
+            <canvas id="chartPayments"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>상병코드별 현황</h4>
+            <canvas id="chartByDisease"></canvas>
+          </div>
         </main>
       </div>
-
-      <!-- 트렌드별 차트 뷰 -->
-      <div id="trendView" style="display:none">
-        <main class="stats-grid">
-          <div class="chart-card"><h4>매출 트렌드</h4><canvas id="trendSales"></canvas></div>
-          <div class="chart-card"><h4>진료 트렌드</h4><canvas id="trendVisits"></canvas></div>
-          <div class="chart-card"><h4>방문목적 트렌드</h4><canvas id="trendPurpose"></canvas></div>
-
-          <div class="chart-card"><h4>담당별 매출 트렌드</h4><canvas id="trendByDoctor"></canvas></div>
-          <div class="chart-card"><h4>보험별 매출 트렌드</h4><canvas id="trendByInsurance"></canvas></div>
-          <div class="chart-card"><h4>지역별 환자 트렌드</h4><canvas id="trendByRegion"></canvas></div>
-
-          <div class="chart-card"><h4>수납 트렌드</h4><canvas id="trendPayments"></canvas></div>
-          <div class="chart-card"><h4>진료횟수 대비 매출 트렌드</h4><canvas id="trendVisitSales"></canvas></div>
-          <div class="chart-card"><h4>상병코드별 트렌드</h4><canvas id="trendByDisease"></canvas></div>
-        </main>
-      </div>
-
     </section>
   </div>
+<script>
+  function formatDateKST(dateObj) {
+    const offset = dateObj.getTimezoneOffset() * 60000;
+    const kst = new Date(dateObj.getTime() - offset);
+    return kst.toISOString().slice(0, 10);
+  }
 
-  <script>
-    // 1) 날짜 선택기 초기화 (Flatpickr)
-    flatpickr("#statsDate", {
-      mode: "range",
-      dateFormat: "Y-m-d",
-      locale: {
-        firstDayOfWeek: 1,
-        weekdays: {
-          shorthand: ['일','월','화','수','목','금','토'],
-          longhand:  ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
-        },
-        months: {
-          shorthand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
-          longhand:  ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
-        }
+  flatpickr("#statsDate", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    locale: {
+      firstDayOfWeek: 1,
+      weekdays: {
+        shorthand: ['일','월','화','수','목','금','토'],
+        longhand: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
+      },
+      months: {
+        shorthand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+        longhand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
       }
-    });
-
-    // 2) 뷰 토글
-    const btnP = document.getElementById('btnPeriod'),
-          btnT = document.getElementById('btnTrend'),
-          vP   = document.getElementById('periodView'),
-          vT   = document.getElementById('trendView');
-    btnP.addEventListener('click', ()=>{
-      btnP.classList.add('active');
-      btnT.classList.remove('active');
-      vP.style.display = 'block';
-      vT.style.display = 'none';
-    });
-    btnT.addEventListener('click', ()=>{
-      btnT.classList.add('active');
-      btnP.classList.remove('active');
-      vP.style.display = 'none';
-      vT.style.display = 'block';
-    });
-
-    // 3) Chart.js 초기화 헬퍼
-    function initChart(id, cfg) {
-      const ctx = document.getElementById(id).getContext('2d');
-      return new Chart(ctx, cfg);
+    },
+    onChange: function (selectedDates) {
+      if (selectedDates.length === 2) {
+        const startDate = formatDateKST(selectedDates[0]);
+        const endDate = formatDateKST(selectedDates[1]);
+        loadDoctorChart(startDate, endDate);
+        loadVisitChart(startDate, endDate);
+      }
     }
+  });
 
-    // 4) 기간별 차트 설정
-    initChart('chartSales', {
-      type: 'bar',
-      data: {
-        labels: ['4/01','4/05','4/10','4/15','4/20','4/25','4/30'],
-        datasets: [{ data:[120,150,170,140,180,190,160], backgroundColor:'#4e73df' }]
-      },
-      options:{ responsive:true, plugins:{ legend:{display:false}} }
-    });
+  function initChart(id, cfg) {
+    const ctx = document.getElementById(id).getContext('2d');
+    return new Chart(ctx, cfg);
+  }
 
-    initChart('chartVisits', {
-      type:'bar',
-      data:{
-        labels:['4/01','4/05','4/10','4/15','4/20','4/25','4/30'],
-        datasets:[
-          { label:'일반진료', data:[30,40,50,45,60,55,50], backgroundColor:'#1cc88a' },
-          { label:'응급진료', data:[10,15,12,18,20,17,22], backgroundColor:'#36b9cc' }
-        ]
-      },
-      options:{ responsive:true }
-    });
+  let doctorChart, visitChart;
 
-    initChart('chartPurpose', {
-      type:'doughnut',
-      data:{
-        labels:['검진','치료','예방접종','상담','처방'],
-        datasets:[{ data:[35,25,15,20,5], backgroundColor:['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b'] }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false, aspectRatio:1,
-        radius:'80%', cutout:'60%',
-        plugins:{ legend:{ position:'right', labels:{ boxWidth:12,boxHeight:12,padding:8,usePointStyle:true,pointStyle:'rect' } } }
-      }
-    });
+  function loadDoctorChart(startDate, endDate) {
+    const url = `/api/statistics/doctor-visits-by-date?startDate=${startDate}&endDate=${endDate}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(d => d.doctorName);
+        const counts = data.map(d => d.visitCount);
+        if (doctorChart) doctorChart.destroy();
+        doctorChart = initChart('chartByDoctor', {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ label: '진료 건수', data: counts, backgroundColor: '#4e73df' }]
+          },
+          options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+      });
+  }
 
-    initChart('chartByDoctor', {
-      type:'bar',
-      data:{
-        labels:['김철수','이영희','박민수','최서연','장한솔'],
-        datasets:[{ data:[80,100,120,90,75], backgroundColor:'#4e73df' }]
-      },
-      options:{ responsive:true, plugins:{ legend:{display:false}} }
-    });
+  function loadVisitChart(startDate, endDate) {
+    const url = `/api/statistics/visit-daily?startDate=${startDate}&endDate=${endDate}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const labels = Object.keys(data);
+        const values = Object.values(data);
+        if (visitChart) visitChart.destroy();
+        visitChart = initChart('chartVisits', {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ label: '진료 건수', data: values, backgroundColor: '#1cc88a' }]
+          },
+          options: { responsive: true }
+        });
+      });
+  }
 
-    initChart('chartByInsurance', {
-      type:'pie',
-      data:{
-        labels:['건강보험','자가부담','의료급여'],
-        datasets:[{ data:[1041460,150000,174460], backgroundColor:['#4e73df','#36b9cc','#f6c23e'] }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false, aspectRatio:1,
-        radius:'80%', cutout:'60%',
-        plugins:{ legend:{ position:'right', labels:{ boxWidth:12,boxHeight:12,padding:8,usePointStyle:true,pointStyle:'rect' } } }
-      }
-    });
+  // ✅ 초기: 현재 달의 1일 ~ 말일 자동 설정
+  window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const first = new Date(today.getFullYear(), today.getMonth(), 1);
+    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    initChart('chartByRegion', {
-      type:'bar',
-      data:{
-        labels:['강남구','서초구','마포구','송파구','광진구'],
-        datasets:[{ data:[120,95,80,70,65], backgroundColor:'#1cc88a' }]
-      },
-      options:{ responsive:true, plugins:{ legend:{display:false}} }
-    });
+    const startDate = formatDateKST(first);
+    const endDate = formatDateKST(last);
 
-    initChart('chartPayments', {
-      type:'pie',
-      data:{
-        labels:['카드','현금','기타'],
-        datasets:[{ data:[85,15,4], backgroundColor:['#4e73df','#36b9cc','#f6c23e'] }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false, aspectRatio:1,
-        radius:'80%', cutout:'60%',
-        plugins:{ legend:{ position:'right', labels:{ boxWidth:12,boxHeight:12,padding:8,usePointStyle:true,pointStyle:'rect' } } }
-      }
-    });
+    loadDoctorChart(startDate, endDate);
+    loadVisitChart(startDate, endDate);
 
-    initChart('chartVisitSales', {
-      data:{
-        labels:['4/01','4/05','4/10','4/15','4/20','4/25','4/30'],
-        datasets:[
-          { type:'bar', label:'매출', data:[100,120,140,110,160,150,130], backgroundColor:'#4e73df' },
-          { type:'line', label:'진료횟수', data:[20,25,22,30,35,28,26], borderColor:'#e74a3b', fill:false, yAxisID:'y1' }
-        ]
-      },
-      options:{
-        responsive:true,
-        scales:{ y:{ beginAtZero:true, position:'left', title:{display:true,text:'매출(만원)'} },
-                 y1:{ beginAtZero:true, position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'진료횟수'} } },
-        plugins:{ legend:{position:'top'} }
-      }
-    });
+    document.getElementById('statsDate')._flatpickr.setDate([startDate, endDate]);
+  });
+  
+    // (예시용) 수납 현황 차트
+  initChart('chartPayments', {
+    type:'pie',
+    data:{
+      labels:['카드','현금','기타'],
+      datasets:[{ data:[85,15,4], backgroundColor:['#4e73df','#36b9cc','#f6c23e'] }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      aspectRatio:1,
+      radius:'80%',
+      cutout:'60%',
+      plugins:{ legend:{ position:'right', labels:{ boxWidth:12, boxHeight:12, padding:8, usePointStyle:true, pointStyle:'rect' } } }
+    }
+  });
 
-    initChart('chartByDisease', {
-      type:'bar',
-      data:{
-        labels:['A100','B200','C300','D400','E500','F600','G700','H800','I900','J1000'],
-        datasets:[{ data:[300,250,200,180,160,140,120,100,80,60], backgroundColor:'#4e73df' }]
-      },
-      options:{ indexAxis:'y', responsive:true, plugins:{ legend:{display:false}} }
-    });
+  // (예시용) 상병코드별 차트
+  initChart('chartByDisease', {
+    type:'bar',
+    data:{
+      labels:['A100','B200','C300','D400','E500','F600','G700','H800','I900','J1000'],
+      datasets:[{ data:[300,250,200,180,160,140,120,100,80,60], backgroundColor:'#4e73df' }]
+    },
+    options:{ indexAxis:'y', responsive:true, plugins:{ legend:{display:false} } }
+  });
 
-    // 5) 트렌드별 차트 설정 (모두 line)
-    const trendLabels = ['4/01','4/05','4/10','4/15','4/20','4/25','4/30'];
-    initChart('trendSales', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[{ label:'매출', data:[120,150,170,140,180,190,160], borderColor:'#4e73df', fill:false }]},
-      options:{ responsive:true }
-    });
-    initChart('trendVisits', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'일반진료', data:[30,40,50,45,60,55,50], borderColor:'#1cc88a', fill:false },
-        { label:'응급진료', data:[10,15,12,18,20,17,22], borderColor:'#36b9cc', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendPurpose', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'검진', data:[35,30,40,25,50,45,35], borderColor:'#4e73df', fill:false },
-        { label:'치료', data:[25,20,30,15,35,30,25], borderColor:'#1cc88a', fill:false },
-        { label:'예방접종', data:[15,10,20,8,25,20,15], borderColor:'#36b9cc', fill:false },
-        { label:'상담', data:[20,18,22,12,30,25,20], borderColor:'#f6c23e', fill:false },
-        { label:'처방', data:[5,4,8,3,10,8,5], borderColor:'#e74a3b', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendByDoctor', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'김철수', data:[80,85,90,95,100,105,110], borderColor:'#4e73df', fill:false },
-        { label:'이영희', data:[100,95,105,110,120,115,100], borderColor:'#1cc88a', fill:false },
-        { label:'박민수', data:[120,115,125,130,140,135,120], borderColor:'#36b9cc', fill:false },
-        { label:'최서연', data:[90,85,95,100,110,105,90], borderColor:'#f6c23e', fill:false },
-        { label:'장한솔', data:[75,70,80,85,90,85,75], borderColor:'#e74a3b', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendByInsurance', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'건강보험', data:[300,320,340,360,380,400,420], borderColor:'#4e73df', fill:false },
-        { label:'자가부담', data:[50,55,60,65,70,75,80], borderColor:'#36b9cc', fill:false },
-        { label:'의료급여', data:[30,35,40,45,50,55,60], borderColor:'#f6c23e', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendByRegion', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'강남구', data:[120,125,130,135,140,145,150], borderColor:'#4e73df', fill:false },
-        { label:'서초구', data:[95,100,105,110,115,120,125], borderColor:'#1cc88a', fill:false },
-        { label:'마포구', data:[80,85,90,95,100,105,110], borderColor:'#36b9cc', fill:false },
-        { label:'송파구', data:[70,75,80,85,90,95,100], borderColor:'#f6c23e', fill:false },
-        { label:'광진구', data:[65,70,75,80,85,90,95], borderColor:'#e74a3b', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendPayments', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'카드', data:[85,88,90,92,95,97,100], borderColor:'#4e73df', fill:false },
-        { label:'현금', data:[15,12,10,8,5,3,2], borderColor:'#36b9cc', fill:false },
-        { label:'기타', data:[4,5,6,7,8,9,10], borderColor:'#f6c23e', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendVisitSales', {
-      data:{ labels:trendLabels, datasets:[
-        { type:'bar', label:'매출', data:[100,120,140,110,160,150,130], backgroundColor:'#4e73df' },
-        { type:'line', label:'진료횟수', data:[20,25,22,30,35,28,26], borderColor:'#e74a3b', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
-    initChart('trendByDisease', {
-      type:'line',
-      data:{ labels:trendLabels, datasets:[
-        { label:'A100', data:[300,290,280,270,260,250,240], borderColor:'#4e73df', fill:false },
-        { label:'B200', data:[250,240,230,220,210,200,190], borderColor:'#1cc88a', fill:false },
-        { label:'C300', data:[200,190,180,170,160,150,140], borderColor:'#36b9cc', fill:false },
-        { label:'D400', data:[180,170,160,150,140,130,120], borderColor:'#f6c23e', fill:false },
-        { label:'E500', data:[160,150,140,130,120,110,100], borderColor:'#e74a3b', fill:false }
-      ]},
-      options:{ responsive:true }
-    });
+  function goToHome()        { location.href = '/home'; }
+  function goToTreatment()   { location.href = '/hospital/treatment'; }
+  function goToReservation() { location.href = '/hospital/reservation'; }
+  function goToChart()       { location.href = '/hospital/chart'; }
+  function goToStats()       { location.href = '/hospital/statistics'; }
+  function goToAdmission()   { location.href = '/hospital/admission'; }
+  function goLogout()        { location.href = '/logout'; }
+</script>
 
-    // 6) 네비게이션 함수
-    function goToHome()        { location.href = '/home'; }
-    function goToTreatment()   { location.href = '/hospital/treatment'; }
-    function goToReservation() { location.href = '/hospital/reservation'; }
-    function goToChart()       { location.href = '/hospital/chart'; }
-    function goToStats()       { location.href = '/hospital/statistics'; }
-    function goToAdmission()   { location.href = '/hospital/admission'; }
-  </script>
+
+
 </body>
 </html>

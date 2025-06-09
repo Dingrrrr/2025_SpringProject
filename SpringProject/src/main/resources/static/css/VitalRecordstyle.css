@@ -12,7 +12,7 @@
             height: 100vh;
         }
 
-        /* 사이드바 */
+        /* 사이드바 - 로그아웃을 맨 아래로 보내기 위한 수정 */
         .sidebar {
             width: 250px;
             background: white;
@@ -20,7 +20,9 @@
             border-right: 1px solid #ddd;
             display: flex;
             flex-direction: column;
-            padding: 20px 0;
+            padding: 20px 0 0 0; /* 👈 아래쪽 패딩 제거 */
+            /* 👇 핵심: 사이드바 전체 높이 사용 */
+            height: 100vh;
         }
 
         .profile {
@@ -55,6 +57,13 @@
             margin-right: 10px;
         }
 
+        /* 👇 핵심: 메뉴 컨테이너 추가 - 로그아웃을 제외한 메뉴들을 감싸는 컨테이너 */
+        .menu-container {
+            flex: 1; /* 남은 공간을 모두 차지 */
+            display: flex;
+            flex-direction: column;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -79,6 +88,17 @@
             background: #e3f2fd;
             color: #2196f3;
             border-right: 3px solid #2196f3;
+        }
+
+        /* 👇 핵심: 로그아웃 메뉴 항목 스타일 */
+        .menu-item.logout {
+            margin-top: auto; /* 자동으로 위쪽 여백을 최대화하여 맨 아래로 밀어냄 */
+            background-color: #fafafa; /* 살짝 다른 배경색으로 구분 */
+        }
+
+        .menu-item.logout:hover {
+            background-color: #ffebee; /* 로그아웃 호버 시 살짝 빨간 계열 */
+            color: #d32f2f;
         }
 
         .menu-icon {

@@ -42,8 +42,7 @@ public interface AdmissionRepository extends JpaRepository<Admission, Integer> {
            "JOIN FETCH a.patient " +
            "JOIN FETCH a.bed b " +
            "JOIN FETCH b.ward " +
-           "JOIN FETCH a.doctor " +
-           "WHERE a.dischargeAt IS NULL")
+           "JOIN FETCH a.doctor ")
     List<Admission> findAllWithDetails();
     
     
