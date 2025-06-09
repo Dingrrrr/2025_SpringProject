@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>진료 관리 화면</title>
@@ -12,94 +12,66 @@
 		<!-- 1) 사이드바 -->
 		<aside class="hospital-sidebar">
 			<h2 class="hospital-profile-title">
-				<img src="/icons/profile.jpg" alt="프로필"> <span>내 프로필</span>
+				<img th:src="@{/icons/profile.jpg}" alt="프로필"> <span
+					th:text="${displayName}">의사 이름</span>
 			</h2>
 			<ul class="hospital-menu">
+				<!-- 알림은 fetch로 부분 로딩 -->
 				<li onclick="loadAndToggleNotification()"><img
-					src="/icons/alert.png" alt=""> 알림</li>
-				<li onclick="goToHome()"><img src="/icons/home.png" alt="">
-					홈</li>
-				<li onclick="goToTreatment()"><img src="/icons/doctor.png"
-					alt="진료"> 진료</li>
-				<li onclick="goToReservation()"><img src="/icons/calendar.png"
-					alt="">예약</li>
-				<li onclick="goToChart()" class="active"><img
-					src="/icons/chart.png" alt="차트"><span>차트</span></li>
-				<li onclick="goToStats()"><img src="/icons/statistics.png"
-					alt="통계"><span>통계</span>
-				<li><img src="/icons/bed.png" alt=""> 입원</li>
+					th:src="@{/icons/alert.png}" alt=""> 알림</li>
+				<!-- 홈 -->
+				<li><a th:href="@{/hospital/hospital_home}"> <img
+						th:src="@{/icons/home.png}" alt=""> 홈
+				</a></li>
+				<!-- 진료 관리 -->
+				<li><a th:href="@{/hospital/treatment}"> <img
+						th:src="@{/icons/doctor.png}" alt=""> 진료
+				</a></li>
+				<!-- 예약 관리 -->
+				<li><a th:href="@{/hospital/reservation}"> <img
+						th:src="@{/icons/calendar.png}" alt=""> 예약
+				</a></li>
+				<!-- 차트 보기 -->
+				<li><a th:href="@{/hospital/chart}"> <img
+						th:src="@{/icons/chart.png}" alt=""> 차트
+				</a></li>
+				<!-- 통계 보기 -->
+				<li><a th:href="@{/hospital/statistics}"> <img
+						th:src="@{/icons/statistics.png}" alt=""> 통계
+				</a></li>
 			</ul>
 			<div class="sidebar-footer">
-				<button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
+				<button class="logout-btn" th:onclick="|location.href='@{/logout}'|">
+					로그아웃</button>
 			</div>
 		</aside>
 
 
 		<!-- 2) 환자 리스트 -->
 		<section class="patient-list">
-			<!-- (A) 검색창 -->
-			<div class="search">
-				<input type="text" placeholder="환자 검색" id="patient-search-input">
-			</div>
-
-			<!-- (A-1) 검색 결과 패널 -->
-			<div class="search-results" id="search-results"
-				style="display: none;">
-				<h4>환자 검색 결과</h4>
-				<ul>
-					<!-- 검색 후 JS 로 여기에 <li>를 채워 넣으시면 됩니다 -->
-					<li><strong>홍길동</strong> (여, 30세, 1995/05/12) — 보험: 건강보험</li>
-					<li><strong>김철수</strong> (남, 40세, 1980/02/20) — 보험: 자가부담</li>
-				</ul>
-			</div>
-
-			<!-- (B) 헤더 -->
-			<h3>환자 리스트</h3>
-			<div class="status-label">대기 / 진행 중</div>
-
-			<!-- (C) 방별 카드들 -->
-			<!-- 진료실1 -->
-			<details open class="room">
-				<summary>
-					진료실 1 <span class="count">3</span>
-				</summary>
-				<ul>
-					<li>전민규 (남,26세,2000/08/04) <span class="badge waiting">대기</span></li>
-					<li>홍길동 (여,30세,1995/05/12) <span class="badge waiting">대기</span></li>
-					<li>김철수 (남,40세,1980/02/20) <span class="badge waiting">대기</span></li>
-				</ul>
-			</details>
-
-			<!-- 진료실2 -->
-			<details open class="room">
-				<summary>
-					진료실 2 <span class="count">2</span>
-				</summary>
-				<ul>
-					<li>이화진 (남,26세,2000/10/10) <span class="badge in-progress">진행중</span></li>
-					<li>박민수 (여,35세,1985/07/15) <span class="badge in-progress">진행중</span></li>
-				</ul>
-			</details>
-
-			<!-- 수납실 -->
-			<details open class="room">
-				<summary>
-					수납실 <span class="count">1</span>
-				</summary>
-				<ul>
-					<li>최서연 (여,28세,1997/11/23) <span class="badge waiting">대기</span></li>
-				</ul>
-			</details>
-
-			<!-- 접수실 -->
-			<details open class="room">
-				<summary>
-					접수실 <span class="count">1</span>
-				</summary>
-				<ul>
-					<li>장하늘 (남,50세,1973/04/08) <span class="badge waiting">대기</span></li>
-				</ul>
-			</details>
+		  <h3>환자 리스트</h3>
+		  <div class="status-label">대기 / 진행 중</div>
+		
+		  <!--  rooms 순회 -->
+		  <div th:each="room : ${rooms}">
+		    <details open class="room">
+		      <summary>
+		        <span th:text="${room}">진료실1</span>
+		        <!-- 컨트롤러에서 계산해 준 값 -->
+		        <span class="count" th:text="${countByRoom[room]}">0</span>
+		      </summary>
+		      <ul>
+		        <li th:each="a : ${waitingByRoom[room]}">
+		          <span th:text="${a.patient.patientName}">환자명</span>
+		          <span class="badge waiting">대기</span>
+		        </li>
+		        <li th:each="a : ${inProgressByRoom[room]}">
+		          <span th:text="${a.patient.patientName}">환자명</span>
+		          <span class="badge in-progress">진행중</span>
+		        </li>
+		      </ul>
+		    </details>
+		  </div>
 		</section>
 
 		<!-- 3) 내원 이력 -->
@@ -181,37 +153,38 @@
 
 				<!-- 검색창 ⬆️ 위로 이동 -->
 				<div class="prescription-search">
-					<input type="text" id="orderSearchInput" placeholder="오더 검색(ctrl+↑)">
-					<div id="suggestions" class="suggestion-box"></div> <!-- 비워두기! -->
+					<input type="text" id="orderSearchInput"
+						placeholder="오더 검색(ctrl+↑)">
+					<div id="suggestions" class="suggestion-box"></div>
+					<!-- 비워두기! -->
 
-				<!-- 진단명 목록 ⬇️ 아래로 -->
-				<div class="diagnosis-list" id="diagnosisList">
-					<div class="diagnosis-items"></div>
+					<!-- 진단명 목록 ⬇️ 아래로 -->
+					<div class="diagnosis-list" id="diagnosisList">
+						<div class="diagnosis-items"></div>
+					</div>
+
+					<!-- 약품 테이블 -->
+					<table class="prescription-table" id="prescriptionTable">
+						<thead>
+							<tr>
+								<th>약품명</th>
+								<th>용법/용량</th>
+								<th>수량</th>
+								<th>비고</th>
+							</tr>
+						</thead>
+						<tbody id="prescriptionTbody">
+							<!-- JS로 삽입 -->
+						</tbody>
+					</table>
+
+					<!-- 버튼 -->
+					<div class="prescription-action">
+						<button id="manualAddBtn" class="add-prescription-btn">+
+							수기처방 추가</button>
+						<button class="send-btn">보내기 ▶</button>
+					</div>
 				</div>
-
-				<!-- 약품 테이블 -->
-				<table class="prescription-table" id="prescriptionTable">
-					<thead>
-						<tr>
-							<th>약품명</th>
-							<th>용법/용량</th>
-							<th>수량</th>
-							<th>비고</th>
-						</tr>
-					</thead>
-					<tbody id="prescriptionTbody">
-						<!-- JS로 삽입 -->
-					</tbody>
-				</table>
-
-				<!-- 버튼 -->
-				<div class="prescription-action">
-					<button id="manualAddBtn" class="add-prescription-btn">+
-						수기처방 추가</button>
-					<button class="send-btn">보내기 ▶</button>
-				</div>
-			</div>
-
 		</section>
 		<!-- 5) 환자 기록 메모 -->
 		<aside class="col patient-record">
@@ -221,8 +194,7 @@
 				<li><span class="tag yellow">김승환</span>
 					<div class="record-time">09:03 AM</div>
 					<div class="record-msg">
-						발열증상 있으나 귀찮, 가족력: 당뇨 있음<br>
-						<small>기록자: 간호사 박은하</small>
+						발열증상 있으나 귀찮, 가족력: 당뇨 있음<br> <small>기록자: 간호사 박은하</small>
 					</div></li>
 				<li><span class="tag pink">이은솔</span>
 					<div class="record-time">09:05 AM</div>
@@ -239,7 +211,7 @@
 		</aside>
 
 	</div>
-<script>
+	<script>
   function goToHome()        { location.href = '/home'; }
   function goToChart()       { location.href = '/hospital/chart'; }
   function goToReservation() { location.href = '/hospital/reservation'; }
@@ -387,9 +359,6 @@
     }
   });
 </script>
-
-
-
 
 </body>
 </html>

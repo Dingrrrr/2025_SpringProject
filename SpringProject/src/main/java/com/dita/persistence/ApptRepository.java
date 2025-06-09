@@ -9,11 +9,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.dita.domain.Appt;
 import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
+import com.dita.domain.Status;
 
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
-    List<Appt> findByStatus(Appt status);
+    List<Appt> findByStatus(Status status);
     List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
+    List<Appt> findAllByStatusAndPatient_PatientTypeIn(Status status, List<PatientType> types);
+    List<Appt> findAllByStatusAndPatient_PatientType(Status status, PatientType patientType);
+    
     Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
 
     // ✅ 진료 상태별

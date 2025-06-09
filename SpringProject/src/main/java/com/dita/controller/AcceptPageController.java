@@ -242,7 +242,9 @@ public class AcceptPageController {
 		    appt.getPatient().setPatientName(dto.getName());
 		    appt.getPatient().setPatientPhone(dto.getPhone());
 		    appt.getPatient().setPatientSymptom(dto.getDisease());
-
+		    if (dto.getStatus() != null) {
+		        appt.setStatus(dto.getStatus());
+		    }
 		    apptRepository.save(appt);
 
 		    return "수정 완료";
@@ -288,9 +290,9 @@ public class AcceptPageController {
 	            dto.setRoom(appt.getRoom());
 	            dto.setDisease(appt.getPatient().getPatientSymptom());
 	            dto.setDoctor(appt.getDoctor().getUsersName());
+	            dto.setStatus(appt.getStatus());
 	            return dto;
 	        }).collect(Collectors.toList());
-
 	        return ResponseEntity.ok(dtoList);
 	    }
 

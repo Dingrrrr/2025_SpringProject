@@ -54,26 +54,43 @@ public class LoginPageController {
 	}
 	
 	@PostMapping("/Login")
-	public String processLogin(HttpServletRequest request, @RequestParam String usersId, @RequestParam String usersPwd, Model model) {
-		Optional<User> opt = repo.findById(usersId);
-		if (opt.isEmpty()) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		User user = opt.get();
-		if(!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
-			return "redirect:/Login/Login?error";
-		}
-		
-		if(!user.getGrade().equals(Grade.간호사)) {
-			model.addAttribute("loginError", "간호사만 접근 가능합니다.");
-            return "Login/Login";
-		}
-		
-		HttpSession session = request.getSession(true);
-		session.setAttribute("loginUser", user);
-		
-		return "redirect:/nurse/NurseHome";
+	public String processLogin(
+	        HttpServletRequest request,
+	        @RequestParam String usersId,
+	        @RequestParam String usersPwd,
+	        Model model) {
+
+	    // 1) 아이디 존재 확인
+	    Optional<User> opt = repo.findById(usersId);
+	    if (opt.isEmpty()) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    User user = opt.get();
+
+	    // 2) 비밀번호 확인
+	    if (!passwordEncoder.matches(usersPwd, user.getUsersPwd())) {
+	        return "redirect:/Login/Login?error";
+	    }
+
+	    // 3) 세션에 로그인 사용자 저장
+	    HttpSession session = request.getSession(true);
+	    session.setAttribute("loginUser", user);
+
+	    // 4) 등급별 분기
+	    if (Grade.의사.equals(user.getGrade())) {
+	        // 의사면 병원 대시보드로
+	        return "redirect:/hospital/hospital_home";
+	    } 
+	    else if (Grade.간호사.equals(user.getGrade())) {
+	        // 간호사면 간호사 홈으로
+	        return "redirect:/nurse/NurseHome";
+	    } 
+	    else {
+	        // 그 외 등급은 접근 불가
+	        model.addAttribute("loginError", "권한이 없습니다.");
+	        return "Login/Login";
+	    }
 	}
 	
 	@GetMapping("/Logout")

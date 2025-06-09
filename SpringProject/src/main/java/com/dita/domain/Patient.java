@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,12 +55,20 @@ public class Patient {
 	@Column(name = "patient_type")
 	private PatientType patientType;// 입원여부 판단, 환자 상태: 외래, 입원대기, 입원중, 퇴원
 	
+	@Transient
 	public int getAge() {
-	    if (this.patientBirth == null || this.patientBirth.isEmpty()) return 0;
-
+	    if (patientBirth == null || patientBirth.length() < 6) return 0;
 	    try {
-	        LocalDate birthDate = LocalDate.parse(this.patientBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-	        return Period.between(birthDate, LocalDate.now()).getYears(); // <- 이게 만 나이
+	        // 앞 6자리는 yyMMdd
+	        String yyMMdd = patientBirth.substring(0,6);
+	        // RRN 두 번째 숫자(7번째 문자)로 세기(1/2→19xx, 3/4→20xx) 구분
+	        char centuryCode = patientBirth.charAt(7);
+	        int century = (centuryCode=='1'||centuryCode=='2') ? 1900 : 2000;
+	        DateTimeFormatter f = DateTimeFormatter.ofPattern("yyMMdd");
+	        LocalDate d = LocalDate.parse(yyMMdd, f).withYear(
+	            century + Integer.parseInt(yyMMdd.substring(0,2))
+	        );
+	        return Period.between(d, LocalDate.now()).getYears();
 	    } catch (Exception e) {
 	        return 0;
 	    }
