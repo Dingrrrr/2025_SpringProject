@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +36,7 @@ public class Med_rec {
 	
 	@ManyToOne
 	@JoinColumn(name = "appt_id", nullable = false)
-	private Appt ApptId; // 예약 아이디
+	private Appt apptId; // 예약 아이디
 	
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
@@ -47,11 +49,16 @@ public class Med_rec {
 	@Column(name = "chief_complaint")
 	private String chiefComplaint;// 증상
 	
-	@Column(name = "diagnosis")
-	private String diagnosis;// 진단명
+	@OneToOne
+	@JoinColumn(name = "id", nullable = false)
+	private Disease Id;
 	
 	@Column(name = "notes")
 	private String notes;// 추가 메모
+	
+	@ManyToOne
+	@JoinColumn(name = "drug_id", nullable = false)
+	private Drug drugId;
 	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
