@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.has-submenu').forEach(mi =>
     mi.addEventListener('click', () => toggleSubMenu(mi))
   );
-
+window.toggleSubMenu = toggleSubMenu;
   // ──────────────────────────────────────────────────────────────────────────────
   // 2) 예약 등록 모달 열기/닫기
   document.querySelector('.register-btn-fixed')
@@ -515,6 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.tab').forEach(tab =>
     tab.addEventListener('click', ()=>showTab(tab.textContent.toLowerCase()))
   );
+	  window.showTab = showTab;
 
   // 날짜 이동
   let currentDateObj = new Date();
@@ -603,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 초기 로드
   updateDateDisplay();
   loadAppointmentsByDate(formatLocalDate(new Date()));
-  
+    window.closeModal = closeModal;
 });
   
 	function formatLocalDate(date) {
@@ -613,6 +614,73 @@ document.addEventListener('DOMContentLoaded', function() {
 	  return `${yyyy}-${mm}-${dd}`;
 	}
 
+// ─────────────────────────────────────────────────────────────
+// 8) 환자 자동완성 (이름 입력 시 DB에서 검색)
+const patientNameInput = document.getElementById("patientNameInput");
+if (patientNameInput) {
+  patientNameInput.addEventListener("input", function () {
+    const name = this.value.trim();
+    if (name === "") return;
+
+    fetch(`/acceptance/searchPatientsByName?name=${encodeURIComponent(name)}`)
+      .then(res => res.json())
+      .then(list => {
+        const datalist = document.getElementById("patientList");
+        datalist.innerHTML = "";
+        list.forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = `${p.name} (${p.rrn})`;
+          opt.dataset.name = p.name;
+          opt.dataset.rrn = p.rrn;
+          opt.dataset.gender = p.gender;
+          opt.dataset.phone = p.phone;
+          datalist.appendChild(opt);
+        });
+      });
+  });
+
+  patientNameInput.addEventListener("change", function () {
+    const inputVal = this.value.trim();
+    const rrnMatch = inputVal.match(/\(([^)]+)\)/); // 괄호 안 주민번호 추출
+    const rrnOnly = rrnMatch ? rrnMatch[1] : null;
+
+    const options = document.querySelectorAll('#patientList option');
+    for (const opt of options) {
+      if (opt.dataset.rrn === rrnOnly) {
+        this.value = opt.dataset.name;
+        document.querySelector('select[name="gender"]').value = opt.dataset.gender || "";
+        document.querySelector('input[name="rrn"]').value = opt.dataset.rrn || "";
+        document.querySelector('input[name="phone"]').value = opt.dataset.phone || "";
+        break;
+      }
+    }
+  });
+}
+
+  // ──────────────────────────────────────────────────────────────────────────────
+  // 9	) 의사 목록 불러오기
+  const doctorSelect = document.getElementById("doctorSelect");
+  if (doctorSelect) {
+    fetch("/acceptance/api/doctors")
+      .then(res => {
+        if (!res.ok) throw new Error("서버 오류: " + res.status);
+        return res.json();
+      })
+      .then(doctors => {
+        if (!Array.isArray(doctors)) throw new Error("데이터 형식 오류");
+        doctors.forEach(doc => {
+          const option = document.createElement("option");
+          option.value = doc.usersId;
+          option.textContent = doc.usersName;
+          doctorSelect.appendChild(option);
+        });
+      })
+      .catch(err => {
+        console.error("의사 목록 로딩 실패:", err);
+        alert("의사 목록을 불러오는 데 실패했습니다.");
+      });
+  }
 </script>
+
 </body>
 </html>

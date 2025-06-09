@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang = "ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,10 +75,9 @@
        <!-- 진료실 1 -->
   <div class="room-box">
     <div class="doctor-header">
-      <img src="/images/IMG_2487.jpg" class="doctor-photo" alt="의사사진">
       <div>
         <h3>진료실 1</h3>
-        <p>전민규 <small>내과 전문의</small></p>
+
       </div>
     </div>
     <div class="divider-row">
@@ -87,25 +86,21 @@
     </div>
     <div class="patient-area">
       <div class="left">
-        <p class="waiting-label">대기자</p>
-        <p class="waiting-count">50명</p>
+		<p class="waiting-count" th:text="${room1Appts.size()} + '명'">50명</p>
       </div>
-      <ul class="right">
-        <li>1. 임순혁님</li>
-        <li>2. 오기한님</li>
-        <li>3. 도화연님</li>
-        <li>4. 임재한님</li>
-      </ul>
+		<ul class="right">
+			<li th:each="appt, stat : ${room1Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+
+		</ul>
+
     </div>
   </div>
 
   <!-- 진료실 2 -->
   <div class="room-box">
     <div class="doctor-header">
-      <img src="/images/IMG_2487.jpg" class="doctor-photo" alt="의사사진">
       <div>
         <h3>진료실 2</h3>
-        <p>이화진 <small>내과 전문의</small></p>
       </div>
     </div>
     <div class="divider-row">
@@ -114,25 +109,21 @@
     </div>
     <div class="patient-area">
       <div class="left">
-        <p class="waiting-label">대기자</p>
-        <p class="waiting-count">30명</p>
+		<p class="waiting-count" th:text="${room2Appts.size()} + '명'">50명</p>
       </div>
-      <ul class="right">
-        <li>1. 김한일님</li>
-        <li>2. 한수한님</li>
-        <li>3. 김이한님</li>
-        <li>4. 우사한님</li>
-      </ul>
+		<ul class="right">
+			<li th:each="appt, stat : ${room2Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+
+		</ul>
+
     </div>
   </div>
 
   <!-- 진료실 3 -->
   <div class="room-box">
     <div class="doctor-header">
-      <img src="/images/photo_1737695158.jpg" class="doctor-photo" alt="의사사진">
       <div>
         <h3>진료실 3</h3>
-        <p>오진우 <small>내과 전문의</small></p>
       </div>
     </div>
     <div class="divider-row">
@@ -141,25 +132,20 @@
     </div>
     <div class="patient-area">
       <div class="left">
-        <p class="waiting-label">대기자</p>
-        <p class="waiting-count">36명</p>
+		<p class="waiting-count" th:text="${room3Appts.size()} + '명'">50명</p>
       </div>
-      <ul class="right">
-        <li>1. 김애령님</li>
-        <li>2. 우가한님</li>
-        <li>3. 오지한님</li>
-        <li>4. 김이해님</li>
-      </ul>
+		<ul class="right">
+			<li th:each="appt, stat : ${room3Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+		</ul>
     </div>
   </div>
 
   <!-- 진료실 4 -->
   <div class="room-box">
     <div class="doctor-header">
-      <img src="/images/doctor4.png" class="doctor-photo" alt="의사사진">
       <div>
         <h3>진료실 4</h3>
-        <p>박성민 <small>내과 전문의</small></p>
+
       </div>
     </div>
     <div class="divider-row">
@@ -168,15 +154,12 @@
     </div>
     <div class="patient-area">
       <div class="left">
-        <p class="waiting-label">대기자</p>
-        <p class="waiting-count">45명</p>
+		<p class="waiting-count" th:text="${room4Appts.size()} + '명'">50명</p>
       </div>
-      <ul class="right">
-        <li>1. 이지훈님</li>
-        <li>2. 정우진님</li>
-        <li>3. 윤서진님</li>
-        <li>4. 한지민님</li>
-      </ul>
+	<ul class="right">
+			<li th:each="appt, stat : ${room4Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+
+	</ul>
     </div>
   </div>
 
