@@ -213,14 +213,14 @@
       <label>진료실</label>
       <select name="room" required>
         <option value="">선택</option>
-        <option>진료실1</option>
-        <option>진료실2</option>
-        <option>진료실3</option>
-        <option>진료실4</option>
+        <option value="진료실1">진료실1</option>
+        <option value="진료실2">진료실2</option>
+        <option value="진료실3">진료실3</option>
+        <option value="진료실4">진료실4</option>
       </select>
       
       <label>병명</label>
-		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required> 
+		<input type="text" name="disease" placeholder="예: 감기, 위염 등" required>
 	
 	<label for="doctorSelect">담당 의사</label>
 	<select id="doctorSelect" name="doctor" required>
@@ -267,7 +267,14 @@
 
       <label>병명</label>
       <input type="text" name="editDisease" required>
-
+	  
+	  <label>예약 상황</label>
+	  <select name="status" required>
+		<option value="">선택</option>
+		<option value="대기">대기</option>
+		<option value="확정">확정</option>
+	  </select>
+	  
       <label>담당 의사</label>
       <input type="text" name="editDoctor" required>
 
@@ -296,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.has-submenu').forEach(mi =>
     mi.addEventListener('click', () => toggleSubMenu(mi))
   );
-
+window.toggleSubMenu = toggleSubMenu;
   // ──────────────────────────────────────────────────────────────────────────────
   // 2) 예약 등록 모달 열기/닫기
   document.querySelector('.register-btn-fixed')
@@ -508,8 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.tab').forEach(tab =>
     tab.addEventListener('click', ()=>showTab(tab.textContent.toLowerCase()))
   );
-  
-   window.showTab = showTab;
+	  window.showTab = showTab;
 
   // 날짜 이동
   let currentDateObj = new Date();
@@ -598,8 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 초기 로드
   updateDateDisplay();
   loadAppointmentsByDate(formatLocalDate(new Date()));
-  
-  window.closeModal = closeModal;
+    window.closeModal = closeModal;
 });
   
 	function formatLocalDate(date) {
@@ -608,7 +613,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	  const dd   = String(date.getDate()).padStart(2,'0');
 	  return `${yyyy}-${mm}-${dd}`;
 	}
-	// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
 // 8) 환자 자동완성 (이름 입력 시 DB에서 검색)
 const patientNameInput = document.getElementById("patientNameInput");
 if (patientNameInput) {
@@ -652,7 +658,7 @@ if (patientNameInput) {
 }
 
   // ──────────────────────────────────────────────────────────────────────────────
-  // 9) 의사 목록 불러오기
+  // 9	) 의사 목록 불러오기
   const doctorSelect = document.getElementById("doctorSelect");
   if (doctorSelect) {
     fetch("/acceptance/api/doctors")
@@ -674,9 +680,7 @@ if (patientNameInput) {
         alert("의사 목록을 불러오는 데 실패했습니다.");
       });
   }
-
 </script>
-
 
 </body>
 </html>

@@ -1,6 +1,5 @@
 package com.dita.persistence;
 
-import java.io.ObjectInputFilter.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,18 +7,22 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.repository.query.Param;
 
 import com.dita.domain.Appt;
 
 import com.dita.domain.Patient;
+import com.dita.domain.PatientType;
+import com.dita.domain.Status;
 
 
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
 	List<Appt> findByStatus(Status status);
+	List<Appt> findAllByStatusAndPatient_PatientTypeIn(Status status, List<PatientType> types);
 	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
 	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
+	
 	
 	@Query("SELECT a.status, COUNT(a) FROM Appt a GROUP BY a.status")
 	List<Object[]> countByStatus();
@@ -38,6 +41,15 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	       "GROUP BY FUNCTION('DATE_FORMAT', a.scheduledAt, '%m/%d') " +
     	       "ORDER BY FUNCTION('DATE_FORMAT', a.scheduledAt, '%m/%d')")
     List<Object[]> countWeeklyOutpatients(LocalDateTime startDate);
+    
+    @Query("SELECT a FROM Appt a JOIN FETCH a.patient WHERE a.room = :room AND a.scheduledAt BETWEEN :start AND :end ORDER BY a.scheduledAt ASC")
+    List<Appt> findByRoomAndScheduledAtToday(@Param("room") String room,
+                                             @Param("start") LocalDateTime start,
+                                             @Param("end") LocalDateTime end);
+    @Query("SELECT a FROM Appt a JOIN FETCH a.patient")
+    List<Appt> findAllWithPatient();
+
+
 
     // ✅ 연령대 통계
     @Query(value = """
@@ -62,4 +74,3 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	// ✅ 환자의 모든 예약 삭제
         void deleteAllByPatient(Patient patient);
 }
-

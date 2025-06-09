@@ -104,7 +104,7 @@
   font-weight: bold;
 }
 .waiting-count {
-  margin-left: auto;
+  margin-left: 30px;
   font-size: 0.9rem;
   color: #666;
 }

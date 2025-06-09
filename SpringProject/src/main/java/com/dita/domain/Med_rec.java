@@ -30,7 +30,11 @@ public class Med_rec {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "record_id", nullable = false)
-	private int recordId;//진료기록 아이디
+	private Integer recordId;//진료기록 아이디
+	
+	@ManyToOne
+	@JoinColumn(name = "appt_id", nullable = false)
+	private Appt ApptId; // 예약 아이디
 	
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
