@@ -1,5 +1,7 @@
 package com.dita.persistence;
 
+import java.io.ObjectInputFilter.Status;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -7,19 +9,31 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+
 import com.dita.domain.Appt;
+
 import com.dita.domain.Patient;
 import com.dita.domain.PatientType;
 import com.dita.domain.Status;
 
+
 public interface ApptRepository extends JpaRepository<Appt, Integer> {
 
+<<<<<<< HEAD
     List<Appt> findByStatus(Status status);
     List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
     List<Appt> findAllByStatusAndPatient_PatientTypeIn(Status status, List<PatientType> types);
     List<Appt> findAllByStatusAndPatient_PatientType(Status status, PatientType patientType);
     
     Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
+=======
+	List<Appt> findByStatus(Status status);
+	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
+	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
+	
+	@Query("SELECT a.status, COUNT(a) FROM Appt a GROUP BY a.status")
+	List<Object[]> countByStatus();
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 
     // ✅ 진료 상태별
     @Query("SELECT a.status, COUNT(a) FROM Appt a WHERE DATE(a.scheduledAt) = CURRENT_DATE GROUP BY a.status")
@@ -59,3 +73,4 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	// ✅ 환자의 모든 예약 삭제
         void deleteAllByPatient(Patient patient);
 }
+

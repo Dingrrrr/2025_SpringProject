@@ -17,11 +17,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.dita.domain.Appt;
+<<<<<<< HEAD
 import com.dita.domain.Grade;
 import com.dita.domain.PatientType;
 import com.dita.domain.Status;
+=======
+
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 import com.dita.domain.User;
 import com.dita.persistence.ApptRepository;
+import com.dita.service.NotifService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.java.Log;
@@ -30,6 +36,17 @@ import lombok.extern.java.Log;
 @Log
 @RequestMapping("/hospital")
 public class HospitalPageController {
+<<<<<<< HEAD
+=======
+	
+    private final NotifService notifService;
+	private final ApptRepository ApptRepository;
+	
+	public HospitalPageController(ApptRepository apptRepository, NotifService notifService) {
+        this.ApptRepository = apptRepository;
+        this.notifService = notifService;
+	}
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 
     private final ApptRepository apptRepository;
 
@@ -53,12 +70,35 @@ public class HospitalPageController {
         return "hospital/hospital_home";
     }
 
+<<<<<<< HEAD
     /** ── 알림 ──
      * GET /hospital/notification → templates/hospital/notification.html
      */
     @GetMapping("/notification")
     public String getTodayNotifications(HttpSession session, Model model) {
         // (원한다면 세션·등급 체크 추가)
+=======
+    // ── /hospital 이하 매핑 ──
+
+    @GetMapping("/hospital/home")
+    public String showDashboard(HttpSession session, Model model) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/Login/Login"; // 로그인 안했으면 로그인으로
+        }
+        model.addAttribute("displayName", loginUser.getUsersName()); // ✅ 이름 넘기기
+        return "hospital/home";
+    }
+
+
+    @GetMapping("/hospital/hospital_home")
+    public String showhospital_homePage() {
+    	return "/hospital/hospital_home";
+    }
+    
+    @GetMapping("/hospital/notification")
+    public String getTodayNotifications(Model model) {
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.atTime(23, 59, 59);
@@ -111,6 +151,7 @@ public class HospitalPageController {
         return "hospital/treatment";
     }
 
+<<<<<<< HEAD
     /** ── 차트 ── GET /hospital/chart → chart.html */
     @GetMapping("/chart")
     public String showChartPage(HttpSession session, Model model) {
@@ -159,9 +200,15 @@ public class HospitalPageController {
         model.addAttribute("waitingByRoom", waitingByRoom);
         model.addAttribute("inProgressByRoom", inProgressByRoom);
 
+=======
+    @GetMapping("/hospital/chart")
+    public String showChartPage(Model model) throws JsonProcessingException {
+       
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
         return "hospital/chart";
     }
 
+<<<<<<< HEAD
     /** ── 통계 ── GET /hospital/statistics → statistics.html */
     @GetMapping("/statistics")
     public String showStatisticsPage(HttpSession session, Model model) {
@@ -173,6 +220,13 @@ public class HospitalPageController {
             return "redirect:/Login/Login?error=not_doctor";
         }
         model.addAttribute("displayName", loginUser.getUsersName());
+=======
+
+    @GetMapping("/hospital/statistics")
+    public String showStatisticsPage() {
+        // templates/hospital/statistics.html
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
         return "hospital/statistics";
     }
+    
 }

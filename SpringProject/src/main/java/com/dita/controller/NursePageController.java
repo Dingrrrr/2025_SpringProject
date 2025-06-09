@@ -1,15 +1,11 @@
 package com.dita.controller;
 
-
 import java.security.Principal;
-
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dita.persistence.NurseChartRepository;
-import com.dita.persistence.UserRepository;
-import com.dita.service.NotifService;
-import com.dita.vo.ChartSaveRequestDto;
-
 import com.dita.domain.Grade;
-import com.dita.domain.Notif;
 import com.dita.domain.User;
 import com.dita.persistence.LoginPageRepository;
+import com.dita.persistence.UserRepository;
+import com.dita.service.NotifService;
+import com.dita.service.NurseChartService;
+import com.dita.vo.ChartSaveRequestDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -43,9 +37,7 @@ public class NursePageController {
 	private final NotifService notifService;
 	private final LoginPageRepository repo;
 	private final UserRepository userRepository;
-
-    @Autowired
-    private NurseChartRepository nurseChartRepository;
+	private final NurseChartService nurseChartService; // Repository 대신 Service 주입
 
     @GetMapping("/NurseChart")
     public String showNurseChartPage(HttpServletRequest request, Model model) {
@@ -98,13 +90,17 @@ public class NursePageController {
         return "nurse/MedicationRecord";
     }
 
-    // 입원 환자 목록 API
+    // ============= API 엔드포인트들 (Service 사용으로 변경) =============
+    
+    /**
+     * 입원 환자 목록 API
+     */
     @GetMapping("/api/patients/inpatients")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getInpatients() {
         try {
             log.info("입원 환자 목록 요청");
-            List<Map<String, Object>> inpatients = nurseChartRepository.getInpatients();
+            List<Map<String, Object>> inpatients = nurseChartService.getInpatients();
             log.info("입원 환자 " + inpatients.size() + "명 조회 완료");
             return ResponseEntity.ok(inpatients);
         } catch (Exception e) {
@@ -112,13 +108,16 @@ public class NursePageController {
             return ResponseEntity.status(500).build();
         }
     }
-    // 특정 환자의 차트 목록 API 추가
+    
+    /**
+     * 특정 환자의 차트 목록 API
+     */
     @GetMapping("/api/charts/patient/{patientId}")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getPatientCharts(@PathVariable int patientId) {
         try {
             log.info("환자 " + patientId + "의 차트 목록 요청");
-            List<Map<String, Object>> charts = nurseChartRepository.getPatientCharts(patientId);
+            List<Map<String, Object>> charts = nurseChartService.getPatientCharts(patientId);
             log.info("환자 " + patientId + "의 차트 " + charts.size() + "개 조회 완료");
             return ResponseEntity.ok(charts);
         } catch (Exception e) {
@@ -126,14 +125,17 @@ public class NursePageController {
             return ResponseEntity.status(500).build();
         }
     }
-    // 차트 저장 API 추가
+    
+    /**
+     * 차트 저장 API
+     */
     @PostMapping("/api/charts/save")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> saveChart(@RequestBody ChartSaveRequestDto request) {
         try {
             log.info("차트 저장 요청 - 환자ID: " + request.getPatientId());
             
-            int savedCount = nurseChartRepository.saveVitalSigns(request);
+            int savedCount = nurseChartService.saveVitalSigns(request);
             
             Map<String, Object> response = Map.of(
                 "success", true,
@@ -154,12 +156,16 @@ public class NursePageController {
         }
     }
     
- // 특정 날짜의 차트 상세 조회 API
+    /**
+     * 특정 날짜의 차트 상세 조회 API
+     */
     @GetMapping("/api/charts/detail/{patientId}/{recordedDate}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getChartDetail(@PathVariable int patientId, @PathVariable String recordedDate) {
+    public ResponseEntity<Map<String, Object>> getChartDetail(@PathVariable int patientId, 
+                                                             @PathVariable String recordedDate) {
         try {
-            Map<String, Object> chartDetail = nurseChartRepository.getChartDetail(patientId, recordedDate);
+            log.info("차트 상세 조회 요청 - 환자ID: " + patientId + ", 날짜: " + recordedDate);
+            Map<String, Object> chartDetail = nurseChartService.getChartDetail(patientId, recordedDate);
             return ResponseEntity.ok(chartDetail);
         } catch (Exception e) {
             log.severe("차트 상세 조회 실패: " + e.getMessage());
@@ -167,53 +173,56 @@ public class NursePageController {
         }
     }
     
+    /**
+     * 환자의 최신 바이탈 사인 조회 API
+     */
+    @GetMapping("/api/vitals/latest/{patientId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getLatestVitals(@PathVariable int patientId) {
+        try {
+            log.info("환자 " + patientId + "의 최신 바이탈 사인 요청");
+            Map<String, Object> latestVital = nurseChartService.getLatestVitalSigns(patientId);
+            return ResponseEntity.ok(latestVital);
+        } catch (Exception e) {
+            log.severe("최신 바이탈 사인 조회 실패: " + e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * 환자의 바이탈 차트 데이터 조회 API
+     */
+    @GetMapping("/api/vitals/chart-data/{patientId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getVitalChartData(@PathVariable int patientId) {
+        try {
+            log.info("환자 " + patientId + "의 차트 데이터 요청");
+            Map<String, Object> chartData = nurseChartService.getVitalChartData(patientId);
+            return ResponseEntity.ok(chartData);
+        } catch (Exception e) {
+            log.severe("바이탈 차트 데이터 조회 실패: " + e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
     
-	
-	@GetMapping("/NurseHome")
-	public String showNurseHome(HttpServletRequest request, Authentication authentication, Model model) {
-		
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return "redirect:/Login/Login";
-		}
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
-			return "redirect:/Login/Login";
-		}
-		
-		model.addAttribute("userName", loginUser.getUsersName());
+    /**
+     * 간호사 홈 페이지
+     */
+    @GetMapping("/NurseHome")
+    public String showNurseHome(HttpServletRequest request, Authentication authentication, Model model) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/Login/Login";
+        }
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+            return "redirect:/Login/Login";
+        }
+        
+        model.addAttribute("userName", loginUser.getUsersName());
         model.addAttribute("usersId", loginUser.getUsersId());
         model.addAttribute("grade", loginUser.getGrade().name());
-		
-		return "nurse/NurseHome";
-	}
-	
-	// NursePageController에 추가할 API들
-	@GetMapping("/api/vitals/latest/{patientId}")
-	@ResponseBody
-	public ResponseEntity<Map<String, Object>> getLatestVitals(@PathVariable int patientId) {
-	    try {
-	        log.info("환자 " + patientId + "의 최신 바이탈 사인 요청");
-	        Map<String, Object> latestVital = nurseChartRepository.getLatestVitalSigns(patientId);
-	        return ResponseEntity.ok(latestVital);
-	    } catch (Exception e) {
-	        log.severe("최신 바이탈 사인 조회 실패: " + e.getMessage());
-	        return ResponseEntity.status(500).build();
-	    }
-	}
-
-	@GetMapping("/api/vitals/chart-data/{patientId}")
-	@ResponseBody
-	public ResponseEntity<Map<String, Object>> getVitalChartData(@PathVariable int patientId) {
-	    try {
-	        log.info("환자 " + patientId + "의 차트 데이터 요청");
-	        Map<String, Object> chartData = nurseChartRepository.getVitalChartData(patientId);
-	        return ResponseEntity.ok(chartData);
-	    } catch (Exception e) {
-	        log.severe("바이탈 차트 데이터 조회 실패: " + e.getMessage());
-	        return ResponseEntity.status(500).build();
-	    }
-	}
-
-	
+        
+        return "nurse/NurseHome";
+    }
 }

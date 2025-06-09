@@ -49,6 +49,7 @@
 
 		<!-- 2) 환자 리스트 -->
 		<section class="patient-list">
+<<<<<<< HEAD
 		  <h3>환자 리스트</h3>
 		  <div class="status-label">대기 / 진행 중</div>
 		
@@ -72,6 +73,53 @@
 		      </ul>
 		    </details>
 		  </div>
+=======
+			<!-- (A) 검색창 -->
+			<div class="search">
+				<input type="text" placeholder="환자 검색" id="patient-search-input">
+			</div>
+
+			<!-- (A-1) 검색 결과 패널 -->
+			<div class="search-results" id="search-results"
+				style="display: none;">
+				<h4>환자 검색 결과</h4>
+				
+			</div>
+
+			<!-- (B) 헤더 -->
+			<h3>환자 리스트</h3>
+			<div class="status-label">대기 / 진행 중</div>
+
+			<!-- (C) 방별 카드들 -->
+			<!-- 진료실1 -->
+			<details open class="room">
+				<summary>
+					진료실 1 <span class="count">3</span><!-- 카운트 되게 만들기 -->
+				</summary>
+				
+			</details>
+
+			<!-- 진료실2 -->
+			<details open class="room">
+				<summary>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
+				</summary>
+			</details>
+			
+			<!-- 진료실3 -->
+			<details open class="room">
+				<summary>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
+				</summary>
+			</details>
+			
+			<!-- 진료실4 -->
+			<details open class="room">
+				<summary>
+					진료실 2 <span class="count">2</span><!-- 카운트 되게 만들기 -->
+				</summary>
+			</details>
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 		</section>
 
 		<!-- 3) 내원 이력 -->
@@ -209,9 +257,14 @@
 				<button type="submit">올리기</button>
 			</form>
 		</aside>
-
+		
 	</div>
+<<<<<<< HEAD
 	<script>
+=======
+</body>
+<script>
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
   function goToHome()        { location.href = '/home'; }
   function goToChart()       { location.href = '/hospital/chart'; }
   function goToReservation() { location.href = '/hospital/reservation'; }
@@ -359,6 +412,10 @@
     }
   });
 </script>
+<<<<<<< HEAD
 
 </body>
+=======
+</script>
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 </html>

@@ -1,5 +1,6 @@
 @charset "UTF-8";
 
+/* 전체 기본 스타일 */
 body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #f9f9f9;
@@ -9,12 +10,13 @@ body {
 
 h2 {
   margin-bottom: 20px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #343a40;
   border-bottom: 2px solid #ddd;
   padding-bottom: 8px;
 }
 
+/* 테이블 기본 구조 */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -44,6 +46,33 @@ tbody tr:hover {
   background-color: #f1f3f5;
 }
 
+/* 병상 정보 span */
+.bed-info {
+  display: inline-block;
+  margin-right: 8px;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* 병상 선택 버튼 */
+button[type="button"] {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button[type="button"]:hover {
+  background-color: #0069d9;
+}
+
+/* 입원 제출 버튼 */
+button[type="submit"],
 button.admit {
   background-color: #28a745;
   color: white;
@@ -54,6 +83,15 @@ button.admit {
   cursor: pointer;
 }
 
+button[type="submit"]:hover,
 button.admit:hover {
   background-color: #218838;
+}
+
+/* 의사 선택 셀렉트박스 */
+select[name="doctorId"] {
+  padding: 6px 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }

@@ -57,8 +57,14 @@ public class Patient {
 	
 	@Transient
 	public int getAge() {
+<<<<<<< HEAD
 	    if (patientBirth == null || patientBirth.length() < 6) return 0;
+=======
+	    if (this.patientBirth == null || this.patientBirth.length() < 7) return 0;
+
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 	    try {
+<<<<<<< HEAD
 	        // 앞 6자리는 yyMMdd
 	        String yyMMdd = patientBirth.substring(0,6);
 	        // RRN 두 번째 숫자(7번째 문자)로 세기(1/2→19xx, 3/4→20xx) 구분
@@ -69,9 +75,32 @@ public class Patient {
 	            century + Integer.parseInt(yyMMdd.substring(0,2))
 	        );
 	        return Period.between(d, LocalDate.now()).getYears();
+=======
+	        // 생년월일 앞자리 (예: 990521)
+	        String birthPart = this.patientBirth.substring(0, 6);
+	        String genderCode = this.patientBirth.substring(7, 8); // 예: '1', '2', '3', '4'...
+
+	        int year = Integer.parseInt(birthPart.substring(0, 2));
+	        int month = Integer.parseInt(birthPart.substring(2, 4));
+	        int day = Integer.parseInt(birthPart.substring(4, 6));
+
+	        // 성별 코드로 세기 판단 (1,2 → 1900년대 / 3,4 → 2000년대 / 5,6 → 1900년대 외국인)
+	        if (genderCode.equals("1") || genderCode.equals("2") || genderCode.equals("5") || genderCode.equals("6")) {
+	            year += 1900;
+	        } else if (genderCode.equals("3") || genderCode.equals("4") || genderCode.equals("7") || genderCode.equals("8")) {
+	            year += 2000;
+	        } else {
+	            return 0; // 잘못된 성별 코드
+	        }
+
+	        LocalDate birthDate = LocalDate.of(year, month, day);
+	        return Period.between(birthDate, LocalDate.now()).getYears();
+
+>>>>>>> branch 'main' of https://github.com/Jangton/2025_SpringProject.git
 	    } catch (Exception e) {
 	        return 0;
 	    }
 	}
+
 
 }

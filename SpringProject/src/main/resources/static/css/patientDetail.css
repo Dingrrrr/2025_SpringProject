@@ -23,49 +23,54 @@ label {
   color: #495057;
 }
 
-p, input {
+p, input, select {
   font-size: 0.95rem;
   margin-top: 4px;
-}
-
-p {
-  padding: 6px 10px;
-  background-color: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  color: #212529;
-}
-
-input {
   width: 100%;
   padding: 8px;
   border: 1px solid #adb5bd;
   border-radius: 4px;
   background-color: #fff;
+  box-sizing: border-box;
 }
 
+p {
+  background-color: #fff;
+  color: #212529;
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* 버튼 그룹 한 줄 배치 */
 .button-group {
   margin-top: 24px;
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 button {
-  flex: 1;
-  margin: 0 5px;
-  padding: 10px 12px;
+  padding: 10px 16px;
   font-size: 0.95rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  min-width: 80px;
 }
 
+/* 버튼 색상 */
 button.edit {
   background-color: #007bff;
   color: white;
 }
-
 button.edit:hover {
   background-color: #0056b3;
 }
@@ -74,7 +79,6 @@ button.delete {
   background-color: #dc3545;
   color: white;
 }
-
 button.delete:hover {
   background-color: #b02a37;
 }
@@ -83,25 +87,31 @@ button.cancel {
   background-color: #ced4da;
   color: #212529;
 }
-
 button.cancel:hover {
   background-color: #adb5bd;
 }
 
-/* 상태 선택 드롭다운 스타일 */
-select#inputStatus {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  font-size: 0.95rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  color: #333;
+.button-group {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center; /* 중앙 정렬 */
+  gap: 12px; /* 버튼 간 간격 */
 }
 
-/* 상태 텍스트 스타일 (view 모드) */
-p.status-view {
+.button-group button,
+.button-group form button {
+  width: 100px; /* 고정 너비 */
+  padding: 10px 0;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+
+/* 상태 표시 스타일 */
+.status-view {
   display: inline-block;
   padding: 6px 10px;
   font-size: 0.9rem;
@@ -115,12 +125,10 @@ p.status-view {
   background-color: #ffc107;
   color: #212529;
 }
-
 .status-입원중 {
   background-color: #28a745;
   color: white;
 }
-
 .status-퇴원 {
   background-color: #6c757d;
   color: white;
