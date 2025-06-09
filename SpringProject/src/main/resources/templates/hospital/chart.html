@@ -9,193 +9,190 @@
 <body>
 	<div class="hospital-container">
 
-		<!-- 1) 사이드바 -->
+		<!-- 사이드바: 네비게이션 메뉴 -->
 		<aside class="hospital-sidebar">
 			<h2 class="hospital-profile-title">
-				<img src="/icons/profile.jpg" alt="프로필"> <span>내 프로필</span>
+				<!-- 로그인한 의사 이름 출력 -->
+				<img th:src="@{/icons/profile.jpg}" alt="프로필"> <span
+					th:text="${displayName}">의사 이름</span>
 			</h2>
 			<ul class="hospital-menu">
 				<li onclick="loadAndToggleNotification()"><img
-					src="/icons/alert.png" alt=""> 알림</li>
-				<li onclick="goToHome()"><img src="/icons/home.png" alt="">
-					홈</li>
-				<li onclick="goToTreatment()"><img src="/icons/doctor.png"
-					alt="진료"> 진료</li>
-				<li onclick="goToReservation()"><img src="/icons/calendar.png"
-					alt="">예약</li>
-				<li onclick="goToChart()" class="active"><img
-					src="/icons/chart.png" alt="차트"><span>차트</span></li>
-				<li onclick="goToStats()"><img src="/icons/statistics.png"
-					alt="통계"><span>통계</span>
-				<li><img src="/icons/bed.png" alt=""> 입원</li>
+					th:src="@{/icons/alert.png}" alt=""> 알림</li>
+				<li><a th:href="@{/hospital/hospital_home}"><img
+						th:src="@{/icons/home.png}" alt=""> 홈</a></li>
+				<li><a th:href="@{/hospital/treatment}"><img
+						th:src="@{/icons/doctor.png}" alt=""> 진료</a></li>
+				<li><a th:href="@{/hospital/reservation}"><img
+						th:src="@{/icons/calendar.png}" alt=""> 예약</a></li>
+				<li><a th:href="@{/hospital/chart}"><img
+						th:src="@{/icons/chart.png}" alt=""> 차트</a></li>
+				<li><a th:href="@{/hospital/statistics}"><img
+						th:src="@{/icons/statistics.png}" alt=""> 통계</a></li>
 			</ul>
 			<div class="sidebar-footer">
-				<button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
+				<button class="logout-btn" th:onclick="|location.href='@{/logout}'|">로그아웃</button>
 			</div>
 		</aside>
 
-
-		<!-- 2) 환자 리스트 -->
+		<!-- 환자 리스트 영역 -->
 		<section class="patient-list">
-	      <h3>환자 리스트</h3>
-	      <div class="status-label">대기 / 진행 중</div>
-	
-	      <!-- 1) 컨트롤러에서 넘긴 appointmentsByRoom 맵을 entry로 순회 -->
-	      <div th:each="entry : ${appointmentsByRoom}">
-	        <details open class="room">
-	          <summary>
-	            <span th:text="${entry.key}">진료실X</span>
-	            <span class="count" th:text="${#lists.size(entry.value)}">0</span>
-	          </summary>
-	
-	          <!-- 2) 해당 방 예약 리스트(entry.value) 반복 -->
-	          <div th:each="appt : ${entry.value}" class="card">
-	            <div class="card-patient">
-	              <strong th:text="${appt.patient.patientName}">홍길동</strong>
-	              <!-- 성별과 나이, 생년월일 -->
-	              [<span th:text="${appt.patient.patientGender}">남</span>]
-	              <span th:text="${appt.patient.age} + '세'">30세</span> ·
-	              <span th:text="${appt.patient.patientBirth}">1990-01-01</span>
-	            </div>
-	            <!-- 3) patientType에 따라 배지 색·문구 분기 -->
-	            <div class="card-status"
-	                 th:classappend="
-	                   ${appt.patient.patientType.name() == '진료대기'} ? ' yellow' :
-	                   (${appt.patient.patientType.name() == '진료중'} ? ' blue' : '')
-	                 "
-	                 th:text="
-	                   ${appt.patient.patientType.name() == '진료대기'} ? '대기' :
-	                   (${appt.patient.patientType.name() == '진료중'} ? '진료중' : '')
-	                 ">
-	            </div>
-	          </div>
-	        </details>
-	      </div>
-	    </section>
+			<h3>환자 리스트</h3>
+			<div class="status-label">대기 / 진행 중</div>
 
-		<!-- 3) 내원 이력 -->
+			<!-- 진료실별로 예약 그룹핑된 appointmentsByRoom 반복 -->
+			<div th:each="entry : ${appointmentsByRoom}">
+				<details open class="room">
+					<summary>
+						<span th:text="${entry.key}">진료실X</span> <span class="count"
+							th:text="${#lists.size(entry.value)}">0</span>
+					</summary>
+
+					<!-- 진료실 내 환자 카드 반복 -->
+					<div th:each="appt : ${entry.value}" class="card"
+						th:onclick="|location.href='@{/hospital/chart(apptId=${appt.apptId})}'|">
+						<div class="card-patient">
+							<strong th:text="${appt.patient.patientName}">홍길동</strong> [<span
+								th:text="${appt.patient.patientGender}">남</span>] <span
+								th:text="${appt.patient.age} + '세'">30세</span>
+						</div>
+						<!-- 상태 뱃지 -->
+						<div class="card-status"
+							th:classappend="
+			        ${appt.patient.patientType.name() == '진료대기'} ? ' yellow' :
+			        (${appt.patient.patientType.name() == '진료중'} ? ' blue' :
+			        (${appt.patient.patientType.name() == '수납'} ? ' gray' : ''))
+			     "
+							th:text="
+			        ${appt.patient.patientType.name() == '진료대기'} ? '대기' :
+			        (${appt.patient.patientType.name() == '진료중'} ? '진료중' :
+			        (${appt.patient.patientType.name() == '수납'} ? '수납' : ''))
+			     ">
+						</div>
+					</div>
+				</details>
+			</div>
+		</section>
+
 		<section class="patient-history">
 			<h3>내원 이력</h3>
 
-			<!-- 첫 번째 방문 기록 -->
-			<details open class="history-entry">
-				<summary>
-					<div class="history-date">2025-05-15 (오늘)</div>
-					<div class="history-doctor">오진우 선생</div>
-				</summary>
-				<div class="history-content">
-					<p>
-						<strong>진단/소견:</strong> 두통, 발열
-					</p>
-					<p>
-						<strong>처방 내역:</strong>
-					</p>
-					<ul>
-						<li>해열진통제 500mg — 하루 3회</li>
-						<li>진통제 시럽 5ml — 필요 시 추가</li>
-					</ul>
+			<div th:if="${medRecords != null and #lists.size(medRecords) > 0}">
+				<div th:each="rec : ${medRecords}">
+					<details class="history-entry">
+						<summary>
+							<div class="history-date"
+								th:text="${#temporals.format(rec.apptId.scheduledAt, 'yyyy-MM-dd')}">날짜</div>
+							<div class="history-doctor" th:text="${rec.doctor.usersName}">의사
+								이름</div>
+						</summary>
+						<div class="history-content">
+							<p>
+								<strong>진단/소견:</strong> <span th:text="${rec.chiefComplaint}"></span>
+							</p>
+							<p>
+								<strong>처방 내역:</strong>
+							</p>
+							<ul>
+								<li th:each="p : ${rec.prescriptions}"><span
+									th:text="${p.drugId.drugName}"></span> <span
+									th:text="${p.dosage}"></span> — <span th:text="${p.frequency}"></span>
+								</li>
+							</ul>
+						</div>
+					</details>
 				</div>
-			</details>
+			</div>
 
-			<!-- 두 번째 방문 기록 -->
-			<details class="history-entry">
-				<summary>
-					<div class="history-date">2025-03-15 (두달 전)</div>
-					<div class="history-doctor">이상민 선생</div>
-				</summary>
-				<div class="history-content">
-					<p>
-						<strong>진단/소견:</strong> 기침, 인후통
-					</p>
-					<p>
-						<strong>처방 내역:</strong>
-					</p>
-					<ul>
-						<li>기침약 10ml — 하루 2회</li>
-						<li>가글액 — 식후 가글</li>
-					</ul>
-				</div>
-			</details>
+			<div th:if="${medRecords == null or #lists.size(medRecords) == 0}">
+				<p style="text-align: center; color: gray;">📭 내원 기록이 없습니다</p>
+			</div>
 		</section>
 
+		<!-- 진료기록 입력 영역 (선택된 예약이 있을 때만 노출) -->
+		<!-- ✅ 선택된 예약이 있을 때만 진료 기록 입력 영역을 보여줌 -->
+		<section class="col treatment-main" th:if="${selectedAppt != null}">
+			<form th:action="@{/hospital/chart}" method="post">
+				<div class="record-header">
+					<div class="record-header-left">
+						<span
+							th:text="${#temporals.format(selectedAppt.scheduledAt, 'yyyy-MM-dd (E) HH:mm')}"></span>
+						▶ <span th:text="${selectedAppt.doctor.usersName}">의사 이름</span> 선생
+					</div>
+					<div class="record-header-right">
+						<button class="icon-btn" type="button">⚙️</button>
+					</div>
+				</div>
 
-		<!-- 4) 메인 진료 기록 -->
-		<section class="col treatment-main">
-			  <!-- 진료기록 저장 폼 시작 -->
-			  <form th:action="@{/hospital/chart/record}" method="post">
-			  
-			    <!-- 1) 헤더: 기존 그대로 -->
-			    <div class="record-header">
-			      <div class="record-header-left">2021-09-01 (월) 10:00 ▶ 이은솔</div>
-			      <div class="record-header-right">
-			        <button class="icon-btn">⚙️</button>
-			      </div>
-			    </div>
-			
-			    <!-- 2) 주증상 입력 -->
-			    <div class="record-notes">
-			      <h4>증상 기록</h4>
-			      <textarea name="chiefComplaint"
-			                placeholder="환자 증상 요약 내용을 입력하세요"
-			                required
-			                class="notes-textarea"></textarea>
-			    </div>
-			
-			    <!-- 3) 진단명 선택 -->
-			    <div class="record-prescription">
-			      <h4>진단 및 처방</h4>
-			
-			      <!-- 도구 버튼(이전 그대로) -->
-			      <div class="prescription-toolbar">
-			        <button type="button">예방접종</button>
-			        <button type="button">DUR점검</button>
-			        <button class="icon-btn" type="button">⚙️</button>
-			      </div>
-			
-			      <!-- (A) 진단명 select -->
-			      <label>진단명:
-			        <select name="diseaseId" required>
-			          <option th:each="d : ${diseases}"
-			                  th:value="${d.id}"
-			                  th:text="${d.name}">
-			            진단명
-			          </option>
-			        </select>
-			      </label>
-			
-			      <!-- (B) 약물 select -->
-			      <label>처방약:
-			        <select name="drugId" required>
-			          <option th:each="drug : ${drugs}"
-			                  th:value="${drug.id}"
-			                  th:text="${drug.name}">
-			            약물명
-			          </option>
-			        </select>
-			      </label>
-			
-			      <!-- (C) 추가메모 -->
-			      <label>추가 메모:
-			        <textarea name="notes"
-			                  placeholder="추가 메모를 입력하세요"
-			                  class="notes-textarea"></textarea>
-			      </label>
-			    </div>
-			
-			    <!-- 4) 숨김 필드: apptId, patientId, doctorId -->
-			    <input type="hidden" name="apptId"    th:value="${selectedAppt.id}" />
-			    <input type="hidden" name="patientId" th:value="${selectedAppt.patient.id}" />
-			    <input type="hidden" name="doctorId"  th:value="${#httpSession.getAttribute('loginUser').usersId}" />
-			
-			    <!-- 5) 저장 버튼 -->
-			    <div class="prescription-action">
-			      <button type="submit" class="send-btn">저장 ▶</button>
-			    </div>
-			
-			  </form>
-			  <!-- 진료기록 저장 폼 끝 -->
-			</section>
-		<!-- 5) 환자 기록 메모 -->
+				<!-- 증상 입력 -->
+				<div class="record-notes">
+					<h4>증상 기록</h4>
+					<textarea name="chiefComplaint" placeholder="환자 증상 요약 내용을 입력하세요"
+						required class="notes-textarea"></textarea>
+				</div>
+
+				<!-- 진단 및 처방 입력 -->
+				<div class="record-prescription">
+					<h4>진단 및 처방</h4>
+
+					<label>진단명: <select name="diseaseId" required>
+							<option th:each="d : ${diseases}" th:value="${d.id}"
+								th:text="${d.name}">진단명</option>
+					</select>
+					</label> <label>추가 메모: <textarea name="notes"
+							placeholder="추가 메모를 입력하세요" class="notes-textarea"></textarea>
+					</label>
+
+					<!-- 처방 약 리스트 -->
+					<table class="prescription-table">
+						<thead>
+							<tr>
+								<th>약물명</th>
+								<th>용량</th>
+								<th>투여 횟수</th>
+								<th>투약 기간</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="drugListContainer">
+							<tr class="drug-select-row">
+								<td><select name="drugIds" required>
+										<option th:each="drug : ${drugs}" th:value="${drug.drugId}"
+											th:text="${drug.drugName}">약물</option>
+								</select></td>
+								<td><input type="text" name="dosages" placeholder="500mg"
+									required></td>
+								<td><input type="text" name="frequencies"
+									placeholder="하루 3회" required></td>
+								<td><input type="text" name="durations" placeholder="5일간"
+									required></td>
+								<td><button type="button" class="delete-drug-btn">🗑</button></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<button type="button" id="addDrugBtn" class="add-btn">+
+						처방약 추가</button>
+				</div>
+
+				<!-- 숨김 필드 (예약 ID, 환자 ID, 의사 ID) -->
+				<!-- ✅ 선택된 예약 정보 기반으로 진료 기록 저장 시 필요한 ID들 -->
+				<input type="hidden" name="apptId" th:value="${selectedAppt.apptId}" />
+				<input type="hidden" name="patientId"
+					th:if="${selectedAppt.patient != null}"
+					th:value="${selectedAppt.patient.patientId}" />
+				<!-- ✅ controller에서 전달받은 doctorId (세션의 loginUser.getUsersId()) -->
+				<input type="hidden" name="doctorId" th:value="${doctorId}" />
+
+				<!-- 저장 버튼 -->
+				<div class="prescription-action">
+					<button type="submit" class="send-btn">저장 ▶</button>
+				</div>
+			</form>
+		</section>
+
+		<!-- 추가 메모 입력 영역 -->
+		<!-- 아직 여기는 db연결안함 -->
 		<aside class="col patient-record">
 			<h3 class="record-title">📝 추가메모</h3>
 			<form class="record-form">
@@ -203,156 +200,42 @@
 				<button type="submit">올리기</button>
 			</form>
 		</aside>
-		
 	</div>
 </body>
 <script>
-  function goToHome()        { location.href = '/home'; }
-  function goToChart()       { location.href = '/hospital/chart'; }
-  function goToReservation() { location.href = '/hospital/reservation'; }
-  function goToTreatment()   { location.href = '/hospital/treatment'; }
-  function goToStats()       { location.href = '/hospital/statistics'; }
-  function goLogout()        { location.href = '/logout'; }
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get("error");
 
-  const orderInput = document.getElementById('orderSearchInput');
-  const suggestions = document.getElementById('suggestions');
-  const diagnosisList = document.querySelector('.diagnosis-items');
-  const tbody = document.getElementById('prescriptionTbody');
-
-  let orderData = [];
-
-  async function loadOrderData() {
-  try {
-    const diseaseRes = await fetch('/api/disease/list');
-    const diseaseData = await diseaseRes.json();
-    console.log("✅ diseaseData:", diseaseData); // 🔍 확인
-
-    const drugRes = await fetch('/api/drug/list');
-    const drugData = await drugRes.json();
-    console.log("✅ drugData:", drugData); // 🔍 확인
-
-    orderData = [
-      ...diseaseData.map(d => ({
-        type: 'disease',
-        code: d.code,
-        name: d.name,
-        category: d.type
-      })),
-      ...drugData
-    ];
-
-    console.log("✅ orderData 최종:", orderData); // ✅ 여기 찍히는지 확인
-  } catch (err) {
-    console.error('❌ loadOrderData 실패:', err); // 오류가 여기 찍히는지!
-  }
-}
-
-  // ✅ 2. 반드시 실행
-  (async () => {
-    await loadOrderData();
-  })();
-
-  // ✅ 3. 자동완성 이벤트 처리
-  orderInput.addEventListener('input', () => {
-    const query = orderInput.value.trim().toLowerCase();
-    suggestions.innerHTML = '';
-
-    if (!orderData || orderData.length === 0) {
-      const div = document.createElement('div');
-      div.innerHTML = '⏳ 데이터 로딩 중...';
-      div.classList.add('suggestion-item');
-      suggestions.appendChild(div);
-      return;
+    if (error === "unauthorized_access") {
+      alert("⚠️ 다른 진료실 환자에게는 진료 기록을 작성할 수 없습니다.");
     }
 
-    const diseases = orderData.filter(item =>
-      item.type === 'disease' && item.name.toLowerCase().includes(query)
-    );
-    const drugs = orderData.filter(item =>
-      item.type === 'drug' && item.name.toLowerCase().includes(query)
-    );
+    const container = document.getElementById('drugListContainer');
+    const addBtn = document.getElementById('addDrugBtn');
 
-    // 진단명 그룹
-    if (diseases.length > 0) {
-      const diseaseLabel = document.createElement('div');
-      diseaseLabel.textContent = '📁 진단명';
-      diseaseLabel.classList.add('group-label');
-      suggestions.appendChild(diseaseLabel);
-
-      diseases.forEach(item => {
-        const div = document.createElement('div');
-        div.classList.add('suggestion-item');
-        div.textContent = item.name;
-        div.onclick = () => {
-          const li = document.createElement('div');
-          li.classList.add('diagnosis-item');
-          li.innerHTML = `
-            <span>${item.name}</span>
-            <button class="delete-diagnosis-btn">❌</button>
-          `;
-          li.querySelector('.delete-diagnosis-btn').onclick = () => li.remove();
-          diagnosisList.appendChild(li);
-          orderInput.value = '';
-          suggestions.innerHTML = '';
-        };
-        suggestions.appendChild(div);
+    if (container && addBtn) {
+      addBtn.addEventListener('click', () => {
+        const row = document.createElement('tr');
+        row.className = 'drug-select-row';
+        row.innerHTML = `
+          <td><select name="drugIds" required>
+            ${document.querySelector('select[name="drugIds"]').innerHTML}
+          </select></td>
+          <td><input type="text" name="dosages" placeholder="예: 500mg" required></td>
+          <td><input type="text" name="frequencies" placeholder="예: 하루 3회" required></td>
+          <td><input type="text" name="durations" placeholder="예: 5일간" required></td>
+          <td><button type="button" class="delete-drug-btn">🗑</button></td>
+        `;
+        container.appendChild(row);
       });
-    }
 
-    // 약물 그룹
-    if (drugs.length > 0) {
-      const drugLabel = document.createElement('div');
-      drugLabel.textContent = '💊 약물';
-      drugLabel.classList.add('group-label');
-      suggestions.appendChild(drugLabel);
-
-      drugs.forEach(item => {
-        const div = document.createElement('div');
-        div.classList.add('suggestion-item');
-        div.textContent = item.name;
-        div.onclick = () => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${item.name}</td>
-            <td contenteditable="true">${item.dosage}</td>
-            <td contenteditable="true">${item.count}</td>
-            <td><button class="delete-btn">삭제</button></td>
-          `;
-          tbody.appendChild(tr);
-          orderInput.value = '';
-          suggestions.innerHTML = '';
-        };
-        suggestions.appendChild(div);
+      container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-drug-btn')) {
+          e.target.closest('tr')?.remove();
+        }
       });
     }
   });
-
-  // 외부 클릭 시 자동완성 닫기
-  document.addEventListener('click', e => {
-    if (!suggestions.contains(e.target) && e.target !== orderInput) {
-      suggestions.innerHTML = '';
-    }
-  });
-
-  // 수기 처방 추가
-  document.getElementById('manualAddBtn').addEventListener('click', () => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="text" placeholder="약품명" class="manual-input"></td>
-      <td><input type="text" placeholder="용법/용량" class="manual-input"></td>
-      <td><input type="number" placeholder="수량" class="manual-input" style="width: 60px;"></td>
-      <td><button class="delete-btn">삭제</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // 처방 테이블 삭제 기능
-  tbody.addEventListener('click', e => {
-    if (e.target.classList.contains('delete-btn')) {
-      const tr = e.target.closest('tr');
-      if (tr) tr.remove();
-    }
-  });
-</script>
 </script>
 </html>

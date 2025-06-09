@@ -5,7 +5,7 @@ import com.dita.persistence.InvLogRepository;
 import com.dita.service.InvLogService;
 import com.dita.vo.DrugInventoryDto;
 import com.dita.vo.InventoryAddRequest;
-import com.dita.vo.WithdrawRequest;
+import com.dita.persistence.WithdrawRequest;
 import java.lang.IllegalStateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
