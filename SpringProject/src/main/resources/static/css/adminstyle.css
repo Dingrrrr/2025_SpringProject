@@ -10,64 +10,56 @@ body {
 
 /* 사이드바 */
 .sidebar {
-  width: 220px;
-  height: 100vh;
-  background-color: #ffffff;
-  border-right: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+	width: 250px;
+	background-color: white;
+	border-right: 1px solid #ddd;
+    padding: 20px 0;
 }
 
-.profile-section {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 10px;
+.sidebar .profile {
+	display: flex;
+    align-items: center;
+    padding: 0 20px;
+    margin-bottom: 30px;
 }
 
-.profile-header {
-  display: flex;
-  align-items: center;
-  padding: 0 20px 12px;
+.sidebar .profile-icon { 
+	width: 40px;
+	height: 40px;
+	background-color: #333;
+	border-radius: 50%;
+	margin-right: 10px;
+	display: flex;
+	align-items: center;
+ 	justify-content: center;
+ 	color: white;
+	font-size: 18px;
 }
 
-.profile-header img {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+.sidebar .menu-item {
+	display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    color: inherit;
 }
 
-.profile-text {
-  font-size: 15px;
-  font-weight: bold;
-  color: #333;
+.sidebar .menu-item:hover {
+	background-color: #f0f0f0;
 }
 
-.alert-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 10px 0;
+.sidebar .menu-item.active {
+	background-color: #e3f2fd;
+	border-right: 3px solid #2196f3;
 }
 
-.alert-list li {
-  display: flex;
-  align-items: center;
-  padding: 14px 24px;
-  font-size: 15px;
-  color: #333;
-  cursor: pointer;
-}
-
-.alert-list li::before {
-  content: "";
-  display: inline-block;
-  width: 22px;
-  height: 22px;
-  margin-right: 12px;
-  background-image: url("/icons/bell.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+.sidebar .menu-icon {
+	width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    opacity: 0.7;
 }
 
 .nav-menu {

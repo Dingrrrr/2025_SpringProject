@@ -66,25 +66,38 @@
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="profile-section">
-      <div class="profile-header">
-        <img src="/icons/profile.png" alt="프로필 아이콘">
-        <span class="profile-text">내 프로필</span>
-      </div>
+  <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span>내 프로필</span>
+        </div>
+        
+        <a href="/admin/adminMemberManage" class="menu-item">
+            <div class="menu-icon">👥</div>
+            <span>회원 관리</span>
+        </a>
+               
+        <a href="/admin/adminCalendarManage" class="menu-item" id="chart-menu">
+            <div class="menu-icon">📋</div>
+            <span>일정 관리</span>
+        </a>
+        
+        <a href="/admin/adminRoomManage" class="menu-item active">
+            <div class="menu-icon">🛏️</div>
+            <span>병실 관리</span>
+        </a>
+        
+        <a href="/admin/adminTotalManage" class="menu-item">
+            <div class="menu-icon">📈</div>
+            <span>통계</span>
+        </a>
+        
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
-    
-    <ul class="nav-menu">
-	  <li><a href="/admin/adminMemberManage">회원 관리</a></li>
-	  <li><a href="/admin/adminCalendarManage">일정 관리</a></li>
-	  <li><a href="/admin/adminRoomManage">병실 관리</a></li>
-	  <li><a href="/admin/adminTotalManage">통계</a></li>
-	</ul>
-
-    <div class="logout-section">
-	  <li class="logout-item" onclick="location.href='/Login/Logout'">로그아웃</li>
-	</div>
-  </div>
 
   <div class="main">
     <div th:each="ward : ${wards}" class="room-type" th:data-ward-id="${ward.wardId}">
