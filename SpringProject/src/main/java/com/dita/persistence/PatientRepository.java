@@ -13,7 +13,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer>{
 
 	List<Patient> findByPatientType(PatientType patientType);
 	Patient findByPatientNameAndPatientBirthAndPatientPhone(String name, String birth, String phone);
-	List<Patient> findByPatientNameAndPatientType(String name, PatientType type);
+	List<Patient> findByPatientNameAndPatientType(String name, PatientType patientType);
 	Patient findByPatientBirth(String patientBirth);
 	
 	Optional<Patient> findByPatientName(String patientName);

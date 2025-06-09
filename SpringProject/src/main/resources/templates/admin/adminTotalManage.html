@@ -8,30 +8,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
+<!-- 사이드바 -->
     <div class="sidebar">
-        <div class="profile-section">
-            <div class="profile-header">
-                <img src="/icons/profile.png" alt="프로필 아이콘">
-                <span class="profile-text">내 프로필</span>
-            </div>
+        <div class="profile">
+            <div class="profile-icon">👤</div>
+            <span>내 프로필</span>
         </div>
         
-        <ul class="nav-menu">
-		  <li><a href="/admin/adminMemberManage">회원 관리</a></li>
-		  <li><a href="/admin/adminCalendarManage">일정 관리</a></li>
-		  <li><a href="/admin/adminRoomManage">병실 관리</a></li>
-		  <li><a href="/admin/adminTotalManage">통계</a></li>
-		</ul>
-
-        <div class="logout-section">
-            <li class="logout-item">로그아웃</li>
-        </div>
+        <a href="/admin/adminMemberManage" class="menu-item">
+            <div class="menu-icon">👥</div>
+            <span>회원 관리</span>
+        </a>
+               
+        <a href="/admin/adminCalendarManage" class="menu-item" id="chart-menu">
+            <div class="menu-icon">📋</div>
+            <span>일정 관리</span>
+        </a>
+        
+        <a href="/admin/adminRoomManage" class="menu-item">
+            <div class="menu-icon">🛏️</div>
+            <span>병실 관리</span>
+        </a>
+        
+        <a href="/admin/adminTotalManage" class="menu-item active">
+            <div class="menu-icon">📈</div>
+            <span>통계</span>
+        </a>
+        
+        <a th:href="@{/Login/Logout}" class="menu-item">
+	      <div class="menu-icon">🚪</div>
+	      <span>로그아웃</span>
+	    </a>
     </div>
 
     <div class="main-content">
         <div class="dashboard-grid">
 			
-			<!-- 3. 최근 일주일 외래환자 수 -->
+			<!-- 1. 최근 일주일 외래환자 수 -->
 		  <div class="chart-card">
 		    <h3>최근 일주일 외래환자 수</h3>
 		    <div class="chart-container">
@@ -65,11 +78,20 @@
 		  
 		  <!-- 5. 입원 현황 -->
 			<div class="chart-card">
-			  <h3>입원 현황</h3>
+			  <h3>병실 사용 현황</h3>
 			  <div class="chart-container">
 			    <canvas id="bedStatusChart"></canvas>
 			  </div>
 			</div>
+			
+			<!-- 6. 월별 매출 -->
+			<div class="chart-card">
+			  <h3>월별 매출</h3>
+			  <div class="chart-container">
+			    <canvas id="revenueChart"></canvas>
+			  </div>
+			</div>
+						
 		</div>
     </div>
     
@@ -209,6 +231,7 @@
         			  loadChart('weeklyOutpatientChart', '/admin/adminTotalManage/weekly-outpatients', 'bar', '최근 일주일 외래환자 수');
         			  loadChart('statusChart', '/admin/adminTotalManage/status-today', 'doughnut', '', ['#4caf50', '#ffc107', '#f44336']);
         			  loadChart('bedStatusChart', '/admin/adminTotalManage/bed-status', 'doughnut', '', ['#ff7043', '#66bb6a']);
+        			  loadChart('revenueChart', '/admin/adminTotalManage/revenue-monthly', 'bar', '월별 매출');
         		});
         		
         </script>

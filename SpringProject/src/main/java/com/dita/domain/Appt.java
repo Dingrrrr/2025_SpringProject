@@ -35,7 +35,7 @@ public class Appt {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "appt_id", nullable = false)
-	private int apptId;
+	private Integer apptId;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)

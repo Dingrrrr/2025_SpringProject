@@ -12,19 +12,50 @@
     <!-- 사이드바 -->
     <aside class="hospital-sidebar">
       <h2 class="hospital-profile-title">
-        <img th:src="@{/icons/profile.jpg}" alt="프로필"><span>내 프로필</span>
+        <img th:src="@{/icons/profile.jpg}" alt="프로필">
+        <span th:text="${displayName}">의사 이름</span>
       </h2>
       <ul class="hospital-menu">
-        <li onclick="loadAndToggleNotification()"><img th:src="@{/icons/alert.png}" alt=""> 알림</li>
-        <li onclick="goToHome()"><img th:src="@{/icons/home.png}" alt=""> 홈</li>
-        <li class="active" onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt=""> 진료</li>
-        <li onclick="goToReservation()"><img th:src="@{/icons/calendar.png}" alt=""> 예약</li>
-        <li onclick="goToChart()"><img th:src="@{/icons/chart.png}" alt=""> 차트</li>
-        <li class="hospital-active" onclick="goToStats()"><img th:src="@{/icons/statistics.png}" alt=""> 통계</li>
-        <li onclick="goToAdmission()"><img th:src="@{/icons/bed.png}" alt=""> 입원</li>
+        <!-- 알림은 fetch로 부분 로딩 -->
+        <li onclick="loadAndToggleNotification()">
+          <img th:src="@{/icons/alert.png}" alt=""> 알림
+        </li>
+        <!-- 홈 -->
+        <li>
+	      <a th:href="@{/hospital/hospital_home}">
+	        <img th:src="@{/icons/home.png}" alt=""> 홈
+	      </a>
+	    </li>
+        <!-- 진료 관리 -->
+        <li>
+	      <a th:href="@{/hospital/treatment}">
+	        <img th:src="@{/icons/doctor.png}" alt=""> 진료
+	      </a>
+	    </li>
+        <!-- 예약 관리 -->
+        <li>
+	      <a th:href="@{/hospital/reservation}">
+	        <img th:src="@{/icons/calendar.png}" alt=""> 예약
+	      </a>
+	    </li>
+        <!-- 차트 보기 -->
+        <li>
+	      <a th:href="@{/hospital/chart}">
+	        <img th:src="@{/icons/chart.png}" alt=""> 차트
+	      </a>
+	    </li>
+        <!-- 통계 보기 -->
+        <li>
+	      <a th:href="@{/hospital/statistics}">
+	        <img th:src="@{/icons/statistics.png}" alt=""> 통계
+	      </a>
+	    </li>
       </ul>
       <div class="sidebar-footer">
-        <button class="logout-btn" onclick="goLogout()">로그아웃</button>
+        <button class="logout-btn"
+                th:onclick="|location.href='@{/logout}'|">
+          로그아웃
+        </button>
       </div>
     </aside>
 
@@ -42,6 +73,8 @@
             <select>
               <option>진료실1</option>
               <option>진료실2</option>
+              <option>진료실3</option>
+              <option>진료실4</option>
             </select>
           </div>
         </div>
@@ -55,163 +88,61 @@
       <!-- 탭 -->
       <nav class="record-tabs">
         <ul>
-          <li class="active">대기</li>
-          <li>예약</li>
-          <li>방문</li>
+          <li class="active">진료실 현황</li>
         </ul>
-        <span class="waiting-count">대기환자 16</span>
+        <span class="waiting-count"
+		      th:text="${'대기환자 : ' + waitingCount}">
+		  대기환자 : 0
+		</span>
       </nav>
 
       <!-- 카드 컬럼 -->
       <div class="treatment-columns">
-        <div class="treatment-column">
-          <h3>검사실 <span class="col-count">0</span></h3>
-          <div class="treatment-card">
-            <div class="card-patient">
-              <span class="card-id">12345678</span> 정호진<br>
-              (남, 24세 · 2000-02-27)
-            </div>
-            <div class="card-status red">접수신청</div>
-          </div>
-        </div>
+    <!-- appointmentsByRoom 는 컨트롤러에서 model.addAttribute("appointmentsByRoom", map) 으로 넣어준 Map<String,List<Appt>> -->
+    <div th:each="entry : ${appointmentsByRoom}">
+      <div class="treatment-column">
+        <h3>
+          <!-- entry.key = "진료실1", entry.value.size = 환자 수 -->
+          <span th:text="${entry.key}">진료실?</span>
+          <span class="col-count" th:text="${#lists.size(entry.value)}">0</span>
+        </h3>
 
-        <div class="treatment-column">
-          <h3>진료실1 <span class="col-count">3</span></h3>
-          <div class="treatment-card">
-            <div class="card-patient">
-              <span class="card-id">12345679</span> 김승환<br>
-              (남, 20세 · 2003-01-12)
-            </div>
-            <div class="card-excerpt">
-              SMK (카이로15회)<br>
-              …증상 요약 텍스트…
-            </div>
-            <div class="card-status blue">진행중</div>
+        <!-- 각 진료실의 예약(확정·대기대기) 리스트 반복 -->
+        <div th:each="appt : ${entry.value}" class="treatment-card">
+          <div class="card-patient">
+            <span th:text="${appt.patient.patientName}">이름</span><br>
+              [<span th:text="${appt.patient.patientGender}">성별</span>] 
+              <!-- 나이 계산: Period.between(생일, 오늘).years -->
+              <span th:text="${appt.patient.age}">0</span>세 ·
+              <span th:text="${appt.patient.patientBirth}">생년월일</span>
           </div>
-          <div class="treatment-card">
-            <div class="card-patient">
-              <span class="card-id">12345680</span> 박민수<br>
-              (남, 22세 · 2001-05-01)
-            </div>
-            <div class="card-status yellow">대기</div>
-          </div>
-        </div>
-
-        <div class="treatment-column">
-          <h3>진료실2 <span class="col-count">2</span></h3>
-          <div class="treatment-card">
-            <div class="card-patient">
-              <span class="card-id">12345681</span> 바나나<br>
-              (여, 20세 · 2004-03-13)
-            </div>
-            <div class="card-status yellow">대기</div>
-          </div>
-        </div>
-
-        <div class="treatment-column">
-          <h3>수납실 <span class="col-count">1</span></h3>
-          <div class="treatment-card">
-            <div class="card-patient">
-              <span class="card-id">12345682</span> 한진용<br>
-              (남, 36세 · 1987-10-24)
-            </div>
-            <div class="card-status yellow">대기</div>
-          </div>
+          <!-- 상태 badge -->
+          <div class="card-status"
+		     th:classappend="${ 
+		       appt.patient.patientType.name() == '진료대기' 
+		         ? ' yellow' 
+		         : (appt.patient.patientType.name() == '진료중' 
+		             ? ' blue' 
+		             : '') 
+		     }"
+		     th:text="${ 
+		       appt.patient.patientType.name() == '진료대기' 
+		         ? '대기' 
+		         : (appt.patient.patientType.name() == '진료중' 
+		             ? '진료중' 
+		             : '') 
+		     }">
+		  </div>
         </div>
       </div>
-
-    </section>
+    </div>
   </div>
+	<script>
 
-  <script>
-    function loadAndToggleNotification() {}
-	function goToHome()        { location.href = '/home'; }
-	function goToTreatment()   { location.href = '/hospital/treatment'; }
-	function goToReservation() { location.href = '/hospital/reservation'; }
-	function goToChart()       { location.href = '/hospital/chart'; }
-	function goToStats()       { location.href = '/hospital/statistics'; }
-	function goToAdmission()   { location.href = '/hospital/admission'; }
-	function goLogout()        { location.href = '/logout'; }
-
-const patientBox = document.getElementById("patientInfoBox");
-
-// ✅ 렌더링 함수: 환자 + vital 데이터 분리
-function renderPatientInfo(patient, vital) {
-  const age = patient.patientBirth
-    ? new Date().getFullYear() - parseInt(patient.patientBirth.split('-')[0])
-    : '-';
-
-  patientBox.innerHTML = `
-    <div class="summary-left">
-      <div class="patient-name">
-        <strong>${patient.patientName}</strong> (${patient.patientGender}, ${age}세, ${patient.patientBirth})
-      </div>
-      <div class="patient-tags">
-        <span class="badge info">${patient.patientSymptom || '증상 정보 없음'}</span>
-      </div>
-      <div class="patient-vitals">
-        <span class="badge">주소: ${patient.patientAddress ?? '-'}</span>
-        <span class="badge">전화: ${patient.patientPhone ?? '-'}</span>
-        <span class="badge">유형: ${patient.patientType ?? '-'}</span>
-        <span class="badge">체온: ${vital?.temperature ?? '-'}</span>
-        <span class="badge">맥박: ${vital?.pulseRate ?? '-'}</span>
-        <span class="badge">혈압: ${vital?.bpSystolic ?? '-'}/${vital?.bpDiastolic ?? '-'}</span>
-        <span class="badge">호흡수: ${vital?.respirationRate ?? '-'}</span>
-        <span class="badge">기록일: ${vital?.recordedDate ?? '-'}</span>
-        <span class="badge">시간대: ${vital?.timePeriod ?? '-'}</span>
-      </div>
-    </div>
-    <div class="summary-right">
-      <button class="btn-outline" onclick="goToChart()">차트 열기</button>
-      <button class="btn-primary" onclick="goToTreatment()">진행하기</button>
-    </div>
-  `;
-}
-
-// ✅ 검색 이벤트 등록
-document.getElementById("patientSearch").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    const name = e.target.value.trim();
-    if (!name) return;
-
-    fetch(`/api/patients/search?name=${encodeURIComponent(name)}`)
-      .then(res => {
-        if (!res.ok) throw new Error("환자 없음");
-        return res.json();
-      })
-      .then(results => {
-        if (!Array.isArray(results)) throw new Error("결과 형식 오류");
-
-        if (results.length === 1) {
-          renderPatientInfo(results[0].patient, results[0].vital);
-        } else {
-          const selectHTML = `
-            <div style="margin-bottom: 10px; color: gray;">동명이인 ${results.length}명. 환자를 선택하세요:</div>
-            <select id="patientSelect">
-              <option disabled selected>-- 환자 선택 --</option>
-              ${results.map((dto, idx) => `
-                <option value="${idx}">
-                  ${dto.patient.patientName} (${dto.patient.patientGender}, ${dto.patient.patientBirth}, 전화: ${dto.patient.patientPhone})
-                </option>
-              `).join('')}
-            </select>
-          `;
-          patientBox.innerHTML = selectHTML;
-
-          document.getElementById("patientSelect").addEventListener("change", function (ev) {
-            const selected = results[ev.target.value];
-            renderPatientInfo(selected.patient, selected.vital);
-          });
-        }
-      })
-      .catch(() => {
-        patientBox.innerHTML = `<div style="color:red; padding:10px;">등록된 환자를 찾을 수 없습니다.</div>`;
-      });
-  }
-});
 
 </script>
 
 </body>
 </html>
+    </section>
+  </div>

@@ -40,6 +40,7 @@
 
 	</ul>
 	
+	
 	<a href="acceptanceReception" class="menu-item">
 	  <div class="menu-icon">👥</div>
 	  <span>예약</span>
@@ -106,7 +107,7 @@
     <div class="reservation-topbar">
         <!-- reservations.size() 를 이용해서 동적으로 개수 표시도 가능 -->
         <span class="reservation-title">
-          예약현황(
+          내원환자현황(
 		    <span th:if="${reservations != null}" th:text="${reservations.size()}">0</span>
 		    <span th:if="${reservations == null}">0</span>
 		  명)
@@ -143,15 +144,37 @@
         <input type="text" placeholder="증상" name="patientSymptom" required style="width: 100%; padding: 8px;">
       </div>    
       <div style="margin-bottom: 10px;">
-        <select name="patientType" required style="width: 100%; padding: 8px;">
-          <option value="진료대기">진료대기</option>
+        <select name="patientType" id="patientTypeSelect" required style="width: 100%; padding: 8px;">
+         <option value="예약">예약</option>
           <option value="입원대기">입원대기</option>
+          <option value="진료대기">진료대기</option>
           <option value="입원중">입원중</option>
           <option value="진료중">진료중</option>
           <option value="퇴원">퇴원</option>
-          <option value="예약">예약</option>
         </select>
-      </div>
+        </div>
+        
+        <div id="visitTimeContainer" style="margin-bottom: 10px; display: none;">
+		  <input type="text" id="visitTime" name="visitTime" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		</div>
+		
+		<div id="roomSelectContainer" style="margin-bottom: 10px; display: none;">
+		  <select name="room" id="roomSelect" style="width: 100%; padding: 8px;">
+		    <option value="">진료실 선택</option>
+		    <option value="진료실1">진료실1</option>
+		    <option value="진료실2">진료실2</option>
+		    <option value="진료실3">진료실3</option>
+		    <option value="진료실4">진료실4</option>
+		  </select>
+		</div>
+		
+		<div id="doctorSelectContainer" style="margin-bottom: 10px; display: none;">
+		  <select name="doctorId" id="doctorSelect" style="width: 100%; padding: 8px;">
+		    <option value="">의사 선택</option>
+		    <option th:each="doc : ${doctors}" th:value="${doc.usersId}" th:text="${doc.usersName}">홍길동</option>
+		  </select>
+		</div>
+        
       <div style="margin-bottom: 15px;">
         <input type="text" placeholder="주소" name="patientAddress" required style="width: 100%; padding: 8px;">
       </div>
@@ -165,8 +188,18 @@
     
 	<!-- 예약 리스트 -->
 		 <ul class="reservation-list">
-        <li class="reservation-item"
-            th:each="patient : ${reservations}">
+		<li class="reservation-item"
+		    th:each="patient : ${reservations}"
+		    th:attr="data-id=${patient.patientId},
+		             data-name=${patient.patientName},
+		             data-gender=${patient.patientGender},
+		             data-birth=${patient.patientBirth},
+		             data-phone=${patient.patientPhone},
+		             data-symptom=${patient.patientSymptom},
+		             data-type=${patient.patientType},
+		             data-address=${patient.patientAddress}"
+		    onclick="openEditModal(this)">
+
 
           <!-- 예: patientBirth 필드를 “시간”처럼 보여주기 -->
           <span th:text="${patient.patientBirth.substring(0,7) + '*******'}"></span>
@@ -188,6 +221,64 @@
         </li>
       </ul>
     </div>
+    
+		    <!-- 환자 정보 수정 모달 -->
+		<div id="editPatientModal" class="modal" style="display:none;">
+		  <div class="modal-content" style="width: 400px;">
+		    <span class="close-btn" onclick="closeEditModal()">×</span>
+		    <h3 style="margin-bottom: 15px;">환자 정보 수정</h3>
+		
+			<form id="editPatientForm" method="post" th:action="@{/acceptance/updatePatientType}">
+		  <input type="hidden" id="editPatientId" name="patientId">
+		
+		  <div style="margin-bottom: 10px;">
+		    <input type="text" id="editName" name="patientName" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		  </div>
+		
+		  <div style="margin-bottom: 10px;">
+		    <select id="editGender" name="patientGender" disabled style="width: 100%; padding: 8px; background-color: #eee;">
+		      <option value="">성별 선택</option>
+		      <option value="남">남</option>
+		      <option value="여">여</option>
+		    </select>
+		  </div>
+		
+		  <div style="margin-bottom: 10px;">
+		    <input type="text" id="editBirth" name="patientBirth" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		  </div>
+		
+		  <div style="margin-bottom: 10px;">
+		    <input type="tel" id="editPhone" name="patientPhone" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		  </div>
+		
+		  <div style="margin-bottom: 10px;">
+		    <input type="text" id="editSymptom" name="patientSymptom" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		  </div>
+		
+		  <!-- ✅ 진료상태만 수정 가능 -->
+		  <div style="margin-bottom: 10px;">
+		    <select id="editType" name="patientType" required style="width: 100%; padding: 8px;">
+		      <option value="진료대기">진료대기</option>
+		      <option value="입원대기">입원대기</option>
+		      <option value="입원중">입원중</option>
+		      <option value="진료중">진료중</option>
+		      <option value="퇴원">퇴원</option>
+		      <option value="예약">예약</option>
+		    </select>
+		  </div>
+		
+		  <div style="margin-bottom: 15px;">
+		    <input type="text" id="editAddress" name="patientAddress" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+		  </div>
+		
+		  <button type="submit" style="padding: 8px 12px; background-color: #1e90ff; color: white; border: none; border-radius: 4px;">
+		    수정
+		  </button>
+		</form>
+
+  </div>
+</div>
+    
 
     <!-- 접수 영역 -->
     <div class="column reception-column">
@@ -273,6 +364,23 @@
             </div>
       </div>
     </li>
+      <li class="reception-item" th:each="patient : ${waitingPatients}">
+    <div class="times">
+      <span class="time1">-</span>
+      <span class="time2">진료대기</span>
+    </div>
+    <div class="info">
+      <div class="name"
+           th:text="${patient.patientName + ' (' + patient.patientGender + ') ' + patient.patientPhone + ' [' + patient.patientId + ']'}">
+        홍길동 (남) 010-1234-5678 [3]
+      </div>
+      <div class="details"
+           th:text="'증상: ' + ${patient.patientSymptom} + ' | 상태: ' + ${patient.patientType}">
+        증상: 복통 | 상태: 진료대기
+      </div>
+    </div>
+  </li>
+    
    </ul>
 
     </div>
@@ -327,16 +435,64 @@
 <script>
     // ───────────────────────────────────────────────────────
     // 1) 메뉴 토글(사이드바 하위메뉴 열고 닫기) (생략)
-    function toggleSubMenu(menuItem) { /* … */ }
+function toggleSubMenu(menuItem) {
+    const allMenuItems = document.querySelectorAll('.menu-item');
+    const allSubmenus = document.querySelectorAll('.submenu');
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.submenu-item').forEach(item => {
-        item.addEventListener('click', () => {
-          document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-        });
-      });
+    // 현재 이미 열려 있는 경우 닫기
+    const isActive = menuItem.classList.contains('active');
+    allMenuItems.forEach(item => item.classList.remove('active'));
+    allSubmenus.forEach(sub => sub.style.display = 'none');
+
+    // 다시 열기 (닫기 상태였다면)
+    if (!isActive) {
+        menuItem.classList.add('active');
+        const submenu = menuItem.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'block';
+        }
+    }
+}
+
+// 하위 메뉴 클릭 시 활성화 처리
+document.addEventListener('DOMContentLoaded', function () {
+  const submenuItems = document.querySelectorAll('.submenu-item');
+  submenuItems.forEach(item => {
+    item.addEventListener('click', function () {
+      submenuItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
     });
+  });
+
+  const patientTypeSelect = document.getElementById('patientTypeSelect');
+  const visitTimeContainer = document.getElementById('visitTimeContainer');
+  const roomSelectContainer = document.getElementById('roomSelectContainer');
+  const doctorSelectContainer = document.getElementById('doctorSelectContainer');
+  const visitTimeInput = document.getElementById('visitTime');
+
+  if (patientTypeSelect) {
+    patientTypeSelect.addEventListener('change', () => {
+      const isWaiting = patientTypeSelect.value === '진료대기';
+      visitTimeContainer.style.display = isWaiting ? 'block' : 'none';
+      roomSelectContainer.style.display = isWaiting ? 'block' : 'none';
+      doctorSelectContainer.style.display = isWaiting ? 'block' : 'none';
+
+      if (isWaiting) {
+        const now = new Date();
+        const formatted = now.toLocaleTimeString('ko-KR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        visitTimeInput.value = formatted;
+      } else {
+        visitTimeInput.value = '';
+      }
+    });
+  }
+});
+
+
 
     // ───────────────────────────────────────────────────────
     // 2) 날짜 선택 모달 관련 (생략)
@@ -388,6 +544,45 @@
     window.changeDate         = changeDate;
     window.openCustomerModal  = openCustomerModal;
     window.closeCustomerModal = closeCustomerModal;
+    
+    // ───────────────────────────────────────────────────────
+    // 5) 환자리스트정보
+	function openEditModal(el) {
+  // 데이터 채우기
+  document.getElementById("editPatientId").value = el.dataset.id;
+  document.getElementById("editName").value = el.dataset.name;
+  document.getElementById("editGender").value = el.dataset.gender;
+  document.getElementById("editBirth").value = el.dataset.birth;
+  document.getElementById("editPhone").value = el.dataset.phone;
+  document.getElementById("editSymptom").value = el.dataset.symptom;
+  document.getElementById("editType").value = el.dataset.type;
+  document.getElementById("editAddress").value = el.dataset.address;
+
+  // ✅ 모든 필드는 비활성화, 진료상태만 활성화
+  const form = document.getElementById("editPatientForm");
+  const inputs = form.querySelectorAll("input, select");
+
+  inputs.forEach(input => {
+    input.disabled = (input.name !== "patientType");  // 상태만 수정 가능
+  });
+
+  // hidden 필드인 patientId는 항상 enable
+  document.getElementById("editPatientId").disabled = false;
+
+  // ✅ 버튼은 항상 활성화
+  const submitBtn = form.querySelector("button[type='submit']");
+  submitBtn.disabled = false;
+  submitBtn.style.backgroundColor = '#1e90ff';
+  submitBtn.style.cursor = 'pointer';
+
+  document.getElementById("editPatientModal").style.display = "flex";
+}
+
+function closeEditModal() {
+  document.getElementById("editPatientModal").style.display = "none";
+}
+
+    
   </script>
 
 
