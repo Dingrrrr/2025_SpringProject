@@ -355,34 +355,62 @@
       });
     });
  
- 	// 수정 시 Ajax 요청
     saveBtn.addEventListener("click", () => {
-      const inputs = document.querySelectorAll("#formFields input");
-      const data = {};
+    	  const isPatientTab = document.querySelector('.tab-btn[data-tab="staff"]').classList.contains('active');
 
-      inputs.forEach((input) => {
-        const idx = input.getAttribute("data-idx");
-        const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
-        data[header] = input.value;
-      });
+    	  if (isPatientTab) {
+    	    // ----- 환자 수정 로직 -----
+    	    const inputs = document.querySelectorAll("#formFields input");
+    	    const patient = {};
+    	    inputs.forEach((input) => {
+    	      const key = input.getAttribute("data-key");
+    	      let value = input.value.trim() || null;
+    	      if (key === "patientBirth") value = formatBirthToISO(value);
+    	      patient[key] = value;
+    	    });
 
-      fetch("/admin/adminMemberManage/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usersId: data["ID"],
-          usersName: data["이름"],
-          usersPhone: data["전화번호"],
-          usersEmail: data["이메일"],
-          usersAddress: data["주소"],
-          usersBirth: data["생년월일"],
-          usersGender: data["성별"],
-          usersIdcard: data["주민등록번호"]
-        })
-      })
-        .then((res) => res.text())
-        .then((msg) => alert(msg));
-    });
+    	    fetch("/admin/adminMemberManage/patients/update", {
+    	      method: "POST",
+    	      headers: { "Content-Type": "application/json" },
+    	      body: JSON.stringify(patient)
+    	    })
+    	      .then(res => res.text())
+    	      .then(msg => {
+    	        alert(msg);
+    	        location.reload();
+    	      });
+
+    	  } else {
+    	    // ----- 일반 사용자 수정 로직 -----
+    	    const inputs = document.querySelectorAll("#formFields input");
+    	    const data = {};
+    	    inputs.forEach((input) => {
+    	      const idx = input.getAttribute("data-idx");
+    	      const header = selectedRow.closest("table").querySelectorAll("thead th")[idx].textContent.trim();
+    	      data[header] = input.value;
+    	    });
+
+    	    fetch("/admin/adminMemberManage/update", {
+    	      method: "POST",
+    	      headers: { "Content-Type": "application/json" },
+    	      body: JSON.stringify({
+    	        usersId: data["ID"],
+    	        usersName: data["이름"],
+    	        usersPhone: data["전화번호"],
+    	        usersEmail: data["이메일"],
+    	        usersAddress: data["주소"],
+    	        usersBirth: data["생년월일"],
+    	        usersGender: data["성별"],
+    	        usersIdcard: data["주민등록번호"]
+    	      })
+    	    })
+    	      .then((res) => res.text())
+    	      .then((msg) => {
+    	        alert(msg);
+    	        location.reload();
+    	      });
+    	  }
+    	});
    
     const infoModal = document.getElementById('infoModal');
 
@@ -401,18 +429,22 @@
           data.forEach(patient => {
             const row = document.createElement("tr");
             row.innerHTML = `
-            	  <td>${patient.patientId}</td>
-            	  <td>${patient.patientName}</td>
-            	  <td>${patient.patientGender}</td>
-            	  <td>${patient.patientBirth}</td>
-            	  <td>${patient.patientPhone}</td>
-            	  <td>${patient.patientAddress}</td>
-            	  <td>${patient.patientSymptom}</td>
-            	  <td>${patient.patientType}</td>
-            	`;
+              <td>${patient.patientId}</td>
+              <td>${patient.patientName}</td>
+              <td>${patient.patientGender}</td>
+              <td>${patient.patientBirth}</td>
+              <td>${patient.patientPhone}</td>
+              <td>${patient.patientAddress}</td>
+              <td>${patient.patientSymptom}</td>
+              <td>${patient.patientType}</td>
+            `;
             row.addEventListener("click", () => openPatientModal(row, patient));
             tbody.appendChild(row);
           });
+
+          // ✅ 검색/정렬 기능 적용
+          const patientTab = document.querySelector('#staff');
+          applySearchAndSort(patientTab);
         });
     }
 
@@ -436,36 +468,6 @@
     function formatBirthToISO(birthStr) {
       return birthStr.replace(/\./g, '-'); // "2010.06.03" → "2010-06-03"
     }
-
-    // 수정 시 Ajax 요청
-    saveBtn.addEventListener("click", () => {
-	  const inputs = document.querySelectorAll("#formFields input");
-	  const patient = {};
-	
-	  inputs.forEach((input) => {
-	    const key = input.getAttribute("data-key");
-	    let value = input.value.trim() || null;
-	
-	    if (key === "patientBirth") {
-	      value = formatBirthToISO(value); // ← 여기 핵심!!
-	    }
-	
-	    patient[key] = value;
-	  });
-	
-	  console.log("patientBirth 최종 값:", patient.patientBirth);
-	
-	  fetch("/admin/adminMemberManage/patients/update", {
-	    method: "POST",
-	    headers: { "Content-Type": "application/json" },
-	    body: JSON.stringify(patient)
-	  })
-	    .then(res => res.text())
-	    .then(msg => {
-	      alert(msg);
-	      location.reload();
-	    });
-	});
 
     document.getElementById('deleteBtn').addEventListener('click', () => {
     	  const isPatientTab = document.querySelector('.tab-btn[data-tab="staff"]').classList.contains('active');
@@ -498,7 +500,41 @@
     	      });
     	  }
     	});
-
+    
+	 // 검색 기능 공통 함수
+	    function applySearchAndSort(tab) {
+	      const searchInput = tab.querySelector('.search-input');
+	      const filterSelect = tab.querySelector('.filter-select');
+	      const sortSelect = tab.querySelector('.sort-select');
+	      const tbody = tab.querySelector('tbody');
+	      
+	      if (searchInput && filterSelect) {
+	        searchInput.addEventListener('input', () => {
+	          const keyword = searchInput.value.toLowerCase();
+	          const colIndex = parseInt(filterSelect.value);
+	
+	          const rows = tab.querySelectorAll('tbody tr');
+	          rows.forEach(row => {
+	            const cellText = row.cells[colIndex].textContent.toLowerCase();
+	            row.style.display = cellText.includes(keyword) ? '' : 'none';
+	          });
+	        });
+	      }
+	
+	      if (sortSelect) {
+	        sortSelect.addEventListener('change', () => {
+	          const index = parseInt(sortSelect.value);
+	          const rows = Array.from(tbody.querySelectorAll('tr'));
+	          rows.sort((a, b) => {
+	            const aText = a.cells[index].textContent;
+	            const bText = b.cells[index].textContent;
+	            return aText.localeCompare(bText);
+	          });
+	          rows.forEach(row => tbody.appendChild(row));
+	        });
+	      }
+	    }
+	 
   </script>
 </body>
 </html>
