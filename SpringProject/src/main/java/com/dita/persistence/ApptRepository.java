@@ -62,4 +62,3 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
     	// ✅ 환자의 모든 예약 삭제
         void deleteAllByPatient(Patient patient);
 }
-

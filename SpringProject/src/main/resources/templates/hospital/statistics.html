@@ -20,20 +20,51 @@
     <!-- 1) 사이드바 -->
     <aside class="hospital-sidebar">
       <h2 class="hospital-profile-title">
-        <img th:src="@{/icons/profile.jpg}" alt="프로필"><span>내 프로필</span>
+        <img th:src="@{/icons/profile.jpg}" alt="프로필">
+        <span th:text="${displayName}">의사 이름</span>
       </h2>
       <ul class="hospital-menu">
-     <li onclick="loadAndToggleNotification()"><img src="/icons/alert.png" alt=""> 알림</li>
-	  <li onclick="goToHome()"><img src="/icons/home.png" alt=""> 홈</li>
-	  <li onclick="goToTreatment()"><img th:src="@{/icons/doctor.png}" alt="진료"> 진료</li>
-      <li onclick="goToReservation()"><img src="/icons/calendar.png" alt="">예약</li>
-      <li onclick="goToChart()"><img src="/icons/chart.png" alt="차트"><span>차트</span></li>
-      <li class="active" onclick="goToStats()"><img th:src="@{/icons/statistics.png}" alt="통계"><span>통계</span>
-      <li><img src="/icons/bed.png" alt=""> 입원</li>
+        <!-- 알림은 fetch로 부분 로딩 -->
+        <li onclick="loadAndToggleNotification()">
+          <img th:src="@{/icons/alert.png}" alt=""> 알림
+        </li>
+        <!-- 홈 -->
+        <li>
+	      <a th:href="@{/hospital/hospital_home}">
+	        <img th:src="@{/icons/home.png}" alt=""> 홈
+	      </a>
+	    </li>
+        <!-- 진료 관리 -->
+        <li>
+	      <a th:href="@{/hospital/treatment}">
+	        <img th:src="@{/icons/doctor.png}" alt=""> 진료
+	      </a>
+	    </li>
+        <!-- 예약 관리 -->
+        <li>
+	      <a th:href="@{/hospital/reservation}">
+	        <img th:src="@{/icons/calendar.png}" alt=""> 예약
+	      </a>
+	    </li>
+        <!-- 차트 보기 -->
+        <li>
+	      <a th:href="@{/hospital/chart}">
+	        <img th:src="@{/icons/chart.png}" alt=""> 차트
+	      </a>
+	    </li>
+        <!-- 통계 보기 -->
+        <li>
+	      <a th:href="@{/hospital/statistics}">
+	        <img th:src="@{/icons/statistics.png}" alt=""> 통계
+	      </a>
+	    </li>
       </ul>
-       <div class="sidebar-footer">
-    <button type="button" class="logout-btn" onclick="goLogout()">로그아웃</button>
-  </div>
+      <div class="sidebar-footer">
+        <button class="logout-btn"
+                th:onclick="|location.href='@{/logout}'|">
+          로그아웃
+        </button>
+      </div>
     </aside>
 
     <!-- 2) 통계 본문 -->
