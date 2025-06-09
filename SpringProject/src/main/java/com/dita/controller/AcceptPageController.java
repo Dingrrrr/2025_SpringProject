@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,13 +92,19 @@ public class AcceptPageController {
 	    List<Patient> reservations = repo.findAll();
 	    model.addAttribute("reservations", reservations);
 
-	    // 4) 진료대기 환자만 필터링 → 접수 리스트 오른쪽에 표시
+	    // ✅ Appt에 포함된 환자 ID 수집
+	    Set<Integer> apptPatientIds = appts.stream()
+	        .map(appt -> appt.getPatient().getPatientId())
+	        .collect(Collectors.toSet());
+
+	    // 4) 진료대기 환자만 필터링하되, Appt에 없는 환자만
 	    List<Patient> waitingPatients = reservations.stream()
 	        .filter(p -> p.getPatientType() == PatientType.진료대기)
+	        .filter(p -> !apptPatientIds.contains(p.getPatientId())) // 중복 제거!
 	        .collect(Collectors.toList());
 	    model.addAttribute("waitingPatients", waitingPatients);
 
-	    // ✅ 5) 의사 목록 전달 → 등록 시 doctor 선택용
+	    // 5) 의사 목록
 	    List<User> doctors = userRepository.findByGrade(Grade.의사);
 	    model.addAttribute("doctors", doctors);
 
@@ -367,15 +374,40 @@ public class AcceptPageController {
 		    
 		    @PostMapping("/updatePatientType")
 		    public String updatePatientType(@RequestParam Integer patientId,
-		                                    @RequestParam PatientType patientType) {
+		                                    @RequestParam PatientType patientType,
+		                                    @RequestParam(required = false) String room,
+		                                    @RequestParam(required = false) String visitTime,
+		                                    @RequestParam(required = false) String doctorId) {
 		        Optional<Patient> optional = repo.findById(patientId);
 		        if (optional.isPresent()) {
 		            Patient patient = optional.get();
-		            patient.setPatientType(patientType);  // ❗ 진료상태만 수정
+		            patient.setPatientType(patientType);
 		            repo.save(patient);
+
+		            // 진료대기 상태일 경우 예약 자동 등록
+		            if (patientType == PatientType.진료대기 && room != null && visitTime != null) {
+		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		                LocalTime time = LocalTime.parse(visitTime, formatter);
+		                LocalDateTime scheduledAt = LocalDateTime.of(LocalDate.now(), time);
+
+		                Appt appt = new Appt();
+		                appt.setPatient(patient);
+		                appt.setRoom(room);
+		                appt.setScheduledAt(scheduledAt);
+		                appt.setCreatedAt(LocalDateTime.now());
+		                appt.setStatus(Status.대기);
+
+		                if (doctorId != null && !doctorId.isBlank()) {
+		                    userRepository.findById(doctorId).ifPresent(appt::setDoctor);
+		                }
+
+		                apptRepository.save(appt);
+		            }
 		        }
+
 		        return "redirect:/acceptance/acceptanceHome";
 		    }
+
 		}
 
 		

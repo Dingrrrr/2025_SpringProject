@@ -267,6 +267,27 @@
 		    </select>
 		  </div>
 		
+		<div id="editVisitTimeContainer" style="margin-bottom: 10px; display: none;">
+  <input type="text" id="editVisitTime" name="visitTime" readonly style="width: 100%; padding: 8px; background-color: #eee;">
+</div>
+
+	<div id="editRoomContainer" style="margin-bottom: 10px; display: none;">
+	  <select name="room" id="editRoom" style="width: 100%; padding: 8px;">
+	    <option value="">진료실 선택</option>
+	    <option value="진료실1">진료실1</option>
+	    <option value="진료실2">진료실2</option>
+	    <option value="진료실3">진료실3</option>
+	    <option value="진료실4">진료실4</option>
+	  </select>
+	</div>
+	
+	<div id="editDoctorContainer" style="margin-bottom: 10px; display: none;">
+	  <select name="doctorId" id="editDoctor" style="width: 100%; padding: 8px;">
+	    <option value="">의사 선택</option>
+	    <option th:each="doc : ${doctors}" th:value="${doc.usersId}" th:text="${doc.usersName}"></option>
+	  </select>
+	</div>
+		
 		  <div style="margin-bottom: 15px;">
 		    <input type="text" id="editAddress" name="patientAddress" readonly style="width: 100%; padding: 8px; background-color: #eee;">
 		  </div>
@@ -490,7 +511,35 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+  
+   const editTypeSelect = document.getElementById('editType');
+  const editVisitTimeContainer = document.getElementById('editVisitTimeContainer');
+  const editRoomContainer = document.getElementById('editRoomContainer');
+  const editDoctorContainer = document.getElementById('editDoctorContainer');
+  const editVisitTimeInput = document.getElementById('editVisitTime');
+
+  if (editTypeSelect) {
+    editTypeSelect.addEventListener('change', () => {
+      const isWaiting = editTypeSelect.value === '진료대기';
+      editVisitTimeContainer.style.display = isWaiting ? 'block' : 'none';
+      editRoomContainer.style.display = isWaiting ? 'block' : 'none';
+      editDoctorContainer.style.display = isWaiting ? 'block' : 'none';
+
+      if (isWaiting) {
+        const now = new Date();
+        const formatted = now.toLocaleTimeString('ko-KR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        editVisitTimeInput.value = formatted;
+      } else {
+        editVisitTimeInput.value = '';
+      }
+    });
+  }
 });
+
 
 
 
@@ -562,9 +611,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById("editPatientForm");
   const inputs = form.querySelectorAll("input, select");
 
-  inputs.forEach(input => {
-    input.disabled = (input.name !== "patientType");  // 상태만 수정 가능
-  });
+inputs.forEach(input => {
+  const name = input.name;
+  const allowList = ["patientType", "visitTime", "room", "doctorId"];
+  input.disabled = !allowList.includes(name);
+});
 
   // hidden 필드인 patientId는 항상 enable
   document.getElementById("editPatientId").disabled = false;
