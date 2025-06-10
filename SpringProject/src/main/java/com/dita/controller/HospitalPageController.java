@@ -162,16 +162,24 @@ public class HospitalPageController {
 
                 model.addAttribute("selectedAppt", appt);
 
-                // 진료 기록 존재 여부 (차트 작성 여부)
+                // 차트 작성 여부
                 boolean alreadyWritten = medRecService.existsByApptId(apptId);
                 model.addAttribute("alreadyWritten", alreadyWritten);
 
-                // 환자 과거 진료 기록 + 메모
-                model.addAttribute("medRecords", medRecService.findRecordsByPatient(appt.getPatient()));
-                model.addAttribute("recentMedRecs", medRecService.findTop2RecordsByPatient(appt.getPatient()));
+                // 환자 진료기록 전체
+                List<Med_rec> medRecords = medRecService.findRecordsByPatient(appt.getPatient());
+                model.addAttribute("medRecords", medRecords);
 
-                boolean chartExists = !medRecService.findByAppt(appt).isEmpty();
-                model.addAttribute("chartExists", chartExists);
+                // ✅ 메모가 있는 최근 진료기록 2건만 필터링
+                List<Med_rec> recentNotes = medRecords.stream()
+                    .filter(rec -> rec.getNotes() != null && !rec.getNotes().isBlank())
+                    .sorted(Comparator.comparing(Med_rec::getCreatedAt).reversed())
+                    .limit(2)
+                    .collect(Collectors.toList());
+                model.addAttribute("recentMedRecs", recentNotes);
+
+                // (추가 flag 사용 시)
+                model.addAttribute("chartExists", alreadyWritten);
             }
         }
 
