@@ -66,10 +66,18 @@ async function submitDrug() {
       body: JSON.stringify(request)
     });
 
-    if (res.ok) {
-      alert("약품 재고가 성공적으로 추가되었습니다.");
-      window.close();
-    } else {
+ if (res.ok) {
+  alert("약품 재고가 성공적으로 추가되었습니다.");
+  try {
+    if (window.opener && typeof window.opener.loadInventoryCards === "function") {
+      window.opener.loadInventoryCards(); // 부모창 새로고침
+    }
+  } catch (e) {
+    console.warn("부모창 갱신 실패:", e); // 오류 무시
+  }
+  window.close(); // 항상 닫힘
+}
+ else {
       const errorText = await res.text();
       showError("서버 오류: " + errorText);
     }

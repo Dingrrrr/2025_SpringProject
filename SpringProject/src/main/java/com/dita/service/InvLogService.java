@@ -40,25 +40,26 @@ public class InvLogService {
         }
         // 신규 약품이면 새로 생성
         else {
-        	drug = Drug.builder()
-        	        .drugName(dto.getName())
-        	        .drugCode(dto.getCode())
-        	        .formType(Form_Type.valueOf(dto.getType().toUpperCase()))
-        	        .build();
+            drug = Drug.builder()
+                    .drugName(dto.getName())
+                    .drugCode(dto.getCode())
+                    .formType(parseFormType(dto.getType()))
+                    .build();
             drugRepository.save(drug);
         }
 
-        // 입고 로그 객체 생성
+        // 입고 로그 객체 생성 (위치 저장 포함)
         Inv_log log = Inv_log.builder()
                 .drug(drug)
                 .changeType(ChangeType.IN)
                 .quantity(dto.getQuantity())
                 .occurredAt(LocalDateTime.now())
-                .location(dto.getLocation())
+                .location(dto.getLocation())  // ✅ 위치값 유지
                 .build();
 
         invLogRepo.save(log);
     }
+
 
 
     /**
@@ -110,6 +111,8 @@ public class InvLogService {
         if (currentStock < quantity) {
             throw new IllegalStateException("재고가 부족합니다. 현재 재고: " + currentStock);
         }
+        
+        
 
         // 출고 로그 생성 (location은 저장하지 않음)
         Inv_log log = Inv_log.builder()
@@ -132,5 +135,22 @@ public class InvLogService {
 
         invLogRepo.save(original);
     }
+    
+    private static Form_Type parseFormType(String input) {
+        switch (input) {
+            case "INTERNAL": return Form_Type.내복약;
+            case "EXTERNAL": return Form_Type.외용약;
+            case "INJECTION": return Form_Type.주사;
+            case "LIQUID": return Form_Type.수액;
+            case "ETC": return Form_Type.기타;
+            case "내복약": return Form_Type.내복약;
+            case "외용약": return Form_Type.외용약;
+            case "주사": return Form_Type.주사;
+            case "수액": return Form_Type.수액;
+            case "기타": return Form_Type.기타;
+            default: throw new IllegalArgumentException("알 수 없는 약품 종류: " + input);
+        }
+    }
 
+    
 }
