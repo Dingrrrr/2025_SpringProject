@@ -51,9 +51,9 @@ public class Med_rec {
 	@Column(name = "chief_complaint")
 	private String chiefComplaint;// 증상
 	
-	@OneToOne
-	@JoinColumn(name = "id", nullable = false)
-	private Disease Id;
+	@ManyToOne
+	@JoinColumn(name = "disease_id", nullable = false)  // 필드명 & 컬럼명 충돌 방지
+	private Disease disease;
 	
 	@Column(name = "notes")
 	private String notes;// 추가 메모

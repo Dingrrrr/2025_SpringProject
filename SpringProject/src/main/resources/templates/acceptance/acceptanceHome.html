@@ -378,7 +378,10 @@
 
   <!-- 접수 리스트 -->
   <ul class="reception-list">
-    <li class="reception-item" th:each="appt : ${appts}">
+<li class="reception-item"
+    th:each="appt : ${appts}"
+    th:attr="data-type=${appt.patient.patientType}">
+
       <div class="times">
         <span class="time1"
              th:text="${#temporals.format(appt.scheduledAt, 'HH:mm')} + ' 전'">
@@ -671,18 +674,16 @@ function closeEditModal() {
   const filterRadios = document.querySelectorAll('input[name="filter"]');
   const receptionItems = document.querySelectorAll('.reception-item');
 
-  function filterReception(type) {
-    receptionItems.forEach(item => {
-      const text = item.textContent || "";
-      if (type === '전체') {
-        item.style.display = '';
-      } else if (type === '예약') {
-        item.style.display = text.includes('상태: 예약') ? '' : 'none';
-      } else if (type === '진료대기') {
-        item.style.display = text.includes('상태: 진료대기') ? '' : 'none';
-      }
-    });
-  }
+function filterReception(type) {
+  receptionItems.forEach(item => {
+    const status = item.getAttribute('data-type');
+    if (type === '전체') {
+      item.style.display = (status === '예약' || status === '진료대기') ? '' : 'none';
+    } else {
+      item.style.display = (status === type) ? '' : 'none';
+    }
+  });
+}
 
   filterRadios.forEach(radio => {
     radio.addEventListener('change', () => {
@@ -690,7 +691,15 @@ function closeEditModal() {
       filterReception(selectedLabel);
     });
   });
+    const selected = document.querySelector('input[name="filter"]:checked');
+  if (selected) {
+    const type = selected.parentElement.textContent.trim();
+    filterReception(type);
+  }
+
 });
+
+
 //새로고침
 function resetToToday() {
   const today = new Date();
