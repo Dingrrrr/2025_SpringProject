@@ -98,18 +98,26 @@
     </div>
     <div class="divider-row">
       <span class="status">진료중</span>
-      <span class="current-patient">성연오님</span>
+<span class="current-patient"
+      th:text="${room1Current != null ? room1Current.patient.patientName + '님' : ''}">
+</span>
+
     </div>
-    <div class="patient-area">
-      <div class="left">
-		<p class="waiting-count" th:text="${room1Appts.size()} + '명'">50명</p>
-      </div>
-		<ul class="right">
-			<li th:each="appt, stat : ${room1Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+<p class="waiting-count"
+    th:text="${room1Appts.size()} + '명'">0명</p>
+
+
+<ul class="right">
+<li class="waiting-name"
+    th:each="appt, stat : ${room1Appts}"
+    th:if="${stat.index < 7}"
+    th:text="${stat.index + 1 + '. ' + appt.patient.patientName + '님'}">
+</li>
+
 
 		</ul>
 
-    </div>
+
   </div>
 
   <!-- 진료실 2 -->
@@ -121,18 +129,26 @@
     </div>
     <div class="divider-row">
       <span class="status">진료중</span>
-      <span class="current-patient">한서린님</span>
+<span class="current-patient"
+      th:text="${room2Current != null ? room2Current.patient.patientName + '님' : ''}">
+</span>
+
     </div>
-    <div class="patient-area">
-      <div class="left">
-		<p class="waiting-count" th:text="${room2Appts.size()} + '명'">50명</p>
-      </div>
-		<ul class="right">
-			<li th:each="appt, stat : ${room2Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+<p class="waiting-count"
+    th:text="${room2Appts.size()} + '명'">0명</p>
+
+
+<ul class="right">
+<li class="waiting-name"
+    th:each="appt, stat : ${room2Appts}"
+    th:if="${stat.index < 7}"
+    th:text="${stat.index + 1 + '. ' + appt.patient.patientName + '님'}">
+</li>
+
 
 		</ul>
 
-    </div>
+
   </div>
 
   <!-- 진료실 3 -->
@@ -144,17 +160,25 @@
     </div>
     <div class="divider-row">
       <span class="status">진료중</span>
-      <span class="current-patient">홍지민님</span>
-    </div>
-    <div class="patient-area">
-      <div class="left">
-		<p class="waiting-count" th:text="${room3Appts.size()} + '명'">50명</p>
-      </div>
-		<ul class="right">
-			<li th:each="appt, stat : ${room3Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+<span class="current-patient"
+      th:text="${room3Current != null ? room3Current.patient.patientName + '님' : ''}">
+</span>
+
+ </div>
+<p class="waiting-count"
+   th:text="${room3Appts.size()} + '명'">0명</p>
+
+
+<ul class="right">
+<li class="waiting-name"
+    th:each="appt, stat : ${room3Appts}"
+    th:if="${stat.index < 7}"
+    th:text="${stat.index + 1 + '. ' + appt.patient.patientName + '님'}">
+</li>
+
 		</ul>
     </div>
-  </div>
+ 
 
   <!-- 진료실 4 -->
   <div class="room-box">
@@ -166,18 +190,26 @@
     </div>
     <div class="divider-row">
       <span class="status">진료중</span>
-      <span class="current-patient">정우진님</span>
-    </div>
-    <div class="patient-area">
-      <div class="left">
-		<p class="waiting-count" th:text="${room4Appts.size()} + '명'">50명</p>
-      </div>
-	<ul class="right">
-			<li th:each="appt, stat : ${room4Appts}" th:text="${stat.index + 1} + '. ' + ${appt.patient.patientName + '님'}"></li>
+<span class="current-patient"
+      th:text="${room4Current != null ? room4Current.patient.patientName + '님' : ''}">
+</span>
+
+  </div>
+<p class="waiting-count"
+   th:text="${room4Appts.size()} + '명'">0명</p>
+
+
+<ul class="right">
+<li class="waiting-name"
+    th:each="appt, stat : ${room4Appts}"
+    th:if="${stat.index < 7}"
+    th:text="${stat.index + 1 + '. ' + appt.patient.patientName + '님'}">
+</li>
+
 
 	</ul>
     </div>
-  </div>
+
 
 </div>
 

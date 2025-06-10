@@ -48,6 +48,10 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
                                              @Param("end") LocalDateTime end);
     @Query("SELECT a FROM Appt a JOIN FETCH a.patient")
     List<Appt> findAllWithPatient();
+    //환자리스트
+    @Query("SELECT a FROM Appt a WHERE a.room = :room AND a.patient.patientType IN :types ORDER BY a.scheduledAt ASC")
+    List<Appt> findByRoomAndPatientTypes(@Param("room") int room, @Param("types") List<PatientType> types);
+
 
 
 
