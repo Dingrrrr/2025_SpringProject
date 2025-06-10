@@ -73,6 +73,11 @@
     <li class="submenu-item">입원 통계</li>
   </a>
 </ul>
+
+<a th:href="@{/Login/Logout}" class="menu-item logout">
+    		<div class="menu-icon">🚪</div>
+    		<span>로그아웃</span>
+		</a>
     </div>
 <div class="content">
 <div class="schedule-header">
@@ -99,67 +104,30 @@
 </div>
 
 <script>
-
-function toggleSubMenu(menuItem) {
-    const allMenuItems = document.querySelectorAll('.menu-item');
-    const allSubmenus = document.querySelectorAll('.submenu');
-
-    const isActive = menuItem.classList.contains('active');
-    allMenuItems.forEach(item => item.classList.remove('active'));
-    allSubmenus.forEach(sub => sub.style.display = 'none');
-
-    if (!isActive) {
-        menuItem.classList.add('active');
-        const submenu = menuItem.nextElementSibling;
-        if (submenu && submenu.classList.contains('submenu')) {
-            submenu.style.display = 'block';
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const submenuItems = document.querySelectorAll('.submenu-item');
-    submenuItems.forEach(item => {
-        item.addEventListener('click', function () {
-            submenuItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        });
-    });
-});
-
-// 전역 변수
+const dayOfWeekNames = ["일", "월", "화", "수", "목", "금", "토"];
 let currentYear = 2025;
 let currentMonth = 6;
 let searchName = '';
 
-// 월 텍스트 업데이트
-function updateMonthTitle(year, month) {
-    document.getElementById('month-title').textContent = `${year}년 ${month}월`;
+// ✅ 요일 기준 API 호출 함수
+async function fetchDoctorsByDay(dayName) {
+    const response = await fetch(`/acceptance/doctorScheduleByWeekday?day=${dayName}`);
+    if (!response.ok) return [];
+    return await response.json();
 }
 
-// 달 변경
-function changeMonth(offset) {
-    currentMonth += offset;
-    if (currentMonth < 1) {
-        currentMonth = 12;
-        currentYear--;
-    } else if (currentMonth > 12) {
-        currentMonth = 1;
-        currentYear++;
+function getColorByName(name) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    updateMonthTitle(currentYear, currentMonth);
-    generateCalendar(currentYear, currentMonth);
+    const hue = hash % 360;
+    return `hsl(${hue}, 70%, 80%)`;
 }
 
-// 검색 버튼 클릭
-function searchDoctor() {
-    const input = document.getElementById('doctorSearch').value.trim();
-    searchName = input;
-    generateCalendar(currentYear, currentMonth);
-}
 
-// 달력 생성
-function generateCalendar(year, month) {
+// ✅ 달력 생성 함수 (비동기)
+async function generateCalendar(year, month) {
     const calendarBody = document.getElementById('calendar-body');
     calendarBody.innerHTML = '';
 
@@ -168,8 +136,14 @@ function generateCalendar(year, month) {
     const startDayOfWeek = firstDay.getDay();
     const totalCells = Math.ceil((startDayOfWeek + lastDate) / 7) * 7;
 
-    let day = 1;
+    // ✅ 요일별 의사 리스트 한 번에 다 받아오기
+    const weekdayMap = {};
+    for (let i = 0; i < 7; i++) {
+        const dayName = dayOfWeekNames[i];
+        weekdayMap[dayName] = await fetchDoctorsByDay(dayName); // { "월": [...], "화": [...] }
+    }
 
+    let day = 1;
     for (let i = 0; i < totalCells / 7; i++) {
         const row = document.createElement('div');
         row.className = 'calendar-row';
@@ -185,16 +159,16 @@ function generateCalendar(year, month) {
                 dateSpan.textContent = day;
                 cell.appendChild(dateSpan);
 
-                const doctors = [];
-                if ([3, 5, 10, 12, 17].includes(day)) doctors.push({ name: '이준수', class: 'blue' });
-                if ([5, 12, 19, 30].includes(day)) doctors.push({ name: '김승환', class: 'yellow' });
-                if ([3, 4, 17, 30].includes(day)) doctors.push({ name: '이화진', class: 'red' });
+                const dayName = dayOfWeekNames[j]; // "월", "화" 등
+                const doctors = weekdayMap[dayName] || [];
 
                 for (let doc of doctors) {
-                    if (!searchName || doc.name.includes(searchName)) {
+                    if (!searchName || doc.usersId.includes(searchName)) {
                         const docDiv = document.createElement('div');
-                        docDiv.className = `doctor ${doc.class}`;
-                        docDiv.textContent = doc.name;
+                        docDiv.className = 'doctor';
+                        docDiv.textContent = doc.usersId;
+                        docDiv.title = `${doc.startTime} ~ ${doc.endTime}`;
+                        docDiv.style.backgroundColor = getColorByName(doc.usersId);
                         cell.appendChild(docDiv);
                     }
                 }
@@ -209,18 +183,49 @@ function generateCalendar(year, month) {
     }
 }
 
-// 최초 실행
-updateMonthTitle(currentYear, currentMonth);
-generateCalendar(currentYear, currentMonth);
+function updateMonthTitle(year, month) {
+    document.getElementById('month-title').textContent = `${year}년 ${month}월`;
+}
 
-//새로고침
+function changeMonth(offset) {
+    currentMonth += offset;
+    if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
+    } else if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+    }
+    updateMonthTitle(currentYear, currentMonth);
+    generateCalendar(currentYear, currentMonth);
+}
+
+function searchDoctor() {
+    const input = document.getElementById('doctorSearch').value.trim();
+    searchName = input;
+    generateCalendar(currentYear, currentMonth);
+}
+
 document.getElementById('resetSearch').addEventListener('click', function () {
     document.getElementById('doctorSearch').value = '';
     searchName = '';
     generateCalendar(currentYear, currentMonth);
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    updateMonthTitle(currentYear, currentMonth);
+    generateCalendar(currentYear, currentMonth);
+
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            submenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
 </script>
+
 </body>
 </html>
 
