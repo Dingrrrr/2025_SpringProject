@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,7 +34,7 @@ import com.dita.domain.Appt;
 import com.dita.domain.Grade;
 import com.dita.domain.Patient;
 import com.dita.domain.PatientType;
-
+import com.dita.domain.Sched;
 import com.dita.domain.Status;
 import com.dita.domain.User;
 import com.dita.persistence.*;
@@ -43,6 +44,7 @@ import com.dita.persistence.LoginPageRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.service.EmailService;
 import com.dita.vo.AppointmentDto;
+import com.dita.vo.SchedDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -63,13 +65,15 @@ public class AcceptPageController {
 	private final PatientRepository repo; 
 	private final ApptRepository arepo;
 	private final ApptRepository apptRepository;
+	private final AdminMemberRepository adminMemberRepository;
 	
-	public AcceptPageController(PatientRepository repo, UserRepository userRepository, ApptRepository apptRepository,ApptRepository arepo) {
+	public AcceptPageController(PatientRepository repo, UserRepository userRepository, ApptRepository apptRepository,ApptRepository arepo, AdminMemberRepository adminMemberRepository) {
 
 		this.repo = repo;
 		this.userRepository = userRepository;
 		this.apptRepository = apptRepository;
 		this.arepo = arepo;
+		this.adminMemberRepository = adminMemberRepository;
 
 	}
 	
@@ -527,7 +531,27 @@ public class AcceptPageController {
 		        return "redirect:/acceptance/acceptanceHome";
 		    }
 
-		    
+		    @GetMapping("/doctorScheduleByWeekday")  // ✅ 이 경로와 결합 → /acceptance/doctorScheduleByWeekday
+		    @ResponseBody
+		    public List<SchedDto> getDoctorSchedulesByDay(@RequestParam("day") String day) {
+		        List<Sched> scheds = adminMemberRepository.findByUserGrade(Grade.의사).stream()
+		                .filter(sched -> sched.getWorkDays().contains(day))
+		                .toList();
+
+		        return scheds.stream().map(sched -> {
+		            SchedDto dto = new SchedDto();
+		            dto.setScheduleId(sched.getScheduleId());
+		            dto.setStartTime(sched.getStartTime());
+		            dto.setEndTime(sched.getEndTime());
+		            dto.setType(sched.getType());
+		            dto.setUsersId(sched.getUser().getUsersName());
+		            dto.setWorkDays(sched.getWorkDays());
+		            return dto;
+		        }).toList();
+		    }
+
+
+
 		    
 		}
 
