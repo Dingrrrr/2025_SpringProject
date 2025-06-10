@@ -414,6 +414,11 @@ public class AcceptPageController {
 		    if (dto.getStatus() != null) {
 		        appt.setStatus(dto.getStatus());
 		    }
+		    if (dto.getStatus() == Status.확정) {
+		        Patient patient = appt.getPatient();
+		        patient.setPatientType(PatientType.진료대기);
+		        repo.save(patient);
+		    }
 		    apptRepository.save(appt);
 
 		    return "수정 완료";
