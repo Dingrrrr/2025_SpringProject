@@ -1,150 +1,140 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>진료 관리</title>
-  <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
-  <link rel="stylesheet" th:href="@{/css/treatment_style.css}">
+<meta charset="UTF-8">
+<title>진료 관리</title>
+<link rel="stylesheet" th:href="@{/css/hospital_style.css}">
+<link rel="stylesheet" th:href="@{/css/treatment_style.css}">
 </head>
 <body>
-  <div class="hospital-container">
+	<div class="hospital-container">
 
-    <!-- 사이드바 -->
-    <aside class="hospital-sidebar">
-      <h2 class="hospital-profile-title">
-        <img th:src="@{/icons/profile.jpg}" alt="프로필">
-        <span th:text="${displayName}">의사 이름</span>
-      </h2>
-      <ul class="hospital-menu">
-        <!-- 알림은 fetch로 부분 로딩 -->
-        <li onclick="loadAndToggleNotification()">
-          <img th:src="@{/icons/alert.png}" alt=""> 알림
-        </li>
-        <!-- 홈 -->
-        <li>
-	      <a th:href="@{/hospital/hospital_home}">
-	        <img th:src="@{/icons/home.png}" alt=""> 홈
-	      </a>
-	    </li>
-        <!-- 진료 관리 -->
-        <li>
-	      <a th:href="@{/hospital/treatment}">
-	        <img th:src="@{/icons/doctor.png}" alt=""> 진료
-	      </a>
-	    </li>
-        <!-- 예약 관리 -->
-        <li>
-	      <a th:href="@{/hospital/reservation}">
-	        <img th:src="@{/icons/calendar.png}" alt=""> 예약
-	      </a>
-	    </li>
-        <!-- 차트 보기 -->
-        <li>
-	      <a th:href="@{/hospital/chart}">
-	        <img th:src="@{/icons/chart.png}" alt=""> 차트
-	      </a>
-	    </li>
-        <!-- 통계 보기 -->
-        <li>
-	      <a th:href="@{/hospital/statistics}">
-	        <img th:src="@{/icons/statistics.png}" alt=""> 통계
-	      </a>
-	    </li>
-      </ul>
-      <div class="sidebar-footer">
-        <button class="logout-btn"
-                th:onclick="|location.href='@{/logout}'|">
-          로그아웃
-        </button>
-      </div>
-    </aside>
+		<!-- 사이드바 -->
+		<aside class="hospital-sidebar">
+			<h2 class="hospital-profile-title">
+				<img th:src="@{/icons/profile.jpg}" alt="프로필"> <span
+					th:text="${displayName}">의사 이름</span>
+			</h2>
+			<ul class="hospital-menu">
+				<!-- 알림은 fetch로 부분 로딩 -->
+				<li onclick="loadAndToggleNotification()"><img
+					th:src="@{/icons/alert.png}" alt=""> 알림</li>
+				<!-- 홈 -->
+				<li><a th:href="@{/hospital/hospital_home}"> <img
+						th:src="@{/icons/home.png}" alt=""> 홈
+				</a></li>
+				<!-- 진료 관리 -->
+				<li><a th:href="@{/hospital/treatment}"> <img
+						th:src="@{/icons/doctor.png}" alt=""> 진료
+				</a></li>
+				<!-- 예약 관리 -->
+				<li><a th:href="@{/hospital/reservation}"> <img
+						th:src="@{/icons/calendar.png}" alt=""> 예약
+				</a></li>
+				<!-- 차트 보기 -->
+				<li><a th:href="@{/hospital/chart}"> <img
+						th:src="@{/icons/chart.png}" alt=""> 차트
+				</a></li>
+				<!-- 통계 보기 -->
+				<li><a th:href="@{/hospital/statistics}"> <img
+						th:src="@{/icons/statistics.png}" alt=""> 통계
+				</a></li>
+			</ul>
+			<div class="sidebar-footer">
+				<form th:action="@{/Login/Logout}" method="get" style="margin: 0;">
+					<button type="submit" class="logout-btn">로그아웃</button>
+				</form>
+			</div>
+		</aside>
 
-    <!-- 메인 콘텐츠 -->
-    <section class="treatment-content">
+		<!-- 메인 콘텐츠 -->
+		<section class="treatment-content">
 
-      <!-- 상단 검색 + 환자 요약 -->
-      <header class="treatment-header">
-        <div class="search-call">
-          <div class="search-box">
-            <form th:action="@{/hospital/search}" method="get" style="display: flex; gap: 10px;">
-  <input type="text" name="keyword" placeholder="환자 검색(ctrl+K)" required>
-  <button type="submit">검색</button>
-</form>
-          </div>
-          <div class="next-pull">
-            <label>다음 환자 부르기</label>
-            <select>
-              <option>진료실1</option>
-              <option>진료실2</option>
-              <option>진료실3</option>
-              <option>진료실4</option>
-            </select>
-          </div>
-        </div>
+			<!-- 상단 검색 + 환자 요약 -->
+			<header class="treatment-header">
+				<div class="search-call">
+					<div class="search-box">
+						<form th:action="@{/hospital/search}" method="get"
+							style="display: flex; gap: 10px;">
+							<input type="text" name="keyword" placeholder="환자 검색(ctrl+K)"
+								required>
+							<button type="submit">검색</button>
+						</form>
+					</div>
+					<div class="next-pull">
+						<label>다음 환자 부르기</label> <select>
+							<option>진료실1</option>
+							<option>진료실2</option>
+							<option>진료실3</option>
+							<option>진료실4</option>
+						</select>
+					</div>
+				</div>
 
-        <!-- 검색 결과 출력 -->
-        <div id="patientInfoBox" class="patient-summary">
-  <div th:if="${patientResults == null}" style="padding: 10px; color: gray;">
-    위쪽 검색창에서 환자 이름을 입력하세요
-  </div>
-  
-  <div th:if="${patientResults != null}">
-    <div th:if="${#lists.isEmpty(patientResults)}" style="color: red;">
-      검색 결과가 없습니다.
-    </div>
-    
-    <div th:each="p : ${patientResults}" class="patient-info-card">
-      <strong th:text="${p.patient.patientName}">이름</strong>
-      (<span th:text="${p.patient.patientGender}">성별</span>,
-      <span th:text="${p.patient.age}">0</span>세,
-      <span th:text="${p.patient.patientBirth}">생년월일</span>)
+				<!-- 검색 결과 출력 -->
+				<div id="patientInfoBox" class="patient-summary">
+					<div th:if="${patientResults == null}"
+						style="padding: 10px; color: gray;">위쪽 검색창에서 환자 이름을 입력하세요</div>
 
-      <div class="tag-list">
-        <span class="tag yellow">체온: <span th:text="${p.vital?.temperature ?: '-'}"></span></span>
-        <span class="tag yellow">맥박: <span th:text="${p.vital?.pulse ?: '-'}"></span></span>
-        <span class="tag yellow">신장: <span th:text="${p.vital?.height ?: '-'}"></span></span>
-        <span class="tag yellow">체중: <span th:text="${p.vital?.weight ?: '-'}"></span></span>
-        <span class="tag yellow">검사일: <span th:text="${#temporals.format(p.vital?.createdAt, 'yyyy-MM-dd') ?: '-'}"></span></span>
-      </div>
-    </div>
-  </div>
-</div>
+					<div th:if="${patientResults != null}">
+						<div th:if="${#lists.isEmpty(patientResults)}" style="color: red;">
+							검색 결과가 없습니다.</div>
+
+						<div th:each="p : ${patientResults}" class="patient-info-card">
+							<strong th:text="${p.patient.patientName}">이름</strong> (<span
+								th:text="${p.patient.patientGender}">성별</span>, <span
+								th:text="${p.patient.age}">0</span>세, <span
+								th:text="${p.patient.patientBirth}">생년월일</span>)
+
+							<div class="tag-list">
+								<span class="tag yellow">체온: <span
+									th:text="${p.vital?.temperature ?: '-'}"></span></span> <span
+									class="tag yellow">맥박: <span
+									th:text="${p.vital?.pulse ?: '-'}"></span></span> <span
+									class="tag yellow">신장: <span
+									th:text="${p.vital?.height ?: '-'}"></span></span> <span
+									class="tag yellow">체중: <span
+									th:text="${p.vital?.weight ?: '-'}"></span></span> <span
+									class="tag yellow">검사일: <span
+									th:text="${#temporals.format(p.vital?.createdAt, 'yyyy-MM-dd') ?: '-'}"></span></span>
+							</div>
+						</div>
+					</div>
+				</div>
 
 
-      <!-- 탭 -->
-      <nav class="record-tabs">
-        <ul>
-          <li class="active">진료실 현황</li>
-        </ul>
-        <span class="waiting-count"
-		      th:text="${'대기환자 : ' + waitingCount}">
-		  대기환자 : 0
-		</span>
-      </nav>
+				<!-- 탭 -->
+				<nav class="record-tabs">
+					<ul>
+						<li class="active">진료실 현황</li>
+					</ul>
+					<span class="waiting-count" th:text="${'대기환자 : ' + waitingCount}">
+						대기환자 : 0 </span>
+				</nav>
 
-      <!-- 카드 컬럼 -->
-      <div class="treatment-columns">
-    <!-- appointmentsByRoom 는 컨트롤러에서 model.addAttribute("appointmentsByRoom", map) 으로 넣어준 Map<String,List<Appt>> -->
-    <div th:each="entry : ${appointmentsByRoom}">
-      <div class="treatment-column">
-        <h3>
-          <!-- entry.key = "진료실1", entry.value.size = 환자 수 -->
-          <span th:text="${entry.key}">진료실?</span>
-          <span class="col-count" th:text="${#lists.size(entry.value)}">0</span>
-        </h3>
+				<!-- 카드 컬럼 -->
+				<div class="treatment-columns">
+					<!-- appointmentsByRoom 는 컨트롤러에서 model.addAttribute("appointmentsByRoom", map) 으로 넣어준 Map<String,List<Appt>> -->
+					<div th:each="entry : ${appointmentsByRoom}">
+						<div class="treatment-column">
+							<h3>
+								<!-- entry.key = "진료실1", entry.value.size = 환자 수 -->
+								<span th:text="${entry.key}">진료실?</span> <span class="col-count"
+									th:text="${#lists.size(entry.value)}">0</span>
+							</h3>
 
-        <!-- 각 진료실의 예약(확정·대기대기) 리스트 반복 -->
-        <div th:each="appt : ${entry.value}" class="treatment-card">
-          <div class="card-patient">
-            <span th:text="${appt.patient.patientName}">이름</span><br>
-              [<span th:text="${appt.patient.patientGender}">성별</span>] 
-              <!-- 나이 계산: Period.between(생일, 오늘).years -->
-              <span th:text="${appt.patient.age}">0</span>세 ·
-              <span th:text="${appt.patient.patientBirth}">생년월일</span>
-          </div>
-          <!-- 상태 badge -->
-         <div class="card-status"
-		  th:classappend="${ appt.patient.patientType.name() == '진료대기' 
+							<!-- 각 진료실의 예약(확정·대기대기) 리스트 반복 -->
+							<div th:each="appt : ${entry.value}" class="treatment-card">
+								<div class="card-patient">
+									<span th:text="${appt.patient.patientName}">이름</span><br>
+									[<span th:text="${appt.patient.patientGender}">성별</span>]
+									<!-- 나이 계산: Period.between(생일, 오늘).years -->
+									<span th:text="${appt.patient.age}">0</span>세 · <span
+										th:text="${appt.patient.patientBirth}">생년월일</span>
+								</div>
+								<!-- 상태 badge -->
+								<div class="card-status"
+									th:classappend="${ appt.patient.patientType.name() == '진료대기' 
 		      ? ' yellow' 
 		      : (appt.patient.patientType.name() == '진료중' 
 		          ? ' blue' 
@@ -152,7 +142,7 @@
 		              ? ' gray' 
 		              : '')) 
 		  }"
-		  th:text="${ 
+									th:text="${ 
 		    appt.patient.patientType.name() == '진료대기' 
 		      ? '대기' 
 		      : (appt.patient.patientType.name() == '진료중' 
@@ -161,16 +151,15 @@
 		              ? '수납' 
 		              : '')) 
 		  }">
-		</div>
-        </div>
-      </div>
-    </div>
-  </div>
-<script>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
   
 </script>
-
 </body>
 </html>
-    </section>
-  </div>
+</section>
+</div>

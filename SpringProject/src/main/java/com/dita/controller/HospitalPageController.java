@@ -151,15 +151,28 @@ public class HospitalPageController {
 
         // apptId 넘어온 경우 → 환자 상세 차트 작성으로 진입한 것
         if (apptId != null) {
-            Appt appt = apptRepository.findById(apptId)
-                            .orElseThrow(() -> new IllegalArgumentException("예약 없음"));
+            Optional<Appt> optionalAppt = apptRepository.findById(apptId);
+            if (optionalAppt.isPresent()) {
+                Appt appt = optionalAppt.get();
 
-            // ✅ 로그인 의사 ID와 예약된 의사 ID 다르면 접근 차단
-            if (!appt.getDoctor().getUsersId().equals(loginUser.getUsersId())) {
-                return "redirect:/hospital/chart?error=unauthorized_access";
+                // ✅ 다른 의사가 예약한 환자일 경우 차단
+                if (!appt.getDoctor().getUsersId().equals(loginUser.getUsersId())) {
+                    return "redirect:/hospital/chart?error=unauthorized_access";
+                }
+
+                model.addAttribute("selectedAppt", appt);
+
+                // 진료 기록 존재 여부 (차트 작성 여부)
+                boolean alreadyWritten = medRecService.existsByApptId(apptId);
+                model.addAttribute("alreadyWritten", alreadyWritten);
+
+                // 환자 과거 진료 기록 + 메모
+                model.addAttribute("medRecords", medRecService.findRecordsByPatient(appt.getPatient()));
+                model.addAttribute("recentMedRecs", medRecService.findTop2RecordsByPatient(appt.getPatient()));
+
+                boolean chartExists = !medRecService.findByAppt(appt).isEmpty();
+                model.addAttribute("chartExists", chartExists);
             }
-
-            model.addAttribute("selectedAppt", appt);
         }
 
         // 진료실 목록 + 확정 예약
@@ -173,15 +186,6 @@ public class HospitalPageController {
                 LinkedHashMap::new
             ));
         model.addAttribute("appointmentsByRoom", appointmentsByRoom);
-
-        // ✅ apptId가 있으면 selectedAppt와 환자의 진료 기록 추가
-        if (apptId != null) {
-            apptRepository.findById(apptId).ifPresent(appt -> {
-                model.addAttribute("selectedAppt", appt);
-                List<Med_rec> medRecords = medRecService.findRecordsByPatient(appt.getPatient());
-                model.addAttribute("medRecords", medRecords);
-            });
-        }
 
         // 진단명 + 약물 목록
         model.addAttribute("diseases", diseaseRepository.findAll());
@@ -242,5 +246,21 @@ public class HospitalPageController {
 
         return "redirect:/hospital/chart";
     }
-  
+    
+    @PostMapping("/chart/note")
+    public String updateNote(
+        @RequestParam Integer recordId,
+        @RequestParam String notes
+    ) {
+        Med_rec rec = medRecService.findById(recordId);
+        if (rec == null) {
+            return "redirect:/hospital/chart";
+        }
+
+        rec.setNotes(notes);         // 메모 내용 설정
+        medRecService.save(rec);     // 저장
+
+        Integer apptId = rec.getApptId().getApptId();
+        return "redirect:/hospital/chart?apptId=" + apptId;  // 차트 페이지로 리다이렉트
+    }  
 }
