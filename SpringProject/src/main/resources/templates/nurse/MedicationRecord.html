@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>투약 및 처치 기록</title>
-    <link rel="stylesheet" href="/css/MedicationRecordstyle.css">
+     <link rel="stylesheet" href="/css/MedicationRecordstyle.css">
 </head>
 <body>
     <!-- 사이드바 -->
@@ -33,204 +33,105 @@
             <div class="menu-icon">💊</div>
             <span>투약 및 처치 기록</span>
         </a>
+        
         <a th:href="@{/Login/Logout}" class="menu-item logout">
-    		<div class="menu-icon">🚪</div>
-    		<span>로그아웃</span>
-		</a>
+            <div class="menu-icon">🚪</div>
+            <span>로그아웃</span>
+        </a>
     </div>
 
     <!-- 메인 컨텐츠 -->
     <div class="main-content">
-        <!-- 헤더 -->
+        <!-- 헤더 섹션 -->
         <div class="header">
             <div class="search-bar">
-                <input type="text" class="search-input" placeholder="환자 검색" value="민규짱 환자">
-                <button class="search-btn">🔍</button>
+                <form th:action="@{/nurse/MedicationRecord}" method="get">
+                    <input type="text" name="patientName" class="search-input" 
+                           placeholder="환자 검색" th:value="${param.patientName}">
+                    <button type="submit" class="search-btn">🔍</button>
+                </form>
             </div>
-            <div class="patient-info">민규짱 환자</div>
-            <div class="patient-details">성별:남 생년월일:2000804 전화번호:010-7462-6853</div>
-        </div>
-
-        <!-- 필터 섹션 -->
-        <div class="filter-section">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">진료일자</label>
-                    <input type="date" class="filter-input date-input" value="2025-05-27">
+            
+            <div th:if="${patient}">
+                <div class="date-time" 
+                     th:text="${latestMedRec != null ? #temporals.format(latestMedRec.createdAt, 'yyyy-MM-dd (E) HH:mm') + ' ► ' + latestMedRec.doctor.usersName + ' 선생' : ''}">
+                    2025-06-10 (화) 14:53 ► 전민규 선생
                 </div>
-                <div class="filter-group">
-                    <label class="filter-label">초진</label>
-                    <select class="filter-select">
-                        <option>초진</option>
-                        <option>재진</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">진찰수간</label>
-                    <select class="filter-select">
-                        <option>진찰수간</option>
-                        <option>1차</option>
-                        <option>2차</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">진료보험</label>
-                    <select class="filter-select">
-                        <option>진료보험</option>
-                        <option>건강보험</option>
-                        <option>의료급여</option>
-                    </select>
-                </div>
-                <div class="checkboxes">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="chkPatient" checked>
-                        <label for="chkPatient">처방전자동체크</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="chkPrint">
-                        <label for="chkPrint">처방발급표출제한</label>
-                    </div>
+                <div class="patient-info" th:text="${patient.patientName} + ' 환자'">민규짱 환자</div>
+                <div class="patient-details" 
+                     th:text="'성별:' + ${patient.patientGender} + ' 생년월일:' + ${patient.patientBirth} + ' 전화번호:' + ${patient.patientPhone}">
+                    성별:남 생년월일:2000804 전화번호:010-7462-6853
                 </div>
             </div>
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">처치수간</label>
-                    <select class="filter-select">
-                        <option>처치수간</option>
-                        <option>1회</option>
-                        <option>2회</option>
-                        <option>3회</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">발인빈수</label>
-                    <select class="filter-select">
-                        <option>발인빈수</option>
-                        <option>1일 1회</option>
-                        <option>1일 2회</option>
-                        <option>1일 3회</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">세금처럼빈수</label>
-                    <select class="filter-select">
-                        <option>00</option>
-                        <option>01</option>
-                        <option>02</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">PT CNT</label>
-                    <input type="text" class="filter-input" style="width: 80px;">
-                </div>
+            
+            <div th:if="${searchError}" class="error-message" th:text="${searchError}">
+                검색 오류 메시지
             </div>
         </div>
 
-        <!-- 테이블 컨테이너 -->
-        <div class="table-container">
-            <table class="medication-table">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">코드</th>
-                        <th style="width: 300px;">명칭</th>
-                        <th style="width: 100px;">일투여량</th>
-                        <th class="time-header">총<br>일<br>수</th>
-                        <th class="time-header">총<br>개<br>수</th>
-                        <th class="time-header">용<br>법</th>
-                        <th class="time-header">식<br>후</th>
-                        <th class="time-header">취<br>침</th>
-                        <th class="time-header">변<br>화</th>
-                        <th class="time-header">대<br>체</th>
-                        <th class="time-header">처<br>방</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="code-cell">A5154</td>
-                        <td class="medication-name">초신진활독-의과의원_모건의료원내31,000</td>
-                        <td class="dosage-cell">1,000</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                    <tr>
-                        <td class="code-cell">M4010</td>
-                        <td class="medication-name">표준형치료</td>
-                        <td class="dosage-cell">1,000</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                    <tr>
-                        <td class="code-cell">G1002</td>
-                        <td class="medication-name">비뇨288</td>
-                        <td class="dosage-cell">1,000</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                    <tr>
-                        <td class="code-cell">10</td>
-                        <td class="medication-name">박사세티오스정(모방)</td>
-                        <td class="dosage-cell">2,000</td>
-                        <td class="frequency-cell">3</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell">3</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell">✓</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                    <tr>
-                        <td class="code-cell">100</td>
-                        <td class="medication-name">디라드정(서울)</td>
-                        <td class="dosage-cell">1,000</td>
-                        <td class="frequency-cell">3</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell">3</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell">✓</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                    <tr>
-                        <td class="code-code">50010</td>
-                        <td class="medication-name">요일만남A142초까지</td>
-                        <td class="dosage-cell">1,000</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="frequency-cell">1</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell">✓</td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                        <td class="route-cell"></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- 액션 버튼 -->
-            <div class="action-buttons">
-                <button class="btn btn-primary">새 처방 추가</button>
-                <button class="btn btn-success">저장</button>    
+        <!-- 의사 소견 섹션 -->
+        <div class="symptom-section" th:if="${latestMedRec}">
+            <div class="section-title">의사 소견</div>
+            <div class="symptom-display" th:text="${latestMedRec.chiefComplaint}">
+                환자가 두통과 어지러움을 호소하며, 체온 38.5도로 발열 증상이 있음.
+                목의 림프절이 부어있는 상태로 감기 초기 증상으로 판단됨.
+                충분한 수분 섭취와 안정을 취하도록 안내함.
             </div>
+        </div>
+
+        <!-- 투약 및 처치 기록 섹션 -->
+        <div class="prescription-section" th:if="${patient}">
+            <div class="section-title">투약 및 처치 기록</div>
+            
+            <!-- 진단명 표시 -->
+            <div class="diagnosis-display" th:if="${latestMedRec}">
+                <div class="diagnosis-label">진단명:</div>
+                <div class="diagnosis-content" th:text="${latestMedRec.disease.name}">[A01] 장티푸스 및 파라티푸스</div>
+            </div>
+            
+            <!-- 의사 처방 목록 -->
+            <div class="prescription-list">
+                <div class="section-title">의사 처방 목록</div>
+                <table class="prescription-table">
+                    <thead>
+                        <tr>
+                            <th>약품명</th>
+                            <th>주성분</th>
+                            <th>약품코드</th>
+                            <th>처방일시</th>
+                            <th>담당의사</th>
+                            <th>투약기록</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prescriptionTableBody">
+                        <tr th:each="medRec, iterStat : ${allMedRecs}" th:if="${medRec.drugId != null}">
+                            <td th:text="${medRec.drugId.drugName}">아세트아미노펜 300mg</td>
+                            <td th:text="${medRec.drugId.mainIngredient}">아세트아미노펜</td>
+                            <td th:text="${medRec.drugId.drugCode}">A01234</td>
+                            <td th:text="${#temporals.format(medRec.createdAt, 'yyyy-MM-dd HH:mm')}">2025-06-10 09:30</td>
+                            <td th:text="${medRec.doctor.usersName}">홍길동</td>
+                            <td>
+                                <!-- iterStat으로 수정 -->
+                                <span th:if="${iterStat.index % 2 == 0}" class="status-completed">투약완료</span>
+                                <span th:if="${iterStat.index % 2 == 0}" class="time-display">(14:30)</span>
+                                <button th:if="${iterStat.index % 2 == 1}" 
+                                        class="record-btn pending" 
+                                        th:onclick="'recordMedication(this, ' + ${medRec.recordId} + ')'">투약기록</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div th:if="${allMedRecs == null or #lists.isEmpty(allMedRecs)}" class="no-data">
+                    처방 기록이 없습니다.
+                </div>
+            </div>
+        </div>
+        
+        <!-- 검색 안내 -->
+        <div class="search-guide" th:if="${patient == null}">
+            <h3>환자 검색</h3>
+            <p>위 검색창에 환자 이름을 입력하여 투약 및 처치 기록을 조회하세요.</p>
         </div>
     </div>
 
@@ -238,7 +139,6 @@
         // 메뉴 클릭 이벤트
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function(e) {
-                // href가 #인 경우만 기본 동작 방지
                 if (this.getAttribute('href') === '#') {
                     e.preventDefault();
                 }
@@ -247,56 +147,49 @@
             });
         });
 
-        // 카테고리 탭 클릭 이벤트
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
+        // 투약 기록 버튼
+        function recordMedication(btn, recordId) {
+            if (confirm('투약을 완료하시겠습니까?')) {
+                const cell = btn.parentElement;
                 
-                // 탭 변경시 테이블 내용 업데이트 (실제 구현시 AJAX 호출)
-                console.log('탭 변경:', this.textContent.trim());
-            });
+                // 투약 시간 기록
+                const currentTime = new Date().toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // 셀 내용을 완료 상태로 변경
+                cell.innerHTML = `
+                    <span class="status-completed">투약완료</span>
+                    <span class="time-display">(${currentTime})</span>
+                `;
+                
+                // 실제 구현시에는 여기서 AJAX로 서버에 투약 완료 기록
+                // fetch('/nurse/api/medication/record', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ recordId: recordId, medicationTime: new Date() })
+                // });
+                
+                alert('투약이 기록되었습니다.');
+            }
+        }
+
+        // 저장 버튼
+        document.querySelector('.save-btn').addEventListener('click', function() {
+            alert('투약 및 처치 기록이 저장되었습니다.');
         });
 
         // 테이블 행 클릭 이벤트
-        document.querySelectorAll('.medication-table tbody tr').forEach(row => {
+        document.querySelectorAll('.prescription-table tbody tr').forEach(row => {
             row.addEventListener('click', function() {
                 // 기존 선택 해제
-                document.querySelectorAll('.medication-table tbody tr').forEach(r => {
+                document.querySelectorAll('.prescription-table tbody tr').forEach(r => {
                     r.style.backgroundColor = '';
                 });
                 // 현재 행 선택
                 this.style.backgroundColor = '#e3f2fd';
             });
-        });
-
-        // 체크박스 이벤트
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                console.log(this.id + ' 체크됨:', this.checked);
-            });
-        });
-
-        // 액션 버튼 이벤트
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.textContent.trim();
-                switch(action) {
-                    case '새 처방 추가':
-                        // 새 처방 추가 모달 또는 페이지 이동
-                        alert('새 처방 추가 기능');
-                        break;
-                    case '저장':
-                        alert('처방 정보가 저장되었습니다.');
-                        break;               
-                }
-            });
-        });
-
-        // 날짜 입력 변경 이벤트
-        document.querySelector('input[type="date"]').addEventListener('change', function() {
-            console.log('진료일자 변경:', this.value);
-            // 실제 구현시 해당 날짜의 처방 정보 로드
         });
     </script>
 </body>
