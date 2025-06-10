@@ -196,3 +196,8 @@
 .selectable-patient:hover {
   background-color: #e9ecef;
 }
+
+.card-status.yellow { background-color: #f1c40f; }  /* 진료대기 */
+.card-status.blue   { background-color: #3498db; }  /* 진료중 */
+.card-status.gray   { background-color: #f08080; }  /* 수납 */
+

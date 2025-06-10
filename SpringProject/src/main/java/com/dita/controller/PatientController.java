@@ -66,9 +66,4 @@ public class PatientController {
         }
         return ResponseEntity.ok(patients);
     }
-    
-  
-
-    
   }
-
