@@ -18,10 +18,7 @@
 		<span th:text="${userName}">수납 이름</span>
 	</div>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">🔔</div>
-		<span>알림</span>
-	</div>
+
 	<a href = "/acceptance/acceptanceHome">
 	<div class = "menu-item">
 		<div class = "menu-icon">🏠</div>
@@ -46,11 +43,6 @@
 	  <div class="menu-icon">👥</div>
 	  <span>예약</span>
 	</a>
-	
-	<div class = "menu-item">
-		<div class = "menu-icon">✏️</div>
-		<span>수납</span>
-	</div>
 	
 	<a href = "/Drug/Drug">
 	<div class = "menu-item">
@@ -88,28 +80,17 @@
     <div class="menu-section">
         <span class="menu-title">|예약</span>
         <button class="search-reset-btn" onclick="resetSearch()">🔄 초기화</button>
-        <select class="dropdown">
-            <option>11</option>
-            <option>12</option>
-        </select>
-        <label class="label-text">내원접수</label>
     </div>
 
     <!-- 가운데 영역: 접수 -->
     <div class="menu-section reception-menu">
         <span class="menu-title">|접수</span>
-        <button class="action-btn">+ 상담등록</button>
-        <button class="action-btn">+ 하이패스 수납</button>
-        <button class="alert-btn">🔴 내원취소</button>
     </div>
 
     <!-- 오른쪽 영역: 진료 -->
     <div class="menu-section treatment-menu">
-        <span class="menu-title">|진료</span>
-        <button class="icon-btn">👤 수납</button>
-        <button class="icon-btn">📝 진료등록</button>
-        <button class="icon-btn">✔️ 귀가처리</button>
-        <button class="icon-btn">🔍 인쇄</button>
+        <span class="menu-title">|수납</span>
+        <button class="icon-btn">👤 </button>
     </div>
 </div>
 <!-- 하단 영역 -->
@@ -414,47 +395,38 @@
 
     <!-- 진료 영역 -->
     <div class="column treatment-column">
-         <!-- 상단 탭 -->
-  <div class="treatment-tabs">
-    <button class="tab-btn active">오늘통계</button>
-    <button class="tab-btn">귀가</button>
-  </div>
-  
-   <div class="treatment-tabs-option ">
-      <select class="select-all">
-      <option>전체선택</option>
-      <option>선택해제</option>
-    </select>
-  </div>
 
   <!-- 수납/진료 현황 파란 바 -->
-  <div class="treatment-status-bar">
-    수납 [대기/완료] (0명/1명)<br>
-    진료 [대기/중/완료] (0명/0명/0명)
-  </div>
+ <div class="treatment-status-bar">
+  수납 대기자 (
+  <span th:text="${dischargedList.size()}">0</span>
+  명)
+</div>
 
-  <!-- 진료 리스트 -->
-  <ul class="treatment-list">
-    <li class="treatment-item">
-      <div class="treatment-top">
-        <div class="left-time">
-          <span class="time-main">13:00 전</span>
-          <span class="time-sub">09:16 수납완료</span>
-        </div>
-        <div class="patient-name">
-          테테투스스(여) 010-1234-5678
-        </div>
+  <!-- 수납 리스트 -->
+ <ul class="treatment-list">
+	<li class="treatment-item"
+	    th:each="patient : ${dischargedList}"
+	    th:attr="data-id=${patient.patientId}"
+	    onclick="confirmPayment(this)">
+    <div class="treatment-top">
+      <div class="left-time">
+        <span class="time-main">퇴원</span>
+        <span class="time-sub">수납 대기</span>
       </div>
+      <div class="patient-name"
+           th:text="${patient.patientName + ' (' + patient.patientGender + ') ' + patient.patientPhone}">
+        홍길동 (남) 010-1234-5678
+      </div>
+    </div>
 
-      <div class="treatment-info">
-        <div><strong>접수:</strong> 상담 성애네트웍스 / <strong>조진:</strong> 외국인상담</div>
-        <div>[카드] 234,422원 [현금] 0원 [통장] 0원</div>
-        <div>▶ 치료지시 ▶ 치료1 ///</div>
-        <div>▶ 치료지시 ▶ 치료2 ///</div>
-        <div>▶ 치료지시 ▶ 치료3, 부귀세 ///</div>
-      </div>
-    </li>
-   </ul>
+    <div class="treatment-info">
+      <div th:text="'증상: ' + ${patient.patientSymptom}"></div>
+      <div th:text="'주소: ' + ${patient.patientAddress}"></div>
+    </div>
+  </li>
+</ul>
+
 
     </div>
 </div>
@@ -721,6 +693,28 @@ function resetSearch() {
   reservationItems.forEach(item => {
     item.style.display = '';
   });
+}
+//수납처리
+function confirmPayment(el) {
+  const patientId = el.getAttribute('data-id');
+  const patientName = el.querySelector('.patient-name').textContent;
+
+  if (confirm(`${patientName}\n수납을 완료하시겠습니까?`)) {
+    fetch(`/acceptance/completePayment?patientId=${patientId}`, {
+      method: 'POST'
+    })
+    .then(response => {
+      if (response.ok) {
+        alert("수납이 완료되었습니다.");
+        window.location.reload(); // 새로고침
+      } else {
+        alert("수납 처리 중 오류가 발생했습니다.");
+      }
+    })
+    .catch(err => {
+      alert("요청 실패: " + err);
+    });
+  }
 }
   </script>
 

@@ -116,6 +116,9 @@ public class AcceptPageController {
 	    // 4) 의사 목록
 	    List<User> doctors = userRepository.findByGrade(Grade.의사);
 	    model.addAttribute("doctors", doctors);
+	    
+	    List<Patient> dischargedList = repo.findByPatientType(PatientType.퇴원);
+	    model.addAttribute("dischargedList", dischargedList);
 
 	    return "acceptance/acceptanceHome";
 	}
@@ -530,6 +533,20 @@ public class AcceptPageController {
 
 		        return "redirect:/acceptance/acceptanceHome";
 		    }
+		    //수납 처리용
+		    @PostMapping("/completePayment")
+		    @ResponseBody
+		    public ResponseEntity<String> completePayment(@RequestParam int patientId) {
+		        Optional<Patient> optionalPatient = repo.findById(patientId);
+		        if (optionalPatient.isPresent()) {
+		            Patient patient = optionalPatient.get();
+		            patient.setPatientType(PatientType.예약);  // 퇴원 → 예약
+		            repo.save(patient);
+		            return ResponseEntity.ok("수납 완료");
+		        } else {
+		            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("환자 없음");
+		        }
+		    }
 
 		    @GetMapping("/doctorScheduleByWeekday")  // ✅ 이 경로와 결합 → /acceptance/doctorScheduleByWeekday
 		    @ResponseBody
@@ -549,9 +566,6 @@ public class AcceptPageController {
 		            return dto;
 		        }).toList();
 		    }
-
-
-
 		    
 		}
 
