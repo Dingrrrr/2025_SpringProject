@@ -448,16 +448,40 @@
   border-radius: 3px;
 }
 
+textarea.notes-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.record-prescription h4,
+.record-notes h4,
+.record-status h4 {
+  margin-top: 1.5rem;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .prescription-table {
   width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-.prescription-table th, .prescription-table td {
-    border: 1px solid #ddd;
-    padding: 10px 6px;
-    text-align: center;
-  }
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.prescription-table th,
+.prescription-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.record-status label {
+  margin-right: 1.5rem;
+  font-size: 15px;
+}
 .prescription-table select,
   .prescription-table input {
     height: 24px;            /* 기존보다 줄임 */
@@ -491,11 +515,18 @@
 }
 .add-prescription-btn,
 .send-btn {
-  padding: 6px 12px;
+  margin-top: 16px;
+  background-color: #3498db;
+  color: white;
+  padding: 10px 18px;
   border: none;
+  border-radius: 6px;
+  font-size: 15px;
   cursor: pointer;
-  font-size: 0. nine rem;
-  border-radius: 3px;
+}
+
+.send-btn:hover {
+  background-color: #2980b9;
 }
 .add-prescription-btn {
   background: #007bff;
@@ -771,6 +802,8 @@
 .card-status.yellow { background-color: #f1c40f; }  /* 진료대기 */
 .card-status.blue   { background-color: #3498db; }  /* 진료중 */
 .card-status.gray   { background-color: #f08080; }  /* 수납 */
+.card-status.green {background-color: #2ecc71; /* 연두색 계열: 입원대기 */
+}
 
 
 .card {

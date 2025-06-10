@@ -3,6 +3,7 @@ package com.dita.controller;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +14,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dita.domain.Grade;
+import com.dita.domain.Med_rec;
+import com.dita.domain.Patient;
 import com.dita.domain.User;
+import com.dita.persistence.DiseaseRepository;
+import com.dita.persistence.DrugRepository;
 import com.dita.persistence.LoginPageRepository;
+import com.dita.persistence.MedRecRepository;
+import com.dita.persistence.PatientRepository;
 import com.dita.persistence.UserRepository;
 import com.dita.service.NotifService;
 import com.dita.service.NurseChartService;
@@ -38,6 +46,10 @@ public class NursePageController {
 	private final LoginPageRepository repo;
 	private final UserRepository userRepository;
 	private final NurseChartService nurseChartService; // Repository 대신 Service 주입
+	private final MedRecRepository mrepo;
+	private final PatientRepository prepo;
+	private final DiseaseRepository diseaseRepo;
+	private final DrugRepository drugRepo;
 
     @GetMapping("/NurseChart")
     public String showNurseChartPage(HttpServletRequest request, Model model) {
@@ -74,19 +86,59 @@ public class NursePageController {
     }
 
     @GetMapping("/MedicationRecord")
-    public String showMedicatonRecordPage(HttpServletRequest request, Model model) {
-    	HttpSession session = request.getSession(false);
-		if (session == null) {
-			return "redirect:/Login/Login";
-		}
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
-			return "redirect:/Login/Login";
-		}
-		
-		model.addAttribute("userName", loginUser.getUsersName());
+    public String showMedicationRecordPage(HttpServletRequest request, Model model,
+                                         @RequestParam(required = false) String patientName) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/Login/Login";
+        }
+        
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null || !loginUser.getGrade().equals(Grade.간호사)) {
+            return "redirect:/Login/Login";
+        }
+        
+        // ✅ 환자 검색 로직 추가
+        if (patientName != null && !patientName.trim().isEmpty()) {
+            try {
+                log.info("환자 검색 요청: " + patientName);
+                
+                // 1. 환자 정보 조회
+                Optional<Patient> patientOpt = prepo.findByPatientName(patientName);
+                
+                if (patientOpt.isPresent()) {
+                    Patient patient = patientOpt.get();
+                    log.info("환자 조회 성공: " + patient.getPatientName());
+                    
+                    // 2. 해당 환자의 최근 진료 기록 조회
+                    Med_rec latestMedRec = mrepo.findTop1ByPatientOrderByCreatedAtDesc(patient);
+                    
+                    // 3. 해당 환자의 모든 진료 기록 조회 (처방 목록용)
+                    List<Med_rec> allMedRecs = mrepo.findByPatient(patient);
+                    
+                    // 4. 모델에 데이터 추가
+                    model.addAttribute("patient", patient);
+                    model.addAttribute("latestMedRec", latestMedRec);
+                    model.addAttribute("allMedRecs", allMedRecs);
+                    
+                    log.info("환자의 진료 기록 " + allMedRecs.size() + "건 조회 완료");
+                    
+                } else {
+                    log.warning("환자 조회 실패: " + patientName);
+                    model.addAttribute("searchError", "해당 이름의 환자를 찾을 수 없습니다.");
+                }
+                
+            } catch (Exception e) {
+                log.severe("환자 정보 조회 중 오류: " + e.getMessage());
+                e.printStackTrace();
+                model.addAttribute("searchError", "환자 정보 조회 중 오류가 발생했습니다: " + e.getMessage());
+            }
+        }
+        
+        model.addAttribute("userName", loginUser.getUsersName());
         model.addAttribute("usersId", loginUser.getUsersId());
         model.addAttribute("grade", loginUser.getGrade().name());
+        
         return "nurse/MedicationRecord";
     }
 
