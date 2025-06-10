@@ -80,7 +80,7 @@ public class InpatientController {
             .map(PatientDto::new)
             .toList();
 
-        model.addAttribute("patients", dtoList);  // ✅ DTO 기준
+        model.addAttribute("patients", dtoList);
         model.addAttribute("doctors", doctors);
         return "Inpatient/PatientWaitingPopup"; 
     }
@@ -93,7 +93,12 @@ public class InpatientController {
                                       @RequestParam String admittedAt,
                                       @RequestParam String doctorId) {
         admissionSe.updatePatientStatus(patientId, status, symptom, admittedAt, doctorId);
-        return "redirect:/Inpatient/PatientWaitingPopup";  // 또는 /Inpatient/list 등
+       
+        if ("퇴원".equals(status)) {
+            return "/Inpatient/popupClose"; // 팝업 닫기용 HTML (JS window.close() 포함)
+        }
+        
+        return "redirect:/Inpatient/Popup?patientId=" + patientId;
     }
     
     //삭제

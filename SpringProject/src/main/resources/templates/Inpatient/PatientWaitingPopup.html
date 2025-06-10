@@ -54,7 +54,12 @@
       </tr>
     </tbody>
   </table>
+  
+	<div class="close-button-wrapper">
+  <button class="close-button" onclick="closeAndReloadParent()">닫기</button>
+</div>
 
+	
   <script>
     let currentRow = null;
 
@@ -74,6 +79,13 @@
         display.textContent = `${bed.wardName} / 침대 ${bed.bedNumber}`;
       }
     }
+    
+    function closeAndReloadParent() {
+    if (window.opener && !window.opener.closed) {
+      window.opener.location.reload();
+    }
+    window.close();
+  }
   </script>
 </body>
 </html>

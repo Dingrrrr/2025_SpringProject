@@ -2,10 +2,14 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>삭제 완료</title>
-  <script>
-    alert("삭제되었습니다.");
-    window.close();
+  <title>팝업닫기 완료</title>
+   <script>
+    window.onload = function () {
+      if (window.opener && !window.opener.closed) {
+        window.opener.location.reload();  // 부모 창 새로고침
+      }
+      window.close();  // 팝업 닫기
+    };
   </script>
 </head>
 <body>

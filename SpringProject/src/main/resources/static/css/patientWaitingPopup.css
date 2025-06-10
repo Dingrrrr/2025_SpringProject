@@ -95,3 +95,24 @@ select[name="doctorId"] {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+.close-button-wrapper {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.close-button {
+  background-color: #ccc;     /* 연한 회색 */
+  color: #333;                /* 진한 글자색 */
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #bbb;     /* hover 시 약간 더 진한 회색 */
+}
+
