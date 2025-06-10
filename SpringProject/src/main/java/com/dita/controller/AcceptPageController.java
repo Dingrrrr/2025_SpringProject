@@ -10,9 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
@@ -44,6 +43,10 @@ import com.dita.persistence.LoginPageRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.service.EmailService;
 import com.dita.vo.AppointmentDto;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import com.dita.persistence.ApptRepository;
 
 import lombok.extern.java.Log;
@@ -75,8 +78,17 @@ public class AcceptPageController {
 	public String showAcceptanceHomePage(
 	        @RequestParam(name = "date", required = false)
 	        @DateTimeFormat(iso = ISO.DATE) LocalDate targetDate,
-	        Model model) {
-
+	        Model model, HttpServletRequest request) {
+		
+		    HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 	    // 1) 날짜 처리
 	    if (targetDate == null) {
 	        targetDate = LocalDate.now();
@@ -106,7 +118,16 @@ public class AcceptPageController {
 
 		
 	@GetMapping("/acceptanceDoctor")
-	public String AcceptanceDoctorPage(Model model) {
+	public String AcceptanceDoctorPage(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        User loginUser = (User) session.getAttribute("loginUser");
+	        if (loginUser != null) {
+	            model.addAttribute("userName", loginUser.getUsersName());
+	            model.addAttribute("usersId", loginUser.getUsersId());
+	            model.addAttribute("grade", loginUser.getGrade().name());
+	        }
+	    }
 	    LocalDate today = LocalDate.now();
 	    LocalDateTime startOfDay = today.atStartOfDay();
 	    LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
@@ -121,7 +142,16 @@ public class AcceptPageController {
 
 	
 	@GetMapping("/acceptanceCondition")
-	public String AcceptanceConditionPage(Model model) {
+	public String AcceptanceConditionPage(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        User loginUser = (User) session.getAttribute("loginUser");
+	        if (loginUser != null) {
+	            model.addAttribute("userName", loginUser.getUsersName());
+	            model.addAttribute("usersId", loginUser.getUsersId());
+	            model.addAttribute("grade", loginUser.getGrade().name());
+	        }
+	    }
 	    LocalDate today = LocalDate.now();
 	    LocalDateTime start = today.atStartOfDay();
 	    LocalDateTime end = today.plusDays(1).atStartOfDay();
@@ -149,7 +179,16 @@ public class AcceptPageController {
 
 		@GetMapping("/AcceptanceReceipt")
 	    public String showAcceptanceReceiptPage(@RequestParam(name="date", required = false)
-		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model) {
+		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model, HttpServletRequest request) {
+			HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 			if(targetDate == null) {
 				targetDate = LocalDate.now();
 			}
@@ -165,7 +204,16 @@ public class AcceptPageController {
 	    }
 		
 		@GetMapping("/acceptanceReception")
-	    public String showAcceptanceReceptionPage(Model model) {
+	    public String showAcceptanceReceptionPage(Model model, HttpServletRequest request) {
+			HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 			// 필요 시 model에 데이터 추가 가능
 	        return "acceptance/acceptanceReception"; 
 
@@ -227,9 +275,6 @@ public class AcceptPageController {
 
 		    return "redirect:/acceptance/acceptanceHome";
 		}
-
-
-	
 
 		@PostMapping("/appointment")
 		@ResponseBody

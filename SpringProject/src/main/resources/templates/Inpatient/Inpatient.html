@@ -8,24 +8,70 @@
 <body>
 <div class="container">
 
- <!-- 사이드바 -->
-    <div class="sidebar">
-        <div class="profile">
-            <div class="profile-icon">👤</div>
-            <span th:text="${userName}">수납 이름</span>
-        </div>
-        
-         <a href="" class="menu-item active">
-            <div class="menu-icon">🛏</div>
-            <span>입원</span>
-        </a>
-        
-        <a th:href="@{/Login/Logout}" class="menu-item">
-	      <div class="menu-icon">🚪</div>
-	      <span>로그아웃</span>
-	    </a>
-    </div>
+ <!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span th:text="${userName}">수납 이름</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	<a href = "/acceptance/acceptanceHome">
+	<div class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</div>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	
+	<ul class="submenu">
+	<a href="/acceptance/acceptanceDoctor">
+   	 	<li class="submenu-item active">의사 스케줄</li></a>
+   	 <a href ="/acceptance/acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+	</ul>
+	
+	
+	<a href="/acceptance/acceptanceReception" class="menu-item">
+	  <div class="menu-icon">👥</div>
+	  <span>예약</span>
+	</a>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<a href = "/Drug/Drug">
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+		
+	</div>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+  <div class="menu-icon">🛌</div>
+  <span>입원</span>
+</div>
 
+<ul class="submenu">
+  <a href="/Inpatient/Inpatient">
+    <li class="submenu-item">입원 관리</li>
+  </a>
+  <a href="/Inpatient/InpatientStatistics">
+    <li class="submenu-item">입원 통계</li>
+  </a>
+</ul>
+
+    </div>
   <!-- 본문 -->
   <main class="main-content">
     <header class="page-header">
@@ -78,6 +124,47 @@
 </div>
 
 <script>
+//토글
+function toggleSubMenu(menuItem) {
+  const allMenuItems = document.querySelectorAll('.menu-item');
+  const allSubmenus = document.querySelectorAll('.submenu');
+
+  // 현재 이미 열려 있는 경우 닫기
+  const isActive = menuItem.classList.contains('active');
+  allMenuItems.forEach(item => item.classList.remove('active'));
+  allSubmenus.forEach(sub => sub.style.display = 'none');
+
+  // 다시 열기 (닫기 상태였다면)
+  if (!isActive) {
+    menuItem.classList.add('active');
+    const submenu = menuItem.nextElementSibling;
+    if (submenu && submenu.classList.contains('submenu')) {
+      submenu.style.display = 'block';
+    }
+  }
+}
+
+// ✅ 메뉴 초기화 및 하위 메뉴 활성화
+document.addEventListener('DOMContentLoaded', function () {
+  const submenuItems = document.querySelectorAll('.submenu-item');
+  submenuItems.forEach(item => {
+    item.addEventListener('click', function () {
+      submenuItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // 사이드바 초기화: 활성화된 메뉴가 있으면 submenu 열기
+  const activeMenu = document.querySelector('.menu-item.has-submenu.active');
+  if (activeMenu) {
+    const submenu = activeMenu.nextElementSibling;
+    if (submenu && submenu.classList.contains('submenu')) {
+      submenu.style.display = 'block';
+    }
+  }
+});
+
+
   function filterByWard(tabElement) {
     const selectedWard = tabElement.getAttribute("data-ward");
 
