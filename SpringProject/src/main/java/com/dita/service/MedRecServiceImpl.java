@@ -63,14 +63,14 @@ public class MedRecServiceImpl implements MedRecService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 약물코드입니다."));
 
         Med_rec rec = Med_rec.builder()
-                .apptId(appt)
-                .patient(patient)
-                .doctor(doctor)
-                .chiefComplaint(chiefComplaint)
-                .Id(disease)
-                .drugId(drug)
-                .notes(notes)
-                .build();
+        	    .apptId(appt)
+        	    .patient(patient)
+        	    .doctor(doctor)
+        	    .chiefComplaint(chiefComplaint)
+        	    .disease(disease)  // ✅ 새 필드명에 맞게 수정
+        	    .drugId(drug)
+        	    .notes(notes)
+        	    .build();
 
         patient.setPatientType(PatientType.수납);
         patientRepo.save(patient);
