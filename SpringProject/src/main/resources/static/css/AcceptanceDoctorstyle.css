@@ -96,6 +96,37 @@
 		    color: #1976d2;
 		    font-weight: bold;
 		}
+		/* 👇 핵심: 로그아웃 메뉴 항목 스타일 */
+        .menu-item.logout {
+            margin-top: auto; /* 자동으로 위쪽 여백을 최대화하여 맨 아래로 밀어냄 */
+            background-color: #fafafa; /* 살짝 다른 배경색으로 구분 */
+        }
+
+        .menu-item.logout:hover {
+            background-color: #ffebee; /* 로그아웃 전용 호버 색상 */
+            color: #d32f2f;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar {
+		  display: flex;
+		  flex-direction: column;
+		  height: 100vh;
+		}
+        
+
+        .sidebar .menu-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
 		
 		.content {
 		    flex: 1;
