@@ -62,13 +62,15 @@
 						<div class="card-status"
 							th:classappend="
 			        ${appt.patient.patientType.name() == '진료대기'} ? ' yellow' :
-			        (${appt.patient.patientType.name() == '진료중'} ? ' blue' :
-			        (${appt.patient.patientType.name() == '수납'} ? ' gray' : ''))
+				    (${appt.patient.patientType.name() == '진료중'} ? ' blue' :
+				    (${appt.patient.patientType.name() == '수납'} ? ' gray' :
+				    (${appt.patient.patientType.name() == '입원대기'} ? ' green' : '')))
 			     "
 							th:text="
-			        ${appt.patient.patientType.name() == '진료대기'} ? '대기' :
-			        (${appt.patient.patientType.name() == '진료중'} ? '진료중' :
-			        (${appt.patient.patientType.name() == '수납'} ? '수납' : ''))
+			         ${appt.patient.patientType.name() == '진료대기'} ? '대기' :
+				    (${appt.patient.patientType.name() == '진료중'} ? '진료중' :
+				    (${appt.patient.patientType.name() == '수납'} ? '수납' :
+				    (${appt.patient.patientType.name() == '입원대기'} ? '입원대기' : '')))
 			     ">
 						</div>
 					</div>
@@ -177,6 +179,19 @@
 						<button type="button" id="addDrugBtn" class="add-btn">+
 							처방약 추가</button>
 				</div>
+				
+				<!-- 진단 및 처방 아래 추가 -->
+				<div class="record-status">
+				  <h4>환자 상태 설정</h4>
+				  <label>
+				    <input type="radio" name="patientType" value="수납"
+				      th:checked="${selectedAppt.patient.patientType.name() == '수납'}"> 수납
+				  </label>
+				  <label style="margin-left: 1rem;">
+				    <input type="radio" name="patientType" value="입원대기"
+				      th:checked="${selectedAppt.patient.patientType.name() == '입원대기'}"> 입원대기
+				  </label>
+				</div>
 
 				<!-- 숨김 필드 (예약 ID, 환자 ID, 의사 ID) -->
 				<!-- ✅ 선택된 예약 정보 기반으로 진료 기록 저장 시 필요한 ID들 -->
@@ -215,12 +230,24 @@
   </div>
 
   <!-- ✅ 메모 작성 폼 -->
-  <form class="record-form" th:action="@{/hospital/chart/note}" method="post"
-        th:if="${!#lists.isEmpty(recentMedRecs)}">
-    <textarea name="notes" class="memo-input" placeholder="기록할 내용을 입력하세요" required></textarea>
-    <input type="hidden" name="recordId" th:value="${recentMedRecs[0].recordId}" />
-    <button type="submit" class="memo-submit-btn">올리기</button>
-  </form>
+  <!-- ✅ 무조건 보이게 -->
+<form class="record-form" th:action="@{/hospital/chart/note}" method="post">
+  <textarea name="notes" class="memo-input" placeholder="기록할 내용을 입력하세요" required
+            th:disabled="${latestRecord == null}"></textarea>
+
+  <!-- ✅ recordId hidden 필드는 latestRecord 있을 때만 -->
+  <input type="hidden" name="recordId" th:if="${latestRecord != null}"
+         th:value="${latestRecord.recordId}" />
+
+  <button type="submit" class="memo-submit-btn" th:disabled="${latestRecord == null}">
+    올리기
+  </button>
+</form>
+
+<!-- 📭 메모 대상이 없을 경우 안내 -->
+<div th:if="${latestRecord == null}" style="text-align: center; color: gray;">
+  🛑 최근 진료기록이 없어 메모를 작성할 수 없습니다
+</div>
 </aside>
 
 	</div>

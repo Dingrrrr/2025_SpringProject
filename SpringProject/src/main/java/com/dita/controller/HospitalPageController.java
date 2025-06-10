@@ -155,31 +155,35 @@ public class HospitalPageController {
             if (optionalAppt.isPresent()) {
                 Appt appt = optionalAppt.get();
 
-                // ✅ 다른 의사가 예약한 환자일 경우 차단
+                // ✅ 다른 의사의 예약 차단
                 if (!appt.getDoctor().getUsersId().equals(loginUser.getUsersId())) {
                     return "redirect:/hospital/chart?error=unauthorized_access";
                 }
 
                 model.addAttribute("selectedAppt", appt);
 
-                // 차트 작성 여부
+                // 차트 존재 여부
                 boolean alreadyWritten = medRecService.existsByApptId(apptId);
                 model.addAttribute("alreadyWritten", alreadyWritten);
+                model.addAttribute("chartExists", alreadyWritten);
 
-                // 환자 진료기록 전체
+                // 전체 진료 기록
                 List<Med_rec> medRecords = medRecService.findRecordsByPatient(appt.getPatient());
                 model.addAttribute("medRecords", medRecords);
 
-                // ✅ 메모가 있는 최근 진료기록 2건만 필터링
+                // 최근 메모 2건 필터링
                 List<Med_rec> recentNotes = medRecords.stream()
                     .filter(rec -> rec.getNotes() != null && !rec.getNotes().isBlank())
                     .sorted(Comparator.comparing(Med_rec::getCreatedAt).reversed())
                     .limit(2)
                     .collect(Collectors.toList());
+
                 model.addAttribute("recentMedRecs", recentNotes);
 
-                // (추가 flag 사용 시)
-                model.addAttribute("chartExists", alreadyWritten);
+                // ✅ 가장 최근 메모 한 건 따로 넘김 (view에서 안전하게 처리 가능)
+                if (!recentNotes.isEmpty()) {
+                    model.addAttribute("latestRecord", recentNotes.get(0));
+                }
             }
         }
 
@@ -238,9 +242,13 @@ public class HospitalPageController {
         @RequestParam List<Integer> drugIds,
         @RequestParam List<String> dosages,
         @RequestParam List<String> frequencies,
-        @RequestParam List<String> durations
+        @RequestParam List<String> durations,
+        
+        @RequestParam String patientType //수납, 입원 선택
     ) {
-        Med_rec saved = medRecService.saveRecord(apptId, patientId, doctorId, chiefComplaint, diseaseId, drugIds.get(0), notes);
+    	Med_rec saved = medRecService.saveRecord(
+    	        apptId, patientId, doctorId, chiefComplaint, diseaseId, drugIds.get(0), notes
+    	    );
 
         for (int i = 0; i < drugIds.size(); i++) {
             medRecService.savePrescription(
@@ -252,8 +260,17 @@ public class HospitalPageController {
             );
         }
 
+     // ✅ 3. 환자 상태 업데이트 (수납 or 입원)
+        Optional<Appt> optionalAppt = apptRepository.findById(apptId);
+        if (optionalAppt.isPresent()) {
+            Appt appt = optionalAppt.get();
+            appt.getPatient().setPatientType(PatientType.valueOf(patientType));
+            apptRepository.save(appt);
+        }
+
         return "redirect:/hospital/chart";
     }
+    
     
     @PostMapping("/chart/note")
     public String updateNote(
