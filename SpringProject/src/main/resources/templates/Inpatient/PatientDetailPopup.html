@@ -20,40 +20,38 @@
 
   <form th:action="@{/Inpatient/updateStatus}" method="post" id="statusForm">
 
+    <!-- 필드: 환자 ID -->
+    <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+
     <label>진단명</label>
-    <input type="text" id="symptomInput"
-           th:value="${admission.patient.patientSymptom ?: '미정'}"
-           readonly />
-	<input type="hidden" name="symptom" th:value="${admission.patient.patientSymptom ?: '미정'}"/>
+    <input type="text" id="symptomInput" name="symptom"
+           th:value="${admission.patient.patientSymptom ?: '미정'}" readonly />
+
     <label>입원일</label>
-    <input type="date" id="admittedAtInput"
-           th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"
-           readonly />
-	<input type="hidden" name="admittedAt" th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}"/>
-	
+    <input type="date" id="admittedAtInput" name="admittedAt"
+           th:value="${#temporals.format(admission.admittedAt, 'yyyy-MM-dd')}" readonly />
+
     <label>담당의</label>
-    <select  id="doctorSelect" disabled>
+    <select id="doctorSelect" name="doctorId" disabled>
       <option th:each="doc : ${doctors}"
               th:value="${doc.usersId}"
               th:text="${doc.usersName}"
               th:selected="${doc.usersId == admission.doctor.usersId}">
       </option>
     </select>
-    <!-- 숨겨진 필드로 값 전달 -->
-    <input type="hidden" name="doctorId" th:value="${admission.doctor.usersId}" />
 
     <label>상태</label>
-    <select  id="statusSelect" disabled>
+    <select id="statusSelect" name="status" disabled>
       <option value="입원중" th:selected="${admission.patient.patientType.name() == '입원중'}">입원중</option>
       <option value="퇴원" th:selected="${admission.patient.patientType.name() == '퇴원'}">퇴원</option>
     </select>
-    <input type="hidden" name="status" id="statusHidden" th:value="${admission.patient.patientType.name()}" />
 
-    <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
+    <!-- 버튼 그룹 (form 안에 포함) -->
+    <div class="button-group">
+      <button type="button" id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
   </form>
 
-  <div class="button-group">
-    <button id="editBtn" class="edit" onclick="toggleEdit()">수정</button>
+  <!-- 삭제 & 닫기 버튼은 별도 -->
 
     <form th:action="@{/Inpatient/delete}" method="post">
       <input type="hidden" name="patientId" th:value="${admission.patient.patientId}" />
@@ -61,41 +59,32 @@
     </form>
 
     <button class="cancel" onclick="window.close()">닫기</button>
-  </div>
-
 </div>
 
 <script>
   let isEditMode = false;
 
   function toggleEdit() {
-  isEditMode = !isEditMode;
+    const editBtn = document.getElementById("editBtn");
+    const statusSelect = document.getElementById("statusSelect");
+    const symptomInput = document.getElementById("symptomInput");
+    const admittedAtInput = document.getElementById("admittedAtInput");
+    const doctorSelect = document.getElementById("doctorSelect");
 
-  const editBtn = document.getElementById("editBtn");
-  const statusSelect = document.getElementById("statusSelect");
-  const symptomInput = document.getElementById("symptomInput");
-  const admittedAtInput = document.getElementById("admittedAtInput");
-  const doctorSelect = document.getElementById("doctorSelect");
+    if (!isEditMode) {
+      isEditMode = true;
+      editBtn.textContent = "저장";
+      editBtn.classList.remove("edit");
+      editBtn.classList.add("save");
 
-  if (isEditMode) {
-    editBtn.textContent = "저장";
-    editBtn.classList.remove("edit");
-    editBtn.classList.add("save");
-
-    statusSelect.disabled = false;
-    symptomInput.removeAttribute("readonly");
-    admittedAtInput.removeAttribute("readonly");
-    doctorSelect.disabled = false;
-  } else {
-    document.getElementById("statusHidden").value = statusSelect.value;
-    document.querySelector('input[name="symptom"]').value = symptomInput.value;
-    document.querySelector('input[name="admittedAt"]').value = admittedAtInput.value;
-    document.querySelector('input[name="doctorId"]').value = doctorSelect.value;
-
-    document.getElementById("statusForm").submit();
+      statusSelect.disabled = false;
+      symptomInput.removeAttribute("readonly");
+      admittedAtInput.removeAttribute("readonly");
+      doctorSelect.disabled = false;
+    } else {
+      document.getElementById("statusForm").submit();
+    }
   }
-}
-
 </script>
 </body>
 </html>
