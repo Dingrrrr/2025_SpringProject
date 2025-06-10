@@ -3,6 +3,7 @@ package com.dita.controller;
 import com.dita.domain.Grade;
 import com.dita.domain.User;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
@@ -289,5 +290,54 @@ public class LoginPageController {
         model.addAttribute("grade", loginUser.getGrade().name());
         return "nurse/NurseHome";
     }
+	
+	@GetMapping("/acceptance/acceptanceHome")
+	public String showacceptancePage(HttpServletRequest request, Model model) {
+	    HttpSession session = request.getSession(false);
+	    if (session == null) return "redirect:/Login/Login";
+
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null|| !loginUser.getGrade().equals(Grade.수납)) {
+	    	return "redirect:/Login/Login";
+	    }
+
+	    model.addAttribute("userName", loginUser.getUsersName());
+	    model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
+	    return "acceptance/acceptanceHome";
+	}
+	
+	@GetMapping("/inpatient/inpatient")
+	public String showInpatientPage(HttpServletRequest request, Model model) {
+	    HttpSession session = request.getSession(false);
+	    if (session == null) return "redirect:/Login/Login";
+
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null|| !loginUser.getGrade().equals(Grade.수납)) {
+	    	return "redirect:/Login/Login";
+	    }
+
+	    model.addAttribute("userName", loginUser.getUsersName());
+	    model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
+	    return "inpatient/inpatient";
+	}
+	
+	@GetMapping("/Drug/Drug")
+	public String showDrugPage(HttpServletRequest request, Model model) {
+	    HttpSession session = request.getSession(false);
+	    if (session == null) return "redirect:/Login/Login";
+
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null|| !loginUser.getGrade().equals(Grade.수납)) {
+	    	return "redirect:/Login/Login";
+	    }
+
+	    model.addAttribute("userName", loginUser.getUsersName());
+	    model.addAttribute("usersId", loginUser.getUsersId());
+        model.addAttribute("grade", loginUser.getGrade().name());
+	    return "Drug/Drug";
+	}
+
 
 }

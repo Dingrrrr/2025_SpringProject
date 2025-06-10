@@ -27,6 +27,8 @@ import com.dita.persistence.WardRepository;
 import com.dita.service.AdmissionService;
 import com.dita.vo.PatientDto;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -42,7 +44,16 @@ public class InpatientController {
     private final WardRepository wardRepository;
     
     @GetMapping("/Inpatient")
-    public String showInpatientPage(Model model) {
+    public String showInpatientPage(Model model, HttpServletRequest request) {
+    	 HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
         List<String> wards = wardRepository.findAll().stream()
                 .map(Ward::getName)
                 .collect(Collectors.toList());
@@ -123,7 +134,16 @@ public class InpatientController {
 
     // 입원 통계
     @GetMapping("/InpatientStatistics")
-    public String showStatisticsPage() {
+    public String showStatisticsPage(Model model,HttpServletRequest request) {
+    	 HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
         return "inpatient/InpatientStatistics";
     }
 

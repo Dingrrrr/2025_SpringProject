@@ -7,36 +7,69 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<!-- 사이드바 -->
-    <div class="sidebar">
-        <div class="profile">
-            <div class="profile-icon">👤</div>
-            <span th:text="${userName}">간호사 이름</span>
-        </div>
-        
-        <a href="NurseHome" class="menu-item">
-            <div class="menu-icon">🔔</div>
-            <span>알림</span>
-        </a>
-                
-        <a href="VitalRecord" class="menu-item">
-            <div class="menu-icon">💜</div>
-            <span>바이탈 기록</span>
-        </a>
-            
-        <a href="NurseChart" class="menu-item">
-            <div class="menu-icon">📋</div>
-            <span>차트</span>
-        </a>
-        
-        <a href="MedicationRecord" class="menu-item active">
-            <div class="menu-icon">👥</div>
-            <span>투약 및 처치 기록</span>
-        </a>
-        <a th:href="@{/Login/Logout}" class="menu-item">
-	      <div class="menu-icon">🚪</div>
-	      <span>로그아웃</span>
-	    </a>
+<!-- 사이드 바 -->
+<div class = "sidebar">
+	<div class = "profile">
+		<div class = "profile-icon">👤</div>
+		<span th:text="${userName}">수납 이름</span>
+	</div>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">🔔</div>
+		<span>알림</span>
+	</div>
+	<a href = "/acceptance/acceptanceHome">
+	<div class = "menu-item">
+		<div class = "menu-icon">🏠</div>
+		<span>홈</span>
+	</div>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+		<div class = "menu-icon">📋</div>
+		<span>진료</span>
+	</div>
+	
+	<ul class="submenu">
+	<a href="/acceptance/acceptanceDoctor">
+   	 	<li class="submenu-item active">의사 스케줄</li></a>
+   	 <a href ="/acceptance/acceptanceCondition">
+    	<li class="submenu-item">진료 상태</li></a>
+	</ul>
+	
+	
+	<a href="/acceptance/acceptanceReception" class="menu-item">
+	  <div class="menu-icon">👥</div>
+	  <span>예약</span>
+	</a>
+	
+	<div class = "menu-item">
+		<div class = "menu-icon">✏️</div>
+		<span>수납</span>
+	</div>
+	
+	<a href = "/Drug/Drug">
+	<div class = "menu-item">
+		<div class = "menu-icon">💜</div>
+		<span>재고</span>
+		
+	</div>
+	</a>
+	
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+  <div class="menu-icon">🛌</div>
+  <span>입원</span>
+</div>
+
+<ul class="submenu">
+  <a href="/Inpatient/Inpatient">
+    <li class="submenu-item">입원 관리</li>
+  </a>
+  <a href="/Inpatient/InpatientStatistics">
+    <li class="submenu-item">입원 통계</li>
+  </a>
+</ul>
+
     </div>
 
 <main class="main">
