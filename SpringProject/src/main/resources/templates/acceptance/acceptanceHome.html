@@ -15,33 +15,34 @@
 <div class = "sidebar">
 	<div class = "profile">
 		<div class = "profile-icon">👤</div>
-		<span>내 프로필</span>
+		<span th:text="${userName}">수납 이름</span>
 	</div>
 	
 	<div class = "menu-item">
 		<div class = "menu-icon">🔔</div>
 		<span>알림</span>
 	</div>
-	
+	<a href = "/acceptance/acceptanceHome">
 	<div class = "menu-item">
 		<div class = "menu-icon">🏠</div>
 		<span>홈</span>
 	</div>
+	</a>
 	
 	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
 		<div class = "menu-icon">📋</div>
 		<span>진료</span>
 	</div>
+	
 	<ul class="submenu">
-	<a href="acceptanceDoctor">
+	<a href="/acceptance/acceptanceDoctor">
    	 	<li class="submenu-item active">의사 스케줄</li></a>
-   	 <a href ="acceptanceCondition">
+   	 <a href ="/acceptance/acceptanceCondition">
     	<li class="submenu-item">진료 상태</li></a>
-
 	</ul>
 	
 	
-	<a href="acceptanceReception" class="menu-item">
+	<a href="/acceptance/acceptanceReception" class="menu-item">
 	  <div class="menu-icon">👥</div>
 	  <span>예약</span>
 	</a>
@@ -51,16 +52,28 @@
 		<span>수납</span>
 	</div>
 	
+	<a href = "/Drug/Drug">
 	<div class = "menu-item">
 		<div class = "menu-icon">💜</div>
 		<span>재고</span>
+		
 	</div>
+	</a>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">👥</div>
-		<span>입원</span>
-	</div>
+	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
+  <div class="menu-icon">🛌</div>
+  <span>입원</span>
 </div>
+
+<ul class="submenu">
+  <a href="/Inpatient/Inpatient">
+    <li class="submenu-item">입원 관리</li>
+  </a>
+  <a href="/Inpatient/InpatientStatistics">
+    <li class="submenu-item">입원 통계</li>
+  </a>
+</ul>
+    </div>
 
 <!-- 메인 -->
 <div class="top-menu-bar">
@@ -358,7 +371,10 @@
 
   <!-- 접수 리스트 -->
   <ul class="reception-list">
-    <li class="reception-item" th:each="appt : ${appts}">
+<li class="reception-item"
+    th:each="appt : ${appts}"
+    th:attr="data-type=${appt.patient.patientType}">
+
       <div class="times">
         <span class="time1"
              th:text="${#temporals.format(appt.scheduledAt, 'HH:mm')} + ' 전'">
@@ -651,18 +667,16 @@ function closeEditModal() {
   const filterRadios = document.querySelectorAll('input[name="filter"]');
   const receptionItems = document.querySelectorAll('.reception-item');
 
-  function filterReception(type) {
-    receptionItems.forEach(item => {
-      const text = item.textContent || "";
-      if (type === '전체') {
-        item.style.display = '';
-      } else if (type === '예약') {
-        item.style.display = text.includes('상태: 예약') ? '' : 'none';
-      } else if (type === '진료대기') {
-        item.style.display = text.includes('상태: 진료대기') ? '' : 'none';
-      }
-    });
-  }
+function filterReception(type) {
+  receptionItems.forEach(item => {
+    const status = item.getAttribute('data-type');
+    if (type === '전체') {
+      item.style.display = (status === '예약' || status === '진료대기') ? '' : 'none';
+    } else {
+      item.style.display = (status === type) ? '' : 'none';
+    }
+  });
+}
 
   filterRadios.forEach(radio => {
     radio.addEventListener('change', () => {
@@ -670,7 +684,15 @@ function closeEditModal() {
       filterReception(selectedLabel);
     });
   });
+    const selected = document.querySelector('input[name="filter"]:checked');
+  if (selected) {
+    const type = selected.parentElement.textContent.trim();
+    filterReception(type);
+  }
+
 });
+
+
 //새로고침
 function resetToToday() {
   const today = new Date();

@@ -6,13 +6,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.dita.persistence.DrugRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dita.domain.Drug;
+import com.dita.domain.User;
 
 @Controller
 @RequestMapping("/Drug")
@@ -25,8 +31,17 @@ public class DrugPageController {
     }
 
     @GetMapping("/Drug")
-    public String showDrugPage() { //Drug페이지
-        return "/Drug/Drug";  
+    public String showDrugPage(Model model, HttpServletRequest request) { //Drug페이지
+    	HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        User loginUser = (User) session.getAttribute("loginUser");
+	        if (loginUser != null) {
+	            model.addAttribute("userName", loginUser.getUsersName());
+	            model.addAttribute("usersId", loginUser.getUsersId());
+	            model.addAttribute("grade", loginUser.getGrade().name());
+	        }
+	    }
+    	return "/Drug/Drug";  
     }
     
     @GetMapping("/Add")

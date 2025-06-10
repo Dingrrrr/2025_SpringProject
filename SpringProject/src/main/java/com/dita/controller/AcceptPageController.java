@@ -10,9 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
@@ -44,6 +43,10 @@ import com.dita.persistence.LoginPageRepository;
 import com.dita.persistence.PatientRepository;
 import com.dita.service.EmailService;
 import com.dita.vo.AppointmentDto;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import com.dita.persistence.ApptRepository;
 
 import lombok.extern.java.Log;
@@ -75,8 +78,17 @@ public class AcceptPageController {
 	public String showAcceptanceHomePage(
 	        @RequestParam(name = "date", required = false)
 	        @DateTimeFormat(iso = ISO.DATE) LocalDate targetDate,
-	        Model model) {
-
+	        Model model, HttpServletRequest request) {
+		
+		    HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 	    // 1) 날짜 처리
 	    if (targetDate == null) {
 	        targetDate = LocalDate.now();
@@ -106,7 +118,16 @@ public class AcceptPageController {
 
 		
 	@GetMapping("/acceptanceDoctor")
-	public String AcceptanceDoctorPage(Model model) {
+	public String AcceptanceDoctorPage(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        User loginUser = (User) session.getAttribute("loginUser");
+	        if (loginUser != null) {
+	            model.addAttribute("userName", loginUser.getUsersName());
+	            model.addAttribute("usersId", loginUser.getUsersId());
+	            model.addAttribute("grade", loginUser.getGrade().name());
+	        }
+	    }
 	    LocalDate today = LocalDate.now();
 	    LocalDateTime startOfDay = today.atStartOfDay();
 	    LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
@@ -121,35 +142,97 @@ public class AcceptPageController {
 
 	
 	@GetMapping("/acceptanceCondition")
-	public String AcceptanceConditionPage(Model model) {
+	public String AcceptanceConditionPage(Model model, HttpServletRequest request) {
+	    HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        User loginUser = (User) session.getAttribute("loginUser");
+	        if (loginUser != null) {
+	            model.addAttribute("userName", loginUser.getUsersName());
+	            model.addAttribute("usersId", loginUser.getUsersId());
+	            model.addAttribute("grade", loginUser.getGrade().name());
+	        }
+	    }
+
 	    LocalDate today = LocalDate.now();
 	    LocalDateTime start = today.atStartOfDay();
 	    LocalDateTime end = today.plusDays(1).atStartOfDay();
 
-	    // ✅ Lazy 강제 초기화 적용
-	    List<Appt> room1Appts = apptRepository.findByRoomAndScheduledAtToday("진료실1", start, end);
-	    room1Appts.forEach(appt -> appt.getPatient().getPatientName()); // 👈 핵심 한 줄
+	    // 각 진료실별 Appt 가져오기
+	    List<Appt> all1 = apptRepository.findByRoomAndScheduledAtToday("진료실1", start, end);
+	    List<Appt> all2 = apptRepository.findByRoomAndScheduledAtToday("진료실2", start, end);
+	    List<Appt> all3 = apptRepository.findByRoomAndScheduledAtToday("진료실3", start, end);
+	    List<Appt> all4 = apptRepository.findByRoomAndScheduledAtToday("진료실4", start, end);
+
+	    // 진료중인 환자
+	    Optional<Appt> room1Current = all1.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료중)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .findFirst();
+
+	    Optional<Appt> room2Current = all2.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료중)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .findFirst();
+
+	    Optional<Appt> room3Current = all3.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료중)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .findFirst();
+
+	    Optional<Appt> room4Current = all4.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료중)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .findFirst();
+
+	    // 진료대기 리스트만 따로 분리
+	    List<Appt> room1Appts = all1.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료대기)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .collect(Collectors.toList());
+
+	    List<Appt> room2Appts = all2.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료대기)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .collect(Collectors.toList());
+
+	    List<Appt> room3Appts = all3.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료대기)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .collect(Collectors.toList());
+
+	    List<Appt> room4Appts = all4.stream()
+	        .filter(appt -> appt.getPatient().getPatientType() == PatientType.진료대기)
+	        .peek(appt -> appt.getPatient().getPatientName())
+	        .collect(Collectors.toList());
+
+	    // 모델에 추가
 	    model.addAttribute("room1Appts", room1Appts);
-
-	    List<Appt> room2Appts = apptRepository.findByRoomAndScheduledAtToday("진료실2", start, end);
-	    room2Appts.forEach(appt -> appt.getPatient().getPatientName());
 	    model.addAttribute("room2Appts", room2Appts);
-
-	    List<Appt> room3Appts = apptRepository.findByRoomAndScheduledAtToday("진료실3", start, end);
-	    room3Appts.forEach(appt -> appt.getPatient().getPatientName());
 	    model.addAttribute("room3Appts", room3Appts);
-
-	    List<Appt> room4Appts = apptRepository.findByRoomAndScheduledAtToday("진료실4", start, end);
-	    room4Appts.forEach(appt -> appt.getPatient().getPatientName());
 	    model.addAttribute("room4Appts", room4Appts);
+
+	    model.addAttribute("room1Current", room1Current.orElse(null));
+	    model.addAttribute("room2Current", room2Current.orElse(null));
+	    model.addAttribute("room3Current", room3Current.orElse(null));
+	    model.addAttribute("room4Current", room4Current.orElse(null));
 
 	    return "acceptance/acceptanceCondition";
 	}
 
 
+
 		@GetMapping("/AcceptanceReceipt")
 	    public String showAcceptanceReceiptPage(@RequestParam(name="date", required = false)
-		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model) {
+		@DateTimeFormat(iso = ISO.DATE) LocalDate targetDate, Model model, HttpServletRequest request) {
+			HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 			if(targetDate == null) {
 				targetDate = LocalDate.now();
 			}
@@ -165,7 +248,16 @@ public class AcceptPageController {
 	    }
 		
 		@GetMapping("/acceptanceReception")
-	    public String showAcceptanceReceptionPage(Model model) {
+	    public String showAcceptanceReceptionPage(Model model, HttpServletRequest request) {
+			HttpSession session = request.getSession(false);
+		    if (session != null) {
+		        User loginUser = (User) session.getAttribute("loginUser");
+		        if (loginUser != null) {
+		            model.addAttribute("userName", loginUser.getUsersName());
+		            model.addAttribute("usersId", loginUser.getUsersId());
+		            model.addAttribute("grade", loginUser.getGrade().name());
+		        }
+		    }
 			// 필요 시 model에 데이터 추가 가능
 	        return "acceptance/acceptanceReception"; 
 
@@ -227,9 +319,6 @@ public class AcceptPageController {
 
 		    return "redirect:/acceptance/acceptanceHome";
 		}
-
-
-	
 
 		@PostMapping("/appointment")
 		@ResponseBody
@@ -324,6 +413,11 @@ public class AcceptPageController {
 		    appt.getPatient().setPatientSymptom(dto.getDisease());
 		    if (dto.getStatus() != null) {
 		        appt.setStatus(dto.getStatus());
+		    }
+		    if (dto.getStatus() == Status.확정) {
+		        Patient patient = appt.getPatient();
+		        patient.setPatientType(PatientType.진료대기);
+		        repo.save(patient);
 		    }
 		    apptRepository.save(appt);
 
