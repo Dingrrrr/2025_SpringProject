@@ -426,7 +426,6 @@ public class AcceptPageController {
 	        return ResponseEntity.ok(dtoList);
 	    }
 		
-
 		    @PostMapping("/acceptance/updatePatient")
 		    public String updatePatient(@ModelAttribute Patient patient, Model model) {
 		        Optional<Patient> optional = repo.findById(patient.getPatientId());
