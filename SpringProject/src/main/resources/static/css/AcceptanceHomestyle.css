@@ -134,10 +134,10 @@
 		}
 		.treatment-menu {
 		    margin-left: auto;         /* 원래 자동 오른쪽 정렬을 막고 */
-		    margin-right: 135px;        /* 원하는 만큼 왼쪽으로 당김 (조절 가능) */
+		    margin-right: 465px;        /* 원하는 만큼 왼쪽으로 당김 (조절 가능) */
 		}
 		.reception-menu {
-		    margin-left: auto;
+		    margin-left: 410px;
 		    margin-right: -70px; /* ← 숫자 조절로 우측 밀기 */
 		}
 		.menu-title {
