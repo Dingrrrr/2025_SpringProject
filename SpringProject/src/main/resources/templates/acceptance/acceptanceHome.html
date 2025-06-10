@@ -18,10 +18,7 @@
 		<span th:text="${userName}">수납 이름</span>
 	</div>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">🔔</div>
-		<span>알림</span>
-	</div>
+
 	<a href = "/acceptance/acceptanceHome">
 	<div class = "menu-item">
 		<div class = "menu-icon">🏠</div>
@@ -55,6 +52,8 @@
 	</div>
 	</a>
 	
+	
+	
 	<div class="menu-item has-submenu" onclick="toggleSubMenu(this)">
   <div class="menu-icon">🛌</div>
   <span>입원</span>
@@ -68,8 +67,13 @@
     <li class="submenu-item">입원 통계</li>
   </a>
 </ul>
-    </div>
-
+    
+<a th:href="@{/Login/Logout}" class="menu-item logout">
+    		<div class="menu-icon">🚪</div>
+    		<span>로그아웃</span>
+		</a>
+		
+</div>
 <!-- 메인 -->
 <div class="top-menu-bar">
     <!-- 왼쪽 영역: 예약 -->

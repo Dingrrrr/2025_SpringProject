@@ -6,6 +6,7 @@ import com.dita.domain.User;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -233,7 +234,9 @@ public class LoginPageController {
 	    // (2) 사용자 로드 및 비밀번호 업데이트
 	    User u = repo.findById(usersId)
 	                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자"));
-	    u.setUsersPwd(newPwd);
+	    
+	    String encoded = passwordEncoder.encode(newPwd);
+	    u.setUsersPwd(encoded);
 	    repo.save(u);
 
 	    // (3) 완료 후 로그인 페이지로

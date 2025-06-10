@@ -52,10 +52,9 @@
 	    </li>
       </ul>
       <div class="sidebar-footer">
-        <button class="logout-btn"
-                th:onclick="|location.href='@{/logout}'|">
-          로그아웃
-        </button>
+        <form th:action="@{/Login/Logout}" method="get" style="margin: 0;">
+					<button type="submit" class="logout-btn">로그아웃</button>
+				</form>
       </div>
     </aside>
 

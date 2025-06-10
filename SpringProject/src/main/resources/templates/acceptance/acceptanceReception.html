@@ -18,10 +18,7 @@
 		<span th:text="${userName}">수납 이름</span>
 	</div>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">🔔</div>
-		<span>알림</span>
-	</div>
+
 	<a href = "/acceptance/acceptanceHome">
 	<div class = "menu-item">
 		<div class = "menu-icon">🏠</div>
@@ -47,11 +44,6 @@
 	  <span>예약</span>
 	</a>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">✏️</div>
-		<span>수납</span>
-	</div>
-	
 	<a href = "/Drug/Drug">
 	<div class = "menu-item">
 		<div class = "menu-icon">💜</div>
@@ -73,11 +65,16 @@
     <li class="submenu-item">입원 통계</li>
   </a>
 </ul>
+
+<a th:href="@{/Login/Logout}" class="menu-item logout">
+    		<div class="menu-icon">🚪</div>
+    		<span>로그아웃</span>
+		</a>
     </div>
 
 <div class="main-content">
   <div class="schedule-wrapper">
-    <!-- Day/Week/Month 탭 -->
+    <!-- Day/Week/탭 -->
     <div class="tab-header">
       <button class="tab active" onclick="showTab('day')">Day</button>
       <button class="tab" onclick="showTab('week')">Week</button>
@@ -298,7 +295,21 @@
       </div>
     </form>
   </div>
+
+<!-- 겹치는 예약 선택 팝업 -->
+<div id="apptListPopup" class="modal" style="display: none;">
+  <div class="modal-content" style="width: 300px; padding: 20px;">
+    <h3>예약 선택</h3>
+    <ul id="apptListContainer" style="list-style: none; padding: 0; margin-top: 10px;"></ul>
+    <div style="text-align: right; margin-top: 20px;">
+      <button onclick="closeApptPopup()" style="padding: 6px 12px; background-color: #ccc;">닫기</button>
+    </div>
+  </div>
 </div>
+
+  
+</div>
+
 
 
 <script>
@@ -403,12 +414,88 @@ window.toggleSubMenu = toggleSubMenu;
       });
     document.getElementById('reservationDetailModal').style.display = 'flex';
   }
-  document.querySelector('.schedule-table')
-          .addEventListener('click', function(e) {
-    if (e.target.classList.contains('green')) {
-      openReservationDetailModal(e.target);
+// 👇 dayView 전용 클릭 이벤트
+document.querySelector('#dayView .schedule-table')
+  .addEventListener('click', function(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell || !cell.classList.contains('green')) return;
+
+    // dayView는 단일 예약만 처리
+    openReservationDetailModal(cell);
+  });
+
+// 👇 weekView 전용 클릭 이벤트
+document.querySelector('#weekView .schedule-table')
+  .addEventListener('click', function(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell || !cell.dataset.appts) return;
+
+    const appts = JSON.parse(cell.dataset.appts);
+    if (!Array.isArray(appts) || appts.length === 0) return;
+
+    if (appts.length === 1) {
+      // 예약 1건이면 바로 모달
+      Object.entries(appts[0]).forEach(([k, v]) => {
+        cell.dataset[k] = v;
+      });
+      openReservationDetailModal(cell);
+    } else {
+      // 예약이 여러 건이면 팝업 먼저 띄우고, 선택 시 모달 열기
+      const listEl = document.getElementById("apptListContainer");
+      listEl.innerHTML = "";
+
+      appts.forEach((appt) => {
+        const li = document.createElement("li");
+        li.textContent = `${appt.name} (${appt.rrn})`;
+        li.style.cursor = "pointer";
+        li.style.margin = "5px 0";
+        li.onclick = function () {
+          // 👉 셀에 선택한 예약 정보만 임시 저장
+          Object.entries(appt).forEach(([k, v]) => {
+            cell.dataset[k] = v;
+          });
+
+          closeApptPopup(); // 팝업 먼저 닫고
+          
+          setTimeout(() => {
+            openReservationDetailModal(cell); // 모달 띄우기
+          }, 100); // 살짝 딜레이를 줘서 자연스럽게 전환
+        };
+        listEl.appendChild(li);
+      });
+
+      document.getElementById("apptListPopup").style.display = "flex";
     }
   });
+
+
+function closeApptPopup() {
+  document.getElementById("apptListPopup").style.display = "none";
+  // 혹시 떠 있는 예약 상세 모달이 있다면 함께 숨기기
+  document.getElementById("reservationDetailModal").style.display = "none";
+}
+window.closeApptPopup = closeApptPopup;
+  
+  // ─────────────────────────────────────────────
+// weekView 셀 클릭 시 예약 상세 모달 열기
+document.querySelector('#weekView .schedule-table')
+        .addEventListener('click', function(e) {
+  if (e.target.classList.contains('green')) {
+    const cell = e.target;
+
+    // 데이터 속성이 배열일 경우(week에서는 여러 예약이 들어갈 수 있음), 첫 예약으로만 모달 열기
+    const appts = JSON.parse(cell.dataset.appts || '[]');
+    if (appts.length > 0) {
+      // 첫 번째 예약 정보 기준으로 모달 열기
+      Object.entries(appts[0]).forEach(([k, v]) => {
+        cell.dataset[k] = v;
+      });
+      openReservationDetailModal(cell);
+    }
+  }
+});
+  
+  
   function closeDetailModal() {
     document.getElementById('reservationDetailModal').style.display = 'none';
   }
@@ -605,16 +692,90 @@ window.toggleSubMenu = toggleSubMenu;
     loadAppointmentsForWeek(dates);
   }
 
-  function loadAppointmentsForWeek(dateList) {
-	  dateList.forEach(dateStr => {
-		fetch(`/acceptance/appointments?date=${dateStr}`)
-		.then(r => r.ok ? r.json() : Promise.reject(r.status))
-		.then(list => {
-		          /* … 셀 채우기 로직 … */
-		})
-		.catch(() => {});
-	});
-  }
+function loadAppointmentsForWeek(dateList) {
+  // 💡 먼저 기존 셀 초기화 - 더 확실하게
+  document.querySelectorAll('#weekView .cell').forEach(cell => {
+    cell.innerHTML = '';
+    cell.classList.remove('green');
+    // 모든 데이터 속성 완전 삭제
+    Object.keys(cell.dataset).forEach(key => {
+      delete cell.dataset[key];
+    });
+  });
+
+  // 각 날짜별로 순차적으로 처리
+  const promises = dateList.map((dateStr, dayIdx) => {
+    return fetch(`/acceptance/appointments?date=${dateStr}`)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(list => {
+        // 해당 날짜의 예약들을 시간대별로 그룹화
+        const timeSlots = {};
+        
+        list.forEach(appt => {
+          const dt = new Date(appt.date);
+          const time = `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+          
+          if (!timeSlots[time]) {
+            timeSlots[time] = [];
+          }
+          timeSlots[time].push(appt);
+        });
+
+        // 시간대별로 셀에 배치
+        Object.entries(timeSlots).forEach(([time, appointments]) => {
+          document.querySelectorAll('#weekView .schedule-row').forEach(row => {
+            const timeCell = row.querySelector('.time-col');
+            if (timeCell && timeCell.textContent.trim() === time) {
+              const cell = row.querySelectorAll('.cell')[dayIdx];
+              if (cell) {
+                // 해당 셀에 예약 정보 저장 (중복 방지를 위해 덮어쓰기)
+                cell.dataset.appts = JSON.stringify(appointments);
+                cell.classList.add('green');
+                
+                // 표시할 내용 생성
+                if (appointments.length === 1) {
+                  cell.innerHTML = appointments[0].name;
+                } else {
+                  cell.innerHTML = `${appointments[0].name} 외 ${appointments.length - 1}건`;
+                }
+              }
+            }
+          });
+        });
+      })
+      .catch(err => console.error(`${dateStr} 데이터 로딩 실패:`, err));
+  });
+
+  // 모든 날짜 로딩 완료 대기
+  Promise.all(promises).then(() => {
+    console.log('주간 예약 데이터 로딩 완료');
+  });
+}
+
+// 또한 updateWeekDisplay 함수도 약간 수정하여 중복 호출 방지
+function updateWeekDisplay() {
+  const cur = new Date(currentDateObj);
+  const dow = (cur.getDay() + 6) % 7; // 월=0
+  const monday = new Date(cur); 
+  monday.setDate(cur.getDate() - dow);
+  const sunday = new Date(monday); 
+  sunday.setDate(monday.getDate() + 6);
+  
+  document.getElementById('weekDateRange').textContent =
+    `${formatLocalDate(monday)} ~ ${formatLocalDate(sunday)}`;
+    
+  const dates = Array.from({length: 5}, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return formatLocalDate(d);
+  });
+  
+  // 약간의 딜레이를 주어 DOM 업데이트 완료 후 실행
+  setTimeout(() => {
+    loadAppointmentsForWeek(dates);
+  }, 50);
+}
+
   // 초기 로드
   updateDateDisplay();
   loadAppointmentsByDate(formatLocalDate(new Date()));

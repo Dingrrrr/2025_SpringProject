@@ -31,7 +31,9 @@
 						th:src="@{/icons/statistics.png}" alt=""> 통계</a></li>
 			</ul>
 			<div class="sidebar-footer">
-				<button class="logout-btn" th:onclick="|location.href='@{/logout}'|">로그아웃</button>
+				<form th:action="@{/Login/Logout}" method="get" style="margin: 0;">
+					<button type="submit" class="logout-btn">로그아웃</button>
+				</form>
 			</div>
 		</aside>
 
@@ -110,8 +112,14 @@
 		</section>
 
 		<!-- 진료기록 입력 영역 (선택된 예약이 있을 때만 노출) -->
+		<div th:if="${alreadyWritten}" style="margin-top: 1rem; color: gray; text-align: center;">
+		  ⚠️ 해당 환자의 예약에 대한 진료기록이 이미 작성되었습니다.
+		</div>
+
+		<!-- 진료기록 입력 영역 (선택된 예약이 있을 때만 노출) -->
 		<!-- ✅ 선택된 예약이 있을 때만 진료 기록 입력 영역을 보여줌 -->
-		<section class="col treatment-main" th:if="${selectedAppt != null}">
+		<section class="col treatment-main" th:if="${selectedAppt != null and (alreadyWritten != null and !alreadyWritten)}">
+
 			<form th:action="@{/hospital/chart}" method="post">
 				<div class="record-header">
 					<div class="record-header-left">
@@ -138,41 +146,36 @@
 					<label>진단명: <select name="diseaseId" required>
 							<option th:each="d : ${diseases}" th:value="${d.id}"
 								th:text="${d.name}">진단명</option>
-					</select>
-					</label> <label>추가 메모: <textarea name="notes"
-							placeholder="추가 메모를 입력하세요" class="notes-textarea"></textarea>
-					</label>
+					</select> <!-- 처방 약 리스트 -->
+						<table class="prescription-table">
+							<thead>
+								<tr>
+									<th>약물명</th>
+									<th>용량</th>
+									<th>투여 횟수</th>
+									<th>투약 기간</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody id="drugListContainer">
+								<tr class="drug-select-row">
+									<td><select name="drugIds" required>
+											<option th:each="drug : ${drugs}" th:value="${drug.drugId}"
+												th:text="${drug.drugName}">약물</option>
+									</select></td>
+									<td><input type="text" name="dosages" placeholder="500mg"
+										required></td>
+									<td><input type="text" name="frequencies"
+										placeholder="하루 3회" required></td>
+									<td><input type="text" name="durations" placeholder="5일간"
+										required></td>
+									<td><button type="button" class="delete-drug-btn">🗑</button></td>
+								</tr>
+							</tbody>
+						</table>
 
-					<!-- 처방 약 리스트 -->
-					<table class="prescription-table">
-						<thead>
-							<tr>
-								<th>약물명</th>
-								<th>용량</th>
-								<th>투여 횟수</th>
-								<th>투약 기간</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody id="drugListContainer">
-							<tr class="drug-select-row">
-								<td><select name="drugIds" required>
-										<option th:each="drug : ${drugs}" th:value="${drug.drugId}"
-											th:text="${drug.drugName}">약물</option>
-								</select></td>
-								<td><input type="text" name="dosages" placeholder="500mg"
-									required></td>
-								<td><input type="text" name="frequencies"
-									placeholder="하루 3회" required></td>
-								<td><input type="text" name="durations" placeholder="5일간"
-									required></td>
-								<td><button type="button" class="delete-drug-btn">🗑</button></td>
-							</tr>
-						</tbody>
-					</table>
-
-					<button type="button" id="addDrugBtn" class="add-btn">+
-						처방약 추가</button>
+						<button type="button" id="addDrugBtn" class="add-btn">+
+							처방약 추가</button>
 				</div>
 
 				<!-- 숨김 필드 (예약 ID, 환자 ID, 의사 ID) -->
@@ -192,14 +195,34 @@
 		</section>
 
 		<!-- 추가 메모 입력 영역 -->
-		<!-- 아직 여기는 db연결안함 -->
-		<aside class="col patient-record">
-			<h3 class="record-title">📝 추가메모</h3>
-			<form class="record-form">
-				<textarea placeholder="기록할 내용을 입력하세요"></textarea>
-				<button type="submit">올리기</button>
-			</form>
-		</aside>
+<aside class="col patient-record" th:if="${selectedAppt != null}">
+  <h3 class="record-title">📝 추가 메모</h3>
+
+  <!-- ✅ 메모 출력 영역 -->
+  <div class="memo-list">
+    <div class="memo-entry" th:each="rec : ${recentMedRecs}">
+      <div class="memo-header">
+        <span class="memo-writer" th:text="${rec.doctor.usersName}">작성자</span>
+        <span class="memo-date" th:text="${#temporals.format(rec.createdAt, 'yyyy-MM-dd')}">날짜</span>
+      </div>
+      <div class="memo-content" th:text="${rec.notes}">메모 내용</div>
+    </div>
+    
+    <!-- ✅ 메모가 없을 때 대체 문구 -->
+    <div th:if="${#lists.isEmpty(recentMedRecs)}" class="memo-entry" style="text-align: center; color: gray;">
+      📭 등록된 메모가 없습니다
+    </div>
+  </div>
+
+  <!-- ✅ 메모 작성 폼 -->
+  <form class="record-form" th:action="@{/hospital/chart/note}" method="post"
+        th:if="${!#lists.isEmpty(recentMedRecs)}">
+    <textarea name="notes" class="memo-input" placeholder="기록할 내용을 입력하세요" required></textarea>
+    <input type="hidden" name="recordId" th:value="${recentMedRecs[0].recordId}" />
+    <button type="submit" class="memo-submit-btn">올리기</button>
+  </form>
+</aside>
+
 	</div>
 </body>
 <script>

@@ -7,17 +7,13 @@
 </head>
 <body class="inventory">
 
-<!-- 사이드 바 -->
+ <!-- 사이드 바 -->
 <div class = "sidebar">
 	<div class = "profile">
 		<div class = "profile-icon">👤</div>
 		<span th:text="${userName}">수납 이름</span>
 	</div>
 	
-	<div class = "menu-item">
-		<div class = "menu-icon">🔔</div>
-		<span>알림</span>
-	</div>
 	<a href = "/acceptance/acceptanceHome">
 	<div class = "menu-item">
 		<div class = "menu-icon">🏠</div>
@@ -64,7 +60,10 @@
     <li class="submenu-item">입원 통계</li>
   </a>
 </ul>
-
+<a th:href="@{/Login/Logout}" class="menu-item logout">
+    		<div class="menu-icon">🚪</div>
+    		<span>로그아웃</span>
+		</a>
     </div>
       <!-- 메인 콘텐츠 -->
   <div class="inventory-main">
