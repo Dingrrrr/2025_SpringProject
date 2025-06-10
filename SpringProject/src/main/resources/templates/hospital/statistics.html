@@ -1,131 +1,110 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>통계 화면</title>
-  <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
-  <link rel="stylesheet" th:href="@{/css/statistics_style.css}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<meta charset="UTF-8">
+<title>통계 화면</title>
+<link rel="stylesheet" th:href="@{/css/hospital_style.css}">
+<link rel="stylesheet" th:href="@{/css/statistics_style.css}">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
-  <div class="hospital-container">
-    <aside class="hospital-sidebar">
-      <h2 class="hospital-profile-title">
-        <img th:src="@{/icons/profile.jpg}" alt="프로필">
-        <span th:text="${displayName}">의사 이름</span>
-      </h2>
-      <ul class="hospital-menu">
-        <!-- 알림은 fetch로 부분 로딩 -->
-        <li onclick="loadAndToggleNotification()">
-          <img th:src="@{/icons/alert.png}" alt=""> 알림
-        </li>
-        <!-- 홈 -->
-        <li>
-	      <a th:href="@{/hospital/hospital_home}">
-	        <img th:src="@{/icons/home.png}" alt=""> 홈
-	      </a>
-	    </li>
-        <!-- 진료 관리 -->
-        <li>
-	      <a th:href="@{/hospital/treatment}">
-	        <img th:src="@{/icons/doctor.png}" alt=""> 진료
-	      </a>
-	    </li>
-        <!-- 예약 관리 -->
-        <li>
-	      <a th:href="@{/hospital/reservation}">
-	        <img th:src="@{/icons/calendar.png}" alt=""> 예약
-	      </a>
-	    </li>
-        <!-- 차트 보기 -->
-        <li>
-	      <a th:href="@{/hospital/chart}">
-	        <img th:src="@{/icons/chart.png}" alt=""> 차트
-	      </a>
-	    </li>
-        <!-- 통계 보기 -->
-        <li>
-	      <a th:href="@{/hospital/statistics}">
-	        <img th:src="@{/icons/statistics.png}" alt=""> 통계
-	      </a>
-	    </li>
-      </ul>
-      <div class="sidebar-footer">
-        <button class="logout-btn"
-                th:onclick="|location.href='@{/logout}'|">
-          로그아웃
-        </button>
-      </div>
-    </aside>
+	<div class="hospital-container">
+		<aside class="hospital-sidebar">
+			<h2 class="hospital-profile-title">
+				<img th:src="@{/icons/profile.jpg}" alt="프로필"> <span
+					th:text="${displayName}">의사 이름</span>
+			</h2>
+			<ul class="hospital-menu">
+				<!-- 알림은 fetch로 부분 로딩 -->
+				<li onclick="loadAndToggleNotification()"><img
+					th:src="@{/icons/alert.png}" alt=""> 알림</li>
+				<!-- 홈 -->
+				<li><a th:href="@{/hospital/hospital_home}"> <img
+						th:src="@{/icons/home.png}" alt=""> 홈
+				</a></li>
+				<!-- 진료 관리 -->
+				<li><a th:href="@{/hospital/treatment}"> <img
+						th:src="@{/icons/doctor.png}" alt=""> 진료
+				</a></li>
+				<!-- 예약 관리 -->
+				<li><a th:href="@{/hospital/reservation}"> <img
+						th:src="@{/icons/calendar.png}" alt=""> 예약
+				</a></li>
+				<!-- 차트 보기 -->
+				<li><a th:href="@{/hospital/chart}"> <img
+						th:src="@{/icons/chart.png}" alt=""> 차트
+				</a></li>
+				<!-- 통계 보기 -->
+				<li><a th:href="@{/hospital/statistics}"> <img
+						th:src="@{/icons/statistics.png}" alt=""> 통계
+				</a></li>
+			</ul>
+			<div class="sidebar-footer">
+				<form th:action="@{/Login/Logout}" method="get" style="margin: 0;">
+					<button type="submit" class="logout-btn">로그아웃</button>
+				</form>
 
-    <section class="statistics-container">
-      <header class="stats-header">
-        <div class="date-range">
-          <input type="text" id="statsDate" placeholder="기간을 선택하세요" readonly>
-        </div>
-      </header>
+			</div>
+		</aside>
 
-      <div id="periodView">
-        <main class="stats-grid">
-          <div class="chart-card">
-            <h4>진료 현황</h4>
-            <canvas id="chartVisits"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>담당별 진료 수 현황</h4>
-            <canvas id="chartByDoctor"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>수납 현황</h4>
-            <canvas id="chartPayments"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>상병코드별 현황</h4>
-            <canvas id="chartByDisease"></canvas>
-          </div>
-        </main>
-      </div>
-    </section>
-  </div>
+		<section class="statistics-container">
+			<header class="stats-header">
+				<div class="date-range">
+					<input type="text" id="statsDate" placeholder="기간을 선택하세요" readonly>
+				</div>
+			</header>
+
+			<div id="periodView">
+				<main class="stats-grid">
+					<div class="chart-card">
+						<h4>진료 현황</h4>
+						<canvas id="chartVisits"></canvas>
+					</div>
+					<div class="chart-card">
+						<h4>담당별 진료 수 현황</h4>
+						<canvas id="chartByDoctor"></canvas>
+					</div>
+					<div class="chart-card">
+						<h4>상병코드별 현황</h4>
+						<canvas id="chartByDisease"></canvas>
+					</div>
+					<div class="chart-card">
+						<h4>연령대별 진료 현황</h4>
+						<canvas id="chartByAgeGroup"></canvas>
+					</div>
+
+					<div class="chart-card">
+						<h4>성별 진료 비율</h4>
+						<canvas id="chartByGender"></canvas>
+					</div>
+				</main>
+			</div>
+		</section>
+	</div>
 <script>
   function formatDateKST(dateObj) {
-    const offset = dateObj.getTimezoneOffset() * 60000;
-    const kst = new Date(dateObj.getTime() - offset);
-    return kst.toISOString().slice(0, 10);
-  }
+  // 1) 현재 타임존 오프셋(분)을 밀리초로 변환
+  const offsetMs = dateObj.getTimezoneOffset() * 60000; // ex) KST에서는 -540분
 
-  flatpickr("#statsDate", {
-    mode: "range",
-    dateFormat: "Y-m-d",
-    locale: {
-      firstDayOfWeek: 1,
-      weekdays: {
-        shorthand: ['일','월','화','수','목','금','토'],
-        longhand: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
-      },
-      months: {
-        shorthand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
-        longhand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
-      }
-    },
-    onChange: function (selectedDates) {
-      if (selectedDates.length === 2) {
-        const startDate = formatDateKST(selectedDates[0]);
-        const endDate = formatDateKST(selectedDates[1]);
-        loadDoctorChart(startDate, endDate);
-        loadVisitChart(startDate, endDate);
-      }
-    }
-  });
+  // 2) UTC 시간 = 로컬 시간 - 오프셋
+  const utc = dateObj.getTime() + offsetMs;
+
+  // 3) KST(UTC+9) 시간 = UTC + 9시간
+  const kstDate = new Date(utc + 9 * 60 * 60 * 1000);
+
+  // 4) ISO → 'YYYY-MM-DD' 앞 10자리만
+  return kstDate.toISOString().slice(0, 10);
+}
 
   function initChart(id, cfg) {
     const ctx = document.getElementById(id).getContext('2d');
     return new Chart(ctx, cfg);
   }
 
-  let doctorChart, visitChart;
+  let doctorChart, visitChart, ageChart, genderChart;
 
   function loadDoctorChart(startDate, endDate) {
     const url = `/api/statistics/doctor-visits-by-date?startDate=${startDate}&endDate=${endDate}`;
@@ -165,50 +144,125 @@
       });
   }
 
-  // ✅ 초기: 현재 달의 1일 ~ 말일 자동 설정
+  function loadDiseaseChart(startDate, endDate) {
+    fetch(`/api/statistics/disease-stats?startDate=${startDate}&endDate=${endDate}`)
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(d => d.diseaseName);
+        const values = data.map(d => d.count);
+        initChart('chartByDisease', {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ label: '진료 건수', data: values, backgroundColor: '#f6c23e' }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } }
+          }
+        });
+      });
+  }
+
+  function loadAgeChart(startDate, endDate) {
+    fetch(`/api/statistics/age-group-stats?startDate=${startDate}&endDate=${endDate}`)
+      .then(res => res.json())
+      .then(data => {
+        const labels = Object.keys(data);
+        const values = Object.values(data);
+        if (ageChart) ageChart.destroy();
+        ageChart = initChart('chartByAgeGroup', {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '진료 수',
+              data: values,
+              backgroundColor: '#f6c23e'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } }
+          }
+        });
+      });
+  }
+
+  function loadGenderChart(startDate, endDate) {
+  fetch(`/api/statistics/gender-stats?startDate=${startDate}&endDate=${endDate}`)
+    .then(res => res.json())
+    .then(data => {
+      const labels = Object.keys(data);      // ['남', '여']
+      const values = Object.values(data);    // [남자 건수, 여자 건수]
+
+      if (genderChart) genderChart.destroy();
+
+      genderChart = initChart('chartByGender', {
+        type: 'bar',                     // 🔻 pie → bar
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '진료 수',
+            data: values,
+            backgroundColor: ['#36b9cc', '#e74a3b']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }   // 범례 숨김
+          },
+          // 막대폭·간격 등 세부조정이 필요하면 여기에 scales 옵션 추가
+          // scales: { y: { beginAtZero: true, ticks: { precision:0 } } }
+        }
+      });
+    })
+    .catch(err => console.error('성별 차트 로드 실패 👉', err));
+}
+
+  flatpickr("#statsDate", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    locale: {
+      firstDayOfWeek: 1,
+      weekdays: {
+        shorthand: ['일','월','화','수','목','금','토'],
+        longhand: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
+      },
+      months: {
+        shorthand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+        longhand: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+      }
+    },
+    onChange: function (selectedDates) {
+      if (selectedDates.length === 2) {
+        const startDate = formatDateKST(selectedDates[0]);
+        const endDate = formatDateKST(selectedDates[1]);
+        loadDoctorChart(startDate, endDate);
+        loadVisitChart(startDate, endDate);
+        loadDiseaseChart(startDate, endDate);
+        loadAgeChart(startDate, endDate);
+        loadGenderChart(startDate, endDate);
+      }
+    }
+  });
+
   window.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     const first = new Date(today.getFullYear(), today.getMonth(), 1);
     const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
     const startDate = formatDateKST(first);
     const endDate = formatDateKST(last);
-
     loadDoctorChart(startDate, endDate);
     loadVisitChart(startDate, endDate);
-
+    loadDiseaseChart(startDate, endDate);
+    loadAgeChart(startDate, endDate);
+    loadGenderChart(startDate, endDate);
     document.getElementById('statsDate')._flatpickr.setDate([startDate, endDate]);
   });
-  
-    // (예시용) 수납 현황 차트
-  initChart('chartPayments', {
-    type:'pie',
-    data:{
-      labels:['카드','현금','기타'],
-      datasets:[{ data:[85,15,4], backgroundColor:['#4e73df','#36b9cc','#f6c23e'] }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      aspectRatio:1,
-      radius:'80%',
-      cutout:'60%',
-      plugins:{ legend:{ position:'right', labels:{ boxWidth:12, boxHeight:12, padding:8, usePointStyle:true, pointStyle:'rect' } } }
-    }
-  });
-
-  // (예시용) 상병코드별 차트
-  initChart('chartByDisease', {
-    type:'bar',
-    data:{
-      labels:['A100','B200','C300','D400','E500','F600','G700','H800','I900','J1000'],
-      datasets:[{ data:[300,250,200,180,160,140,120,100,80,60], backgroundColor:'#4e73df' }]
-    },
-    options:{ indexAxis:'y', responsive:true, plugins:{ legend:{display:false} } }
-  });
 </script>
-
-
 
 </body>
 </html>
