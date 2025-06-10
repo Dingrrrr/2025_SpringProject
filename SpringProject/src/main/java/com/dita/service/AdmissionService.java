@@ -228,12 +228,14 @@ public class AdmissionService {
 
         // ✅ 진단명별
         Map<String, Long> reasonStats = allAdmissions.stream()
-                .map(Admission::getAdmissionReason)
-                .filter(reason -> reason != null && !reason.isBlank())
-                .collect(Collectors.groupingBy(
-                        r -> r,
-                        Collectors.counting()
-                ));
+        	    .map(Admission::getPatient)
+        	    .map(Patient::getPatientSymptom)
+        	    .filter(symptom -> symptom != null && !symptom.isBlank())
+        	    .collect(Collectors.groupingBy(
+        	        s -> s,
+        	        Collectors.counting()
+        	    ));
+
 
         Map<String, Map<String, Long>> result = new HashMap<>();
         result.put("상태별통계", statusStats);
