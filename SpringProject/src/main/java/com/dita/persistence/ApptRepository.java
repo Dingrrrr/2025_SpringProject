@@ -21,6 +21,7 @@ public interface ApptRepository extends JpaRepository<Appt, Integer> {
 	List<Appt> findByStatus(Status status);
 	List<Appt> findAllByStatusAndPatient_PatientTypeIn(Status status, List<PatientType> types);
 	List<Appt> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
+	List<Appt> findByPatient_PatientId(int patientId);
 	Optional<Appt> findByScheduledAtAndPatient_PatientBirth(LocalDateTime date, String patientBirth);
 	
 	
