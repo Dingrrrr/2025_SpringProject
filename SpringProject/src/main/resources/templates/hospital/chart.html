@@ -5,6 +5,10 @@
 <title>진료 관리 화면</title>
 <link rel="stylesheet" href="/css/hospital_style.css">
 <link rel="stylesheet" href="/css/chart_style.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
 	<div class="hospital-container">
@@ -145,10 +149,12 @@
 				<div class="record-prescription">
 					<h4>진단 및 처방</h4>
 
-					<label>진단명: <select name="diseaseId" required>
-							<option th:each="d : ${diseases}" th:value="${d.id}"
-								th:text="${d.name}">진단명</option>
-					</select> <!-- 처방 약 리스트 -->
+					<label>진단명:
+  <!-- 옵션은 Thymeleaf로 이미 꽉 채워져 있다고 가정 -->
+  <select id="diseaseSelect" name="diseaseId" style="width:240px;" required>
+      <option th:each="d : ${diseases}" th:value="${d.id}" th:text="${d.name}"></option>
+  </select>
+</label> <!-- 처방 약 리스트 -->
 						<table class="prescription-table">
 							<thead>
 								<tr>
@@ -225,7 +231,7 @@
     
     <!-- ✅ 메모가 없을 때 대체 문구 -->
     <div th:if="${#lists.isEmpty(recentMedRecs)}" class="memo-entry" style="text-align: center; color: gray;">
-      📭 등록된 메모가 없습니다
+      📭 최근 진료기록이 없어 메모를 작성할 수 없습니다.
     </div>
   </div>
 
@@ -243,16 +249,18 @@
     올리기
   </button>
 </form>
-
-<!-- 📭 메모 대상이 없을 경우 안내 -->
-<div th:if="${latestRecord == null}" style="text-align: center; color: gray;">
-  🛑 최근 진료기록이 없어 메모를 작성할 수 없습니다
-</div>
-</aside>
-
 	</div>
 </body>
 <script>
+$(function(){
+  $('#diseaseSelect').select2({
+    placeholder: '진단명 검색',
+    width: 'resolve',     // 셀렉트 폭 그대로
+    allowClear: true      // (선택) X 버튼으로 초기화
+  });
+});
+
+
   document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get("error");

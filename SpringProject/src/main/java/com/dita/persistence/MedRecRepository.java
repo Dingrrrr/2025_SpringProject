@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.dita.domain.Appt;
 import com.dita.domain.Med_rec;
@@ -26,6 +27,8 @@ public interface MedRecRepository extends JpaRepository<Med_rec, Integer> {
 
 	Med_rec findTopByPatientOrderByCreatedAtDesc(Patient patient);
 
+	
+	
 	// 진료 기록 테이블에서 상병코드별 진료 수를 집계
 	 @Query("SELECT new com.dita.vo.DiseaseStatDto(d.name, COUNT(m.id)) " +
 			          "FROM Med_rec m JOIN m.disease d " +
@@ -73,4 +76,8 @@ public interface MedRecRepository extends JpaRepository<Med_rec, Integer> {
 		// 성별별 진료 수 통계
 		@Query("SELECT p.patientGender, COUNT(m) FROM Med_rec m JOIN m.patient p WHERE m.createdAt BETWEEN :start AND :end GROUP BY p.patientGender")
 		List<Object[]> countByGenderBetween(LocalDateTime start, LocalDateTime end);
-}
+		
+		/** 해당 예약(apptId)에 대해 가장 최근 1건의 Med_rec */
+		Optional<Med_rec> findTopByApptId_ApptIdOrderByCreatedAtDesc(Integer apptId);
+		}
+

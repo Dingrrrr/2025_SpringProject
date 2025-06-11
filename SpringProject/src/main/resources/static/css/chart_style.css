@@ -828,3 +828,57 @@ select {
   vertical-align: middle;
   display: inline-block;
 }
+
+/* ─────────────────────────
+ * 📝 메모지-스타일 메모 카드
+ * ───────────────────────── */
+.memo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;              /* 메모 사이 여백 */
+}
+
+.memo-entry {
+  /* 종이 질감 & 살짝 노란 크림색 */
+  background: #fffbe6;
+  border: 1px solid #f5e1a3;
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,.16);
+  width: 85%;
+  position: relative;
+  transition: transform .15s;
+  overflow: visible;
+}
+
+/* 상단 헤더(작성자·날짜) */
+.memo-header {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #4a4a4a;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 본문 */
+.memo-content {
+  white-space: pre-wrap;
+  line-height: 1.4;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* 포스트-잇 접힌 귀 효과 */
+.memo-entry::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  right: 0.4rem;
+  top: 0.4rem;
+  border-width: 0 14px 14px 0;
+  border-style: solid;
+  border-color: transparent #fff9d0 transparent transparent;
+}
+

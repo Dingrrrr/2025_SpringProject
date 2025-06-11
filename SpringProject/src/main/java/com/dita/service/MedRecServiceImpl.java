@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class MedRecServiceImpl implements MedRecService {
 
+	
     private final PatientController patientController;
     private final PrescriptionRepository prescriptionRepo;
     private final MedRecRepository medRecRepo;
@@ -128,6 +129,13 @@ public class MedRecServiceImpl implements MedRecService {
     @Override
     public Med_rec findLatestRecordByPatient(Patient patient) {
         return medRecRepo.findTopByPatientOrderByCreatedAtDesc(patient);  // ✅ 인자 전달
+    }
+    
+    @Override
+    public Med_rec findLatestRecordByApptId(Integer apptId) {
+        return medRecRepo
+                .findTopByApptId_ApptIdOrderByCreatedAtDesc(apptId)
+                .orElse(null);
     }
 }
 
