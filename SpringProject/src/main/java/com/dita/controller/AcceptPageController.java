@@ -540,13 +540,21 @@ public class AcceptPageController {
 		        Optional<Patient> optionalPatient = repo.findById(patientId);
 		        if (optionalPatient.isPresent()) {
 		            Patient patient = optionalPatient.get();
-		            patient.setPatientType(PatientType.예약);  // 퇴원 → 예약
+
+		            // ① Appt 테이블에서 이 환자의 모든 예약 레코드를 삭제
+		            List<Appt> toDelete = apptRepository.findByPatient_PatientId(patientId);
+		            apptRepository.deleteAll(toDelete);
+
+		            // ② 환자 상태를 '예약'으로 돌려놓아도, 접수현황에는 Appt가 없으니 표시되지 않음
+		            patient.setPatientType(PatientType.예약);
 		            repo.save(patient);
-		            return ResponseEntity.ok("수납 완료");
+
+		            return ResponseEntity.ok("수납 완료 및 접수 기록 삭제됨");
 		        } else {
-		            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("환자 없음");
+		            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("환자를 찾을 수 없습니다.");
 		        }
 		    }
+
 
 		    @GetMapping("/doctorScheduleByWeekday")  // ✅ 이 경로와 결합 → /acceptance/doctorScheduleByWeekday
 		    @ResponseBody
