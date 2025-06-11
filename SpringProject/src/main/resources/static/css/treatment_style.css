@@ -201,3 +201,33 @@
 .card-status.blue   { background-color: #3498db; }  /* 진료중 */
 .card-status.gray   { background-color: #f08080; }  /* 수납 */
 
+
+.patient-info-card{
+  display:flex;
+  flex-wrap:wrap;        /* 태그 많으면 자동 줄바꿈 */
+  gap:6px;               /* 요소 간격 */
+  padding:10px 16px;
+  border:1px solid #ddd;
+  border-radius:6px;
+  background:#fafafa;
+  font-size:1rem;
+  align-items:center;
+}
+
+.patient-info-card strong{
+  margin-right:4px;
+  font-weight:700;
+  color:#222;
+  font-size: 1.05rem;  
+}
+
+/* 노란 태그 */
+.tag.yellow{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:6px;
+  background:#f1c40f;
+  color:#222;
+  font-size:0.9rem;
+  line-height:1.3;
+}
