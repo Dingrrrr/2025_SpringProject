@@ -223,6 +223,7 @@
 		    height:900px;
 		    top: 70px;
 		    left: 10px;
+		    overflow: hidden !important;
 		}
 		
 		/* 접수 칼럼 위치 및 크기 조정 */
@@ -551,6 +552,17 @@
 	  cursor: pointer;
 	}
 	
+	body {
+	  -ms-overflow-style: none;
+	}
+	/* Firefox */
+	body {
+	  scrollbar-width: none;
+	}
+	/* Chrome, Safari, Opera */
+	body::-webkit-scrollbar {
+	  display: none;
+	}
 	
 	
 	
