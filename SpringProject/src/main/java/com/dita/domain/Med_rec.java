@@ -52,7 +52,7 @@ public class Med_rec {
 	private String chiefComplaint;// 증상
 	
 	@ManyToOne
-	@JoinColumn(name = "disease_id", nullable = false)  // 필드명 & 컬럼명 충돌 방지
+	@JoinColumn(name = "id", nullable = false)  // 필드명 & 컬럼명 충돌 방지
 	private Disease disease;
 	
 	@Column(name = "notes")
