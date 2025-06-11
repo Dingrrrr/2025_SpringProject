@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dita.persistence.AppointmentRepository;
+import com.dita.persistence.MedRecRepository;
+import com.dita.vo.DiseaseStatDto;
 import com.dita.vo.DoctorStatsDto;
 
 @Service
@@ -17,6 +19,8 @@ public class StatisticsService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private MedRecRepository medRecRepository;
 
     // 전체 통계
     public List<DoctorStatsDto> getDoctorVisitStats() {
@@ -40,6 +44,39 @@ public class StatisticsService {
             .collect(Collectors.toMap(
                 r -> r[0].toString(),       // 날짜 (String)
                 r -> (Long) r[1]            // 건수
+            ));
+    }
+    
+    public List<DiseaseStatDto> getDiseaseStats(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+
+        return medRecRepository.getDiseaseStats(start, end);
+    }
+    
+    // 연령대별
+    public Map<String, Long> getAgeGroupStats(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        List<Object[]> results = medRecRepository.countByAgeGroupBetween(start, end);
+
+        return results.stream()
+            .collect(Collectors.toMap(
+                r -> r[0].toString(),   // "10대", "20대" 등
+                r -> (Long) r[1]
+            ));
+    }
+
+    // 성별별
+    public Map<String, Long> getGenderStats(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        List<Object[]> results = medRecRepository.countByGenderBetween(start, end);
+
+        return results.stream()
+            .collect(Collectors.toMap(
+                r -> (String) r[0],  // 성별
+                r -> (Long) r[1]     // 건수
             ));
     }
 }
